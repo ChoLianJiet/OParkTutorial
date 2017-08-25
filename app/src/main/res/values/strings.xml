@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">O.Park</string>
+    <string name="app_sign_in">Sign In</string>
+    <string name="app_register">Register</string>
+    <string name="app_username_autocomplete">Username</string>
+    <string name="app_password_edit_text">Password</string>
+    <item name="visible" type="id"/>
+    <item name="masked" type="id"/>
+
+
 </resources>
