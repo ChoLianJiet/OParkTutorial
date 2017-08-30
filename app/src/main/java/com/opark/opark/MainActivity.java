@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     //FACEBOOK ONCREATEVIEW
-
     @Override
     public View onCreateView(
             LayoutInflater inflater,
@@ -64,4 +63,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }
