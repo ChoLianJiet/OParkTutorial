@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "309977752062",
+    "firebase_url": "https://opark-bb73f.firebaseio.com",
+    "project_id": "opark-bb73f",
+    "storage_bucket": "opark-bb73f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309977752062:android:ee343f4715733dd8",
+        "android_client_info": {
+          "package_name": "com.opark.opark"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "309977752062-v5qupscna0qqlm4h2rjiijgt27hu7ojs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1WuePzOn-7qUU0ZWvpVoyYrXPn6PEALs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,26 @@
+[
+    {
+        "outputFile": "C:\\Users\\Yz\\Documents\\ANRDOID_PROJECTS\\OParkTutorial\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-ur\\values-ur.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 105,
+                    "endColumn": 210,
+                    "endOffset": 311
+                },
+                "from": {
+                    "file": "C:\\Users\\Yz\\.android\\build-cache\\e13beeba27c8c9bb897a53276b7529faa31e2c74\\output\\res\\values-ur\\values.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 0,
+                        "startOffset": 285,
+                        "endColumn": 210,
+                        "endOffset": 495
+                    }
+                }
+            }
+        ]
+    }
+]

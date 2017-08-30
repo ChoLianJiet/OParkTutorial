@@ -7,5 +7,10 @@
     <item name="visible" type="id"/>
     <item name="masked" type="id"/>
 
+    <!--//FACEBOOK STRING-->
+    <string name="facebook_app_id">113991652589123</string>
+    <string name="fb_login_protocol_scheme">fb113991652589123</string>
+
+
 
 </resources>
