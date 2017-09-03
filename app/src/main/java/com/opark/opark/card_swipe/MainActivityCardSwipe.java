@@ -1,5 +1,6 @@
 package com.opark.opark.card_swipe;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +10,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckedTextView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -57,6 +60,18 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
 
         initView();
         loadData();
+
+        ImageButton mapButton = (ImageButton) findViewById(R.id.toMapButton);
+
+        mapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(com.opark.opark.card_swipe.MainActivityCardSwipe.this,com.opark.opark.motion_vehicle_tracker.Map.class);
+                startActivity(intent);
+            }
+        });
+
+
     }
 
     private void initView() {
