@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/OParkTutorial.iml" filepath="$PROJECT_DIR$/OParkTutorial.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OParkTutorial - CardSwipe2.iml" filepath="$PROJECT_DIR$/OParkTutorial - CardSwipe2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

@@ -20,13 +20,11 @@ public class MainActivity extends AppCompatActivity {
         pressButtonToSwipeCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(com.opark.opark.MainActivity.this,com.opark.opark.CardSwipeView.CardStackView.class);
+                Intent intent = new Intent(com.opark.opark.MainActivity.this,com.opark.opark.card_swipe.MainActivityCardSwipe.class);
                 finish();
                 startActivity(intent);
             }
         });
     }
-
-    //Comment for github push test
 
 }

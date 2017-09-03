@@ -16,10 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!--this part i duno which activity to put, cuz CardContainerView and CardStackView are FrameLayouts-->
-        <!--if replace <activity></activity> to <framelayout></framelayout>, then can liao, but also cannot run the app-->
-        <!--when press liao button will crash-->
-        <activity android:name="com.opark.opark.CardSwipeView.internal.CardContainerView">
+        <activity android:name="com.opark.opark.card_swipe.MainActivityCardSwipe">
         </activity>
     </application>
 
