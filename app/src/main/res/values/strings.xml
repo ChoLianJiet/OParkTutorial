@@ -10,7 +10,11 @@
     <!--//FACEBOOK STRING-->
     <string name="facebook_app_id">113991652589123</string>
     <string name="fb_login_protocol_scheme">fb113991652589123</string>
-
+    <string name="Opark">Opark</string>
+    <string name="error">Error</string>
+    <string name="success">success</string>
+    <string name="successfully_posted_post">successfully_posted_post</string>
+    <string name="ok">Ok!</string>
 
 
 </resources>
