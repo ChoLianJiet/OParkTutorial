@@ -46,24 +46,24 @@
         android:layout_marginTop="50dp"
         android:text="@string/app_sign_in"/>
 
+
     <Button
         android:id="@+id/register_button"
         android:layout_width="350dp"
         android:layout_height="75dp"
-        android:background="#F26141"
-        android:layout_marginTop="20dp"
         android:layout_marginBottom="75dp"
-        android:text="@string/app_register"/>
-
-
+        android:layout_marginTop="20dp"
+        android:background="#F26141"
+        android:text="@string/app_register" />
 
     <com.facebook.login.widget.LoginButton
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="30dp"
         android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp" />
+        android:layout_weight="0.12" />
 
 </LinearLayout>
 
