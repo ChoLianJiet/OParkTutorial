@@ -1,11 +1,11 @@
 package com.opark.opark;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
@@ -14,7 +14,6 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.LoggingBehavior;
-import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -29,20 +28,22 @@ import com.google.firebase.auth.FirebaseUser;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class MainActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
 
- 
+
     private FirebaseAuth mAuth;
     // UI references.
 
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText mPasswordView;
     private CallbackManager callbackManager;
     LoginButton loginButton;
+    private Button registerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mAuth = FirebaseAuth.getInstance();
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.email_login_autocompletetextview) ;
+        mPasswordView = (EditText) findViewById(R.id.password_edit_text) ;
+        registerButton = (Button) findViewById(R.id.register_button);
+
+
+
+        // attempt login
+        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                    attemptLogin();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                registerNewUser(v);
+            }
+        });
+
 
 
         //FACEBOOK LOGIN BUTTON
@@ -88,10 +116,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        // Other app specific specialization
+        // FACEBOOK CALLBACK MANAGER
         callbackManager = CallbackManager.Factory.create();
-
-
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
                     @Override
@@ -103,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-
                     @Override
                     public void onCancel() {
                         // App code
@@ -111,12 +136,11 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(FacebookException exception) {
-                        Toast.makeText(MainActivity.this, "Error in register callback : " + exception.toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this, "Error in register callback : " + exception.toString(), Toast.LENGTH_LONG).show();
                     }
                 });
 
     }
-
 
 
 
@@ -157,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("facebook token", "signInWithCredential:failure", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
@@ -170,7 +194,60 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+    // Executed when Register button pressed
+    public void registerNewUser(View v) {
+        Intent intent = new Intent(this, com.opark.opark.RegisterActivity.class);
+        finish();
+        startActivity(intent);
     }
+
+
+// Attempt Login Method
+    private void attemptLogin() {
+        String email = mEmailView.getText().toString();
+        String password = mPasswordView.getText().toString();
+
+        if (email.equals("")|| password.equals(""))
+        {
+            return;
+        }
+
+        Toast.makeText(this,"Login you to Opark !",Toast.LENGTH_SHORT).show();
+        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                Log.d ("OparkLogin", "Log in successfull ? " + task.isSuccessful() );
+
+                if (!task.isSuccessful()){
+                    Log.d("OparkLogin", "Problem signing in : " + task.getException());
+                    showErrorDialog("Problem signing you in. Try again maybe ? ");
+                }
+                else {
+//                    Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+//                    finish();
+//                    startActivity(intent);
+                }
+            }
+        });
+
+
+    }
+
+
+
+// AlertDialog
+
+
+    private void showErrorDialog(String message) {
+        new AlertDialog.Builder(this)
+                .setTitle("Oops")
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok,null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+}
 
 
 
