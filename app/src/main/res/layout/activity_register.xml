@@ -10,24 +10,7 @@
     tools:context="com.opark.opark.RegisterActivity">
 
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <AutoCompleteTextView
-            android:id="@+id/name_register"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/name_registration"
-            android:imeOptions="actionNext"
-            android:inputType="textEmailAddress"
-            android:maxLines="1"
-            android:textColor="@color/white"
-            android:textColorHint="@color/white"
-            android:textIsSelectable="false"
-            android:textSize="18sp" />
-    </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"

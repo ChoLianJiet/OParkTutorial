@@ -4,19 +4,13 @@
     <string name="app_register">Register</string>
     <string name="app_username_autocomplete">Username</string>
     <string name="app_password_edit_text">Password</string>
-    <item name="visible" type="id" />
-    <item name="masked" type="id" />
-
-
+    <item name="visible" type="id"/>
+    <item name="masked" type="id"/>
 
 
     <!--//FACEBOOK STRING-->
     <string name="facebook_app_id">113991652589123</string>
     <string name="fb_login_protocol_scheme">fb113991652589123</string>
-
-
-
-
 
 
     <string name="error">Error</string>
@@ -30,6 +24,9 @@
     <string name="email_registration">Email</string>
     <string name="confirm_password_text">Confirm Password</string>
     <string name="name_registration">Name</string>
+    <string name="name_and_number_text">Name and Number</string>
+    <string name="your_car_text">Your Car</string>
+    <string name="address_text">Your Address</string>
 
 
 </resources>

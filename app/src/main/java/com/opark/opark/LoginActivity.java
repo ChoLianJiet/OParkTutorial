@@ -125,6 +125,9 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), loginResult.toString(), Toast.LENGTH_LONG).show();
                         Log.d("facebook login", "facebook:onSuccess:" + loginResult);
                         handleFacebookAccessToken(loginResult.getAccessToken());
+                        Intent intent = new Intent(LoginActivity.this, UserProfileSetup.class);
+                        finish();
+                        startActivity(intent);
 
                     }
 
@@ -222,11 +225,13 @@ public class LoginActivity extends AppCompatActivity {
                 if (!task.isSuccessful()){
                     Log.d("OparkLogin", "Problem signing in : " + task.getException());
                     showErrorDialog("Problem signing you in. Try again maybe ? ");
+
+
                 }
                 else {
-//                    Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-//                    finish();
-//                    startActivity(intent);
+                    Intent intent = new Intent(LoginActivity.this, UserProfileSetup.class);
+                    finish();
+                    startActivity(intent);
                 }
             }
         });
