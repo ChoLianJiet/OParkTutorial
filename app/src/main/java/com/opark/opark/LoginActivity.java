@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
             FacebookSdk.setIsDebugEnabled(true);
             FacebookSdk.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
         }
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email_login_autocompletetextview) ;
@@ -194,7 +194,11 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
+    // Executed when Sign in button pressed
+    public void signInRegisteredUser(View v)   {
+        attemptLogin();
 
+    }
 
 
 

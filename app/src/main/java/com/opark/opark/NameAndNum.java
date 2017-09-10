@@ -10,6 +10,9 @@ class NameAndNum {
         public String lastName;
         public String phoneNum;
 
+public NameAndNum(){
+
+}
 
         public NameAndNum(String firstName, String lastName, String phoneNum){
             this.firstName = firstName;

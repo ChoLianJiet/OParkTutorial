@@ -10,6 +10,9 @@ public class Car {
     public String carModel;
     public String carPlate;
 
+    public Car(){
+
+    }
 
     public Car (String carColour, String carBrand, String carModel, String carPlate){
        this.carBrand = carBrand;

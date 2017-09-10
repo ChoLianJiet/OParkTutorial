@@ -27,6 +27,18 @@
     <string name="name_and_number_text">Name and Number</string>
     <string name="your_car_text">Your Car</string>
     <string name="address_text">Your Address</string>
+    <string name="first_name_string">First Name</string>
+    <string name="last_name_string">Last Name</string>
+    <string name="contact_number_string">Contact Number</string>
+    <string name="car_brand_string">Car Brand</string>
+    <string name="car_colour_string">Car Colour</string>
+    <string name="line_2_address_string">Line 2 Address</string>
+    <string name="line_1_address_string">Line 1 Address</string>
+    <string name="city_string">City</string>
+    <string name="postcode_string">Postcode</string>
+    <string name="state_county_string">State / County</string>
+    <string name="profile_submit">Submit</string>
+    <string name="car_plate_string">Car Plate</string>
 
 
 </resources>
