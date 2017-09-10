@@ -4,7 +4,7 @@ package com.opark.opark;
  * Created by Yz on 09-Sep-17.
  */
 
-class NameAndNum {
+public class NameAndNum {
 
         public String firstName;
         public String lastName;
