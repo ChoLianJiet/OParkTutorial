@@ -1,5 +1,6 @@
 package com.opark.opark;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -255,6 +256,9 @@ public class UserProfileSetup extends AppCompatActivity {
                 collectCar();
                 collectAddress();
                 //TODO add in all other methods to package it as a JSON
+                Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
+                finish();
+                startActivity(intent);
             }
         });
 
