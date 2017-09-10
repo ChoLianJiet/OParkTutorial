@@ -6,21 +6,21 @@ package com.opark.opark;
 
 public class User {
 
-    public NameAndNum userName;
-    public Address userAddress;
-    public Car userCar;
-    public String phoneNum;
+    public NameAndNum userName = new NameAndNum();
+    public Address userAddress = new Address();
+    public Car userCar = new Car();
+
 
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(NameAndNum userName, Address userAddress, Car userCar, String phoneNum   ) {
+    public User(NameAndNum userName, Address userAddress, Car userCar  ) {
         this.userName = userName;
         this.userAddress = userAddress;
         this.userCar = userCar;
-        this.phoneNum = phoneNum;
+
     }
 
 

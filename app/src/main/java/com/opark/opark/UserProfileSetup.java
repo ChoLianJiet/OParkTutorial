@@ -159,21 +159,7 @@ public class UserProfileSetup extends AppCompatActivity {
 
 
 
-     //TODO solve Bug   /****************BUG CODE HERE ******************/
-        /**take away the comment lines and use the getTextToString within OnCreate will result in a crash**/
-
-//        user.userName.firstName = firstName.getText().toString();
-//        user.userName.lastName = lastName.getText().toString();
-//        user.userName.phoneNum = phoneNum.getText().toString();
-//        user.userCar.carColour = carColour.getText().toString();
-//        user.userCar.carBrand = carBrand.getText().toString();
-//        user.userCar.carModel = carModel.getText().toString();
-//        user.userCar.carPlate = carPlate.getText().toString();
-//        user.userAddress.firstline = firstLine.getText().toString();
-//        user.userAddress.secondline = secondLine.getText().toString();
-//        user.userAddress.city = city.getText().toString();
-//        user.userAddress.postcode = postcode.getText().toString();
-//        user.userAddress.countryState = countryState.getText().toString();
+ 
 
 
 
@@ -248,7 +234,7 @@ public class UserProfileSetup extends AppCompatActivity {
             }
         });
 
-//TODO solve Bug /****AS LONG AS THIS BUTTON IS CLICKED APP CRASHES****/
+
         profileSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -288,6 +274,14 @@ public class UserProfileSetup extends AppCompatActivity {
         user.userAddress.countryState = countryState.getText().toString();
     }
 
+
+    // On Back Pressed
+    @Override
+    public void onBackPressed() {
+        finish();
+        Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
+        startActivity(intent);
+    }
 
 
 }
