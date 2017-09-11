@@ -24,6 +24,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.gson.Gson;
 
 import android.os.Bundle;
 import android.util.Base64;
@@ -233,7 +234,12 @@ public class LoginActivity extends AppCompatActivity {
 
                 }
                 else {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    String userObjtoJson = new Gson().toJson(user);
+                    //TODO check if user.getDisplayName() returns null, if yes direct to profile setup
+                    //if not direct to main page
                     Intent intent = new Intent(LoginActivity.this, UserProfileSetup.class);
+                    intent.putExtra("firesbaseUser",userObjtoJson);
                     finish();
                     startActivity(intent);
                 }
