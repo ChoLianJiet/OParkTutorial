@@ -56,7 +56,7 @@ public class UserProfileSetup extends AppCompatActivity {
 
 
     private User user = new User(); // Changed User from static to non static
-    FirebaseUser firebaseUser;
+    String firebaseUserUID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +65,7 @@ public class UserProfileSetup extends AppCompatActivity {
 
         // Retrieve FirebaseUser object via intent string extra
         // String is converted into FirebaseUser object via Gson
-        firebaseUser = new Gson().fromJson(getIntent().getStringExtra("firebaseUser"), FirebaseUser.class);
-        Log.i("Hello", firebaseUser.toString());
+        firebaseUserUID = getIntent().getStringExtra("firebaseUser");
 
         // LINKING VARIABLES TO RESPECTIVE IDs
         firstName = (EditText) findViewById(R.id.edittext_first_name);
@@ -264,7 +263,7 @@ public class UserProfileSetup extends AppCompatActivity {
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference storageRef = storage.getReference();
 
-                StorageReference userFolder = storageRef.child("users/" + firebaseUser.getUid() + "/profile.txt");
+                StorageReference userFolder = storageRef.child("users/" + firebaseUserUID + "/profile.txt");
                 objToByteStreamUpload(user, userFolder);
 
                 //TODO add in all other methods to package it as a JSON

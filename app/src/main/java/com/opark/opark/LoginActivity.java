@@ -66,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email_login_autocompletetextview) ;
         mPasswordView = (EditText) findViewById(R.id.password_edit_text) ;
         registerButton = (Button) findViewById(R.id.register_button);
@@ -125,8 +126,12 @@ public class LoginActivity extends AppCompatActivity {
                     public void onSuccess(LoginResult loginResult) {
                         Toast.makeText(getApplicationContext(), loginResult.toString(), Toast.LENGTH_LONG).show();
                         Log.d("facebook login", "facebook:onSuccess:" + loginResult);
+
                         handleFacebookAccessToken(loginResult.getAccessToken());
                         Intent intent = new Intent(LoginActivity.this, UserProfileSetup.class);
+                        String userUID = mAuth.getCurrentUser().getUid();
+                        intent.putExtra("firebaseUser",userUID);
+
                         finish();
                         startActivity(intent);
 
@@ -234,12 +239,11 @@ public class LoginActivity extends AppCompatActivity {
 
                 }
                 else {
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    String userObjtoJson = new Gson().toJson(user);
+                    String userUID = mAuth.getCurrentUser().getUid();
                     //TODO check if user.getDisplayName() returns null, if yes direct to profile setup
                     //if not direct to main page
                     Intent intent = new Intent(LoginActivity.this, UserProfileSetup.class);
-                    intent.putExtra("firesbaseUser",userObjtoJson);
+                    intent.putExtra("firebaseUser",userUID);
                     finish();
                     startActivity(intent);
                 }

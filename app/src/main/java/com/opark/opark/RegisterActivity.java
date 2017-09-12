@@ -60,8 +60,6 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
-
-
     // Executed when Sign Up button is pressed.
     public void signUp(View v) {
         attemptRegistration();
@@ -111,8 +109,6 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
-
-
     private boolean isEmailValid(String email) {
         // You can add more checking logic here.
         return email.contains("@");
@@ -123,8 +119,6 @@ public class RegisterActivity extends AppCompatActivity {
         String confirmPassword = mConfirmPasswordView.getText().toString();
         return confirmPassword.equals(password) && password.length() > 4;
     }
-
-
 
 
     // Firebase User creation
@@ -149,7 +143,6 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
-
 
 
 // On Back Pressed
