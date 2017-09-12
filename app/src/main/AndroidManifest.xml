@@ -2,10 +2,38 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.opark.opark">
 
+    <!-- Uses permission -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.LOCATION_HARDWARE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.LOCATION_HARDWARE"/>
+
+    <!-- FACEBOOK META DATA ELEMENT -->
+    <meta-data
+        android:name="com.facebook.sdk.ApplicationId"
+        android:value="@string/facebook_app_id"/>
+
+    <!--GOOGLE LOCATION SERVICE META DATA-->
+    <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="@string/map_api_key"/>
+
+    <activity
+        android:name="com.facebook.FacebookActivity"
+        android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+        android:label="Opark"/>
+    <activity
+        android:name="com.facebook.CustomTabActivity"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW"/>
+
+            <category android:name="android.intent.category.DEFAULT"/>
+            <category android:name="android.intent.category.BROWSABLE"/>
+
+            <data android:scheme="@string/fb_login_protocol_scheme"/>
+        </intent-filter>
+    </activity>
 
     <application
         android:allowBackup="true"
@@ -15,11 +43,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/map_api_key"/>
-
-        <activity android:name=".MainActivity">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -29,6 +53,9 @@
         <activity android:name="com.opark.opark.card_swipe.MainActivityCardSwipe">
         </activity>
         <activity android:name="com.opark.opark.motion_vehicle_tracker.Map">
+        </activity>
+        <activity android:name=".RegisterActivity"/>
+        <activity android:name=".UserProfileSetup">
         </activity>
     </application>
 
