@@ -326,6 +326,7 @@ public class UserProfileSetup extends AppCompatActivity {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(getApplicationContext(), "Profile update successful!", Toast.LENGTH_LONG).show();
+                Log.i("Hello", "Profile update successful!");
                 // Use analytics to calculate the success rate
             }
         });

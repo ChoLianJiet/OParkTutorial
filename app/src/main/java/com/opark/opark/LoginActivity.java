@@ -235,15 +235,11 @@ public class LoginActivity extends AppCompatActivity {
                 if (!task.isSuccessful()){
                     Log.d("OparkLogin", "Problem signing in : " + task.getException());
                     showErrorDialog("Problem signing you in. Try again maybe ? ");
-
-
                 }
                 else {
-                    String userUID = mAuth.getCurrentUser().getUid();
-                    //TODO check if user.getDisplayName() returns null, if yes direct to profile setup
-                    //if not direct to main page
+                    String firebaseUserUID = mAuth.getCurrentUser().getUid();
                     Intent intent = new Intent(LoginActivity.this, UserProfileSetup.class);
-                    intent.putExtra("firebaseUser",userUID);
+                    intent.putExtra("firebaseUser",firebaseUserUID);
                     finish();
                     startActivity(intent);
                 }
