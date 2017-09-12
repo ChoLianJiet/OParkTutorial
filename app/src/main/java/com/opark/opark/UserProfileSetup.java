@@ -1,14 +1,30 @@
 package com.opark.opark;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 public class UserProfileSetup extends AppCompatActivity {
 
@@ -39,14 +55,18 @@ public class UserProfileSetup extends AppCompatActivity {
     private Button profileSubmit;
 
 
-    private static  User user = new User();
+    private User user = new User(); // Changed User from static to non static
+    FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile_setup);
 
-
+        // Retrieve FirebaseUser object via intent string extra
+        // String is converted into FirebaseUser object via Gson
+        firebaseUser = new Gson().fromJson(getIntent().getStringExtra("firebaseUser"), FirebaseUser.class);
+        Log.i("Hello", firebaseUser.toString());
 
         // LINKING VARIABLES TO RESPECTIVE IDs
         firstName = (EditText) findViewById(R.id.edittext_first_name);
@@ -241,6 +261,12 @@ public class UserProfileSetup extends AppCompatActivity {
                 collectUserName();
                 collectCar();
                 collectAddress();
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageRef = storage.getReference();
+
+                StorageReference userFolder = storageRef.child("users/" + firebaseUser.getUid() + "/profile.txt");
+                objToByteStreamUpload(user, userFolder);
+
                 //TODO add in all other methods to package it as a JSON
                 Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
                 finish();
@@ -282,6 +308,39 @@ public class UserProfileSetup extends AppCompatActivity {
         Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
         startActivity(intent);
     }
+
+    public void objToByteStreamUpload(Object obj, StorageReference destination){
+
+        String objStr = new Gson().toJson(obj);
+        InputStream in = new ByteArrayInputStream(objStr.getBytes( Charset.forName("UTF-8")));
+        UploadTask uploadTask = destination.putStream(in);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                showErrorDialog("Failed to update your profile. Try again maybe? ");
+                // Use analytics to find out why is the error
+                // then only implement the best corresponding measures
+
+
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(getApplicationContext(), "Profile update successful!", Toast.LENGTH_LONG).show();
+                // Use analytics to calculate the success rate
+            }
+        });
+    }
+
+    private void showErrorDialog(String message) {
+        new AlertDialog.Builder(this)
+                .setTitle("Oops")
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok,null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
 
 
 }
