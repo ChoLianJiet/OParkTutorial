@@ -77,130 +77,27 @@ public class UserProfileSetup extends AppCompatActivity {
         firebaseUserUID = getIntent().getStringExtra("firebaseUser");
 
         // LINKING VARIABLES TO RESPECTIVE IDs
-
         bindViews();
 
         //Provided by Library but haven't test if useful or not
-        expandableFirstName.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandableLastName.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandablePhoneNum.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandableCarColour.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandableCarBrand.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandableCarModel.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandableCarPlate.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandableFirstLineAddress.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandableSecondLineAddress.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandableCity.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandablePostcode.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandableCountryState.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-
-
+        expandableListener();
 
         /**EXPANDING LAYOUT**/
         //Expand Name and Num layout
         buttonExpandNameNumLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                expandableFirstName.expand();
-                expandableLastName.expand();
-                expandablePhoneNum.expand();
 
-                expandableCarColour.collapse();
-                expandableCarBrand.collapse();
-                expandableCarPlate.collapse();
-                expandableCarModel.collapse();
-
-                expandableFirstLineAddress.collapse();
-                expandableSecondLineAddress.collapse();
-                expandableCity.collapse();
-                expandablePostcode.collapse();
-                expandableCountryState.collapse();
-
-
+                nameNumExpand();
             }
         });
-
-
 
 // Expand Address Layout
         buttonExpandAddressLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                expandableFirstName.collapse();
-                expandableLastName.collapse();
-                expandablePhoneNum.collapse();
 
-                expandableCarColour.collapse();
-                expandableCarBrand.collapse();
-                expandableCarPlate.collapse();
-                expandableCarModel.collapse();
-
-                expandableFirstLineAddress.expand();
-                expandableSecondLineAddress.expand();
-                expandableCity.expand();
-                expandablePostcode.expand();
-                expandableCountryState.expand();
-
+               addressExpand();
             }
         });
 
@@ -208,25 +105,12 @@ public class UserProfileSetup extends AppCompatActivity {
         buttonExpandCarLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                expandableFirstName.collapse();
-                expandableLastName.collapse();
-                expandablePhoneNum.collapse();
 
-                expandableCarColour.expand();
-                expandableCarBrand.expand();
-                expandableCarPlate.expand();
-                expandableCarModel.expand();
-
-                expandableFirstLineAddress.collapse();
-                expandableSecondLineAddress.collapse();
-                expandableCity.collapse();
-                expandablePostcode.collapse();
-                expandableCountryState.collapse();
-
-
+               carExpand();
             }
         });
 
+        
         buttonSignOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -359,6 +243,135 @@ public class UserProfileSetup extends AppCompatActivity {
         expandableCountryState = (ExpandableLayout) findViewById(R.id.expand_countryState_address);
         profileSubmit = (Button) findViewById(R.id.profile_submit_button) ;
         buttonSignOut = (Button) findViewById(R.id.not_you_sign_out_button);
+    }
+
+    private void expandableListener(){
+
+        expandableFirstName.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+        expandableLastName.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+        expandablePhoneNum.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+        expandableCarColour.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+        expandableCarBrand.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+        expandableCarModel.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+        expandableCarPlate.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+        expandableFirstLineAddress.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+        expandableSecondLineAddress.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+        expandableCity.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+        expandablePostcode.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+        expandableCountryState.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+            @Override
+            public void onExpansionUpdate(float expansionFraction, int state) {
+
+            }
+        });
+
+    }
+
+    private void nameNumExpand(){
+        expandableFirstName.expand();
+        expandableLastName.expand();
+        expandablePhoneNum.expand();
+
+        expandableCarColour.collapse();
+        expandableCarBrand.collapse();
+        expandableCarPlate.collapse();
+        expandableCarModel.collapse();
+
+        expandableFirstLineAddress.collapse();
+        expandableSecondLineAddress.collapse();
+        expandableCity.collapse();
+        expandablePostcode.collapse();
+        expandableCountryState.collapse();
+    }
+
+    private void addressExpand(){
+        expandableFirstName.collapse();
+        expandableLastName.collapse();
+        expandablePhoneNum.collapse();
+
+        expandableCarColour.collapse();
+        expandableCarBrand.collapse();
+        expandableCarPlate.collapse();
+        expandableCarModel.collapse();
+
+        expandableFirstLineAddress.expand();
+        expandableSecondLineAddress.expand();
+        expandableCity.expand();
+        expandablePostcode.expand();
+        expandableCountryState.expand();
+
+    }
+
+    private void carExpand(){
+        expandableFirstName.collapse();
+        expandableLastName.collapse();
+        expandablePhoneNum.collapse();
+
+        expandableCarColour.expand();
+        expandableCarBrand.expand();
+        expandableCarPlate.expand();
+        expandableCarModel.expand();
+
+        expandableFirstLineAddress.collapse();
+        expandableSecondLineAddress.collapse();
+        expandableCity.collapse();
+        expandablePostcode.collapse();
+        expandableCountryState.collapse();
     }
 
 }
