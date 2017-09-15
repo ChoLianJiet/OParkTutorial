@@ -13,6 +13,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.storage.FirebaseStorage;
@@ -53,6 +56,12 @@ public class UserProfileSetup extends AppCompatActivity {
     private EditText postcode ;
     private EditText countryState;
     private Button profileSubmit;
+    private Button buttonExpandAddressLayout;
+    private Button buttonExpandNameNumLayout;
+    private Button buttonExpandCarLayout;
+    private Button buttonSignOut;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
 
     private User user = new User(); // Changed User from static to non static
@@ -68,43 +77,13 @@ public class UserProfileSetup extends AppCompatActivity {
         firebaseUserUID = getIntent().getStringExtra("firebaseUser");
 
         // LINKING VARIABLES TO RESPECTIVE IDs
-        firstName = (EditText) findViewById(R.id.edittext_first_name);
-        lastName = (EditText) findViewById(R.id.edittext_last_name);
-        phoneNum = (EditText) findViewById(R.id.edittext_phone_num);
-        carColour = (EditText) findViewById(R.id.edittext_car_colour);
-        carBrand = (EditText) findViewById(R.id.edittext_car_brand);
-        carModel = (EditText) findViewById(R.id.edittext_car_model);
-        carPlate = (EditText) findViewById(R.id.edittext_car_plate);
-        firstLine = (EditText) findViewById(R.id.edittext_first_line);
-        secondLine = (EditText) findViewById(R.id.edittext_second_line);
-        city = (EditText) findViewById(R.id.edittext_city);
-        postcode = (EditText) findViewById(R.id.edittext_postcode);
-        countryState = (EditText) findViewById(R.id.edittext_state);
-        Button buttonExpandAddressLayout = (Button) findViewById(R.id.expand_address_button);
-        Button buttonExpandNameNumLayout = (Button) findViewById(R.id.expand_name_button);
-        Button buttonExpandCarLayout = (Button) findViewById(R.id.expand_car_button);
-        expandableFirstName = (ExpandableLayout) findViewById(R.id.expand_first_name);
-        expandableLastName = (ExpandableLayout) findViewById(R.id.expand_last_name);
-        expandablePhoneNum = (ExpandableLayout) findViewById(R.id.expand_phone_number);
-        expandableCarColour =(ExpandableLayout) findViewById(R.id.expand_car_colour);
-        expandableCarBrand = (ExpandableLayout) findViewById(R.id.expand_car_brand);
-        expandableCarModel = (ExpandableLayout) findViewById(R.id.expand_car_model);
-        expandableCarPlate = (ExpandableLayout) findViewById(R.id.expand_car_plate);
-        expandableFirstLineAddress = (ExpandableLayout) findViewById(R.id.expand_firstline_address);
-        expandableSecondLineAddress = (ExpandableLayout) findViewById(R.id.expand_secondline_address);
-        expandableCity = (ExpandableLayout) findViewById(R.id.expand_city_address);
-        expandablePostcode = (ExpandableLayout) findViewById(R.id.expand_postcode_address);
-        expandableCountryState = (ExpandableLayout) findViewById(R.id.expand_countryState_address);
-        profileSubmit = (Button) findViewById(R.id.profile_submit_button) ;
 
+        bindViews();
 
         //Provided by Library but haven't test if useful or not
         expandableFirstName.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
             @Override
             public void onExpansionUpdate(float expansionFraction, int state) {
-
-//                user.userName.firstName = firstName.getText().toString();
-                Log.d("ExpansionListener","userName state:" + state );
 
             }
         });
@@ -174,11 +153,6 @@ public class UserProfileSetup extends AppCompatActivity {
 
             }
         });
-
-
-
-
- 
 
 
 
@@ -253,6 +227,19 @@ public class UserProfileSetup extends AppCompatActivity {
             }
         });
 
+        buttonSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.d("signout", "signoutbutton Clicked");
+                mAuth = FirebaseAuth.getInstance();
+                mAuth.signOut();
+                Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
+                finish();
+                startActivity(intent);
+                    }
+                });
+
 
         profileSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -266,7 +253,7 @@ public class UserProfileSetup extends AppCompatActivity {
                 StorageReference userFolder = storageRef.child("users/" + firebaseUserUID + "/profile.txt");
                 objToByteStreamUpload(user, userFolder);
 
-                //TODO add in all other methods to package it as a JSON
+                //TODO intent to card swipe or other page ? maybe upload prof pic ?
                 Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
                 finish();
                 startActivity(intent);
@@ -341,6 +328,37 @@ public class UserProfileSetup extends AppCompatActivity {
                 .show();
     }
 
+    private void bindViews(){
 
+        firstName = (EditText) findViewById(R.id.edittext_first_name);
+        lastName = (EditText) findViewById(R.id.edittext_last_name);
+        phoneNum = (EditText) findViewById(R.id.edittext_phone_num);
+        carColour = (EditText) findViewById(R.id.edittext_car_colour);
+        carBrand = (EditText) findViewById(R.id.edittext_car_brand);
+        carModel = (EditText) findViewById(R.id.edittext_car_model);
+        carPlate = (EditText) findViewById(R.id.edittext_car_plate);
+        firstLine = (EditText) findViewById(R.id.edittext_first_line);
+        secondLine = (EditText) findViewById(R.id.edittext_second_line);
+        city = (EditText) findViewById(R.id.edittext_city);
+        postcode = (EditText) findViewById(R.id.edittext_postcode);
+        countryState = (EditText) findViewById(R.id.edittext_state);
+         buttonExpandAddressLayout = (Button) findViewById(R.id.expand_address_button);
+         buttonExpandNameNumLayout = (Button) findViewById(R.id.expand_name_button);
+         buttonExpandCarLayout = (Button) findViewById(R.id.expand_car_button);
+        expandableFirstName = (ExpandableLayout) findViewById(R.id.expand_first_name);
+        expandableLastName = (ExpandableLayout) findViewById(R.id.expand_last_name);
+        expandablePhoneNum = (ExpandableLayout) findViewById(R.id.expand_phone_number);
+        expandableCarColour =(ExpandableLayout) findViewById(R.id.expand_car_colour);
+        expandableCarBrand = (ExpandableLayout) findViewById(R.id.expand_car_brand);
+        expandableCarModel = (ExpandableLayout) findViewById(R.id.expand_car_model);
+        expandableCarPlate = (ExpandableLayout) findViewById(R.id.expand_car_plate);
+        expandableFirstLineAddress = (ExpandableLayout) findViewById(R.id.expand_firstline_address);
+        expandableSecondLineAddress = (ExpandableLayout) findViewById(R.id.expand_secondline_address);
+        expandableCity = (ExpandableLayout) findViewById(R.id.expand_city_address);
+        expandablePostcode = (ExpandableLayout) findViewById(R.id.expand_postcode_address);
+        expandableCountryState = (ExpandableLayout) findViewById(R.id.expand_countryState_address);
+        profileSubmit = (Button) findViewById(R.id.profile_submit_button) ;
+        buttonSignOut = (Button) findViewById(R.id.not_you_sign_out_button);
+    }
 
 }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
@@ -18,12 +19,16 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 
 import android.os.Bundle;
@@ -53,6 +58,7 @@ public class LoginActivity extends AppCompatActivity {
     private CallbackManager callbackManager;
     LoginButton loginButton;
     private Button registerButton;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +72,23 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+
+        mAuthListener = new FirebaseAuth.AuthStateListener(){
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user!=null){
+                    System.out.println("User logged in");
+                }
+                else{
+                    System.out.println("User not logged in");
+                }
+            }
+        };
+
+
+
+
 
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email_login_autocompletetextview) ;
         mPasswordView = (EditText) findViewById(R.id.password_edit_text) ;
@@ -128,13 +151,8 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d("facebook login", "facebook:onSuccess:" + loginResult);
 
                         handleFacebookAccessToken(loginResult.getAccessToken());
-                        Intent intent = new Intent(LoginActivity.this, UserProfileSetup.class);
-                        String userUID = mAuth.getCurrentUser().getUid();
-                        intent.putExtra("firebaseUser",userUID);
-
-                        finish();
-                        startActivity(intent);
-
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        updateUI(user);
                     }
 
 
@@ -165,12 +183,48 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        mAuth.addAuthStateListener(mAuthListener);
+
         updateUI(currentUser);
     }
 
 
 
     private void updateUI(FirebaseUser currentUser) {
+
+        if (currentUser != null) {
+
+            String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
+            storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    // file exists
+                    Log.d("login","user logged in");
+                    Log.d("urlget", "uri: " + uri.toString());
+                    Toast.makeText(LoginActivity.this, "Log in Successful! :D ",
+                            Toast.LENGTH_SHORT).show();
+
+                    //TODO Add Intent to Card Swipe onSuccess
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    //file not found
+                    String firebaseUserUID = mAuth.getCurrentUser().getUid();
+                    Log.d("urlget","New User, No profile");
+                    Intent intent = new Intent(LoginActivity.this, UserProfileSetup.class);
+                    intent.putExtra("firebaseUser",firebaseUserUID);
+                    finish();
+                    startActivity(intent);
+                }
+            });}
+         else {
+            // No user is signed in
+            Log.d("login","no user");
+            return;
+        }
     }
 
 
@@ -237,11 +291,10 @@ public class LoginActivity extends AppCompatActivity {
                     showErrorDialog("Problem signing you in. Try again maybe ? ");
                 }
                 else {
-                    String firebaseUserUID = mAuth.getCurrentUser().getUid();
-                    Intent intent = new Intent(LoginActivity.this, UserProfileSetup.class);
-                    intent.putExtra("firebaseUser",firebaseUserUID);
-                    finish();
-                    startActivity(intent);
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
+
+                    updateUI(currentUser);
+
                 }
             }
         });

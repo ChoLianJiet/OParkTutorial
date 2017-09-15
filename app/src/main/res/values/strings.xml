@@ -39,6 +39,7 @@
     <string name="state_county_string">State / County</string>
     <string name="profile_submit">Submit</string>
     <string name="car_plate_string">Car Plate</string>
+    <string name="notyousignout">Sign out</string>
 
 
 </resources>
