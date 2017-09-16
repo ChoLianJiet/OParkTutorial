@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import static android.R.attr.type;
+
 
 public class MainActivityCardSwipe extends AppCompatActivity implements com.opark.opark.card_swipe.internal.SwipeFlingAdapterView.onFlingListener,
         com.opark.opark.card_swipe.internal.SwipeFlingAdapterView.OnItemClickListener, View.OnClickListener {
@@ -36,6 +38,15 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
             R.drawable.i6
     };
 
+    int [] carIcons = {
+            R.drawable.c1,
+            R.drawable.c2,
+            R.drawable.c3,
+            R.drawable.c4,
+            R.drawable.c5,
+            R.drawable.c6
+    };
+
     String[] names = {"张三","李四","王五","小明","小红","小花"};
 
     String[] citys = {"北京", "上海", "广州", "深圳"};
@@ -43,6 +54,10 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
     String[] edus = {"大专", "本科", "硕士", "博士"};
 
     String[] years = {"1年", "2年", "3年", "4年", "5年"};
+
+    String[] distance = {"10","20","30","40","50","60"};
+
+    String[] typeOfCar = {"Nissan Almera","Proton Saga","Perodua Bezza","Toyota Hilux","Ford Fiesta","Mercedez Benz"};
 
     Random ran = new Random();
 
@@ -153,10 +168,13 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
                 for (int i = 0; i < 10; i++) {
                     talent = new Talent();
                     talent.headerIcon = headerIcons[i % headerIcons.length];
+                    talent.carIcon = carIcons[i % carIcons.length];
                     talent.nickname = names[ran.nextInt(names.length-1)];
                     talent.cityName = citys[ran.nextInt(citys.length-1)];
                     talent.educationName = edus[ran.nextInt(edus.length-1)];
                     talent.workYearName = years[ran.nextInt(years.length-1)];
+                    talent.distanceName = distance[ran.nextInt(distance.length-1)];
+                    talent.typeOfCarName = typeOfCar[ran.nextInt(typeOfCar.length-1)];
                     list.add(talent);
                 }
                 return list;
@@ -234,6 +252,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
                 holder.portraitView = (ImageView) convertView.findViewById(R.id.portrait);
                 //holder.portraitView.getLayoutParams().width = cardWidth;
                 holder.portraitView.getLayoutParams().height = cardHeight;
+                holder.carView = (ImageView) convertView.findViewById(R.id.car_image);
                 holder.nameView = (TextView) convertView.findViewById(R.id.name);
                 //parentView.getLayoutParams().width = cardWidth;
                 //holder.jobView = (TextView) convertView.findViewById(R.id.job);
@@ -241,12 +260,15 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
                 holder.cityView = (TextView) convertView.findViewById(R.id.city);
                 holder.eduView = (TextView) convertView.findViewById(R.id.education);
                 holder.workView = (TextView) convertView.findViewById(R.id.work_year);
+                holder.distanceView = (TextView) convertView.findViewById(R.id.distance);
+                holder.typeOfCarView = (TextView) convertView.findViewById(R.id.in_type_of_car);
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
 
 
             holder.portraitView.setImageResource(talent.headerIcon);
+            holder.carView.setImageResource(talent.carIcon);
 
             holder.nameView.setText(String.format("%s", talent.nickname));
             //holder.jobView.setText(talent.jobName);
@@ -255,16 +277,19 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
 
             holder.cityView.setHint(no);
             holder.cityView.setText(talent.cityName);
-            holder.cityView.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.home01_icon_location,0,0);
+//            holder.cityView.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.home01_icon_location,0,0);
 
             holder.eduView.setHint(no);
             holder.eduView.setText(talent.educationName);
-            holder.eduView.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.home01_icon_edu,0,0);
+//            holder.eduView.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.home01_icon_edu,0,0);
 
             holder.workView.setHint(no);
             holder.workView.setText(talent.workYearName);
-            holder.workView.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.home01_icon_work_year,0,0);
+//            holder.workView.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.home01_icon_work_year,0,0);
 
+            holder.distanceView.setText("I'm " + talent.distanceName + "m away!");
+
+            holder.typeOfCarView.setText("in a " + talent.typeOfCarName);
 
             return convertView;
         }
@@ -273,20 +298,26 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
 
     private static class ViewHolder {
         ImageView portraitView;
+        ImageView carView;
         TextView nameView;
         TextView cityView;
         TextView eduView;
         TextView workView;
+        TextView distanceView;
+        TextView typeOfCarView;
         CheckedTextView collectView;
 
     }
 
     public static class Talent {
         public int headerIcon;
+        public int carIcon;
         public String nickname;
         public String cityName;
         public String educationName;
         public String workYearName;
+        public String distanceName;
+        public String typeOfCarName;
     }
 
 }

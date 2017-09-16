@@ -24,6 +24,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.opark.opark.card_swipe.MainActivityCardSwipe;
 
 import android.os.Bundle;
 import android.util.Base64;
@@ -53,6 +54,9 @@ public class LoginActivity extends AppCompatActivity {
     LoginButton loginButton;
     private Button registerButton;
 
+    //    To Delete
+    private Button toCardSwipe;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +74,17 @@ public class LoginActivity extends AppCompatActivity {
         registerButton = (Button) findViewById(R.id.register_button);
 
 
+        //        toDelete
+        toCardSwipe = (Button) findViewById(R.id.button_card);
+
+        toCardSwipe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, MainActivityCardSwipe.class);
+                finish();
+                startActivity(intent);
+            }
+        });
 
         // attempt login
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {

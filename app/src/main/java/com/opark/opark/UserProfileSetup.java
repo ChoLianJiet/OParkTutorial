@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.opark.opark.card_swipe.MainActivityCardSwipe;
+
 import net.cachapa.expandablelayout.ExpandableLayout;
 
 public class UserProfileSetup extends AppCompatActivity {
@@ -37,6 +39,8 @@ public class UserProfileSetup extends AppCompatActivity {
     private EditText postcode ;
     private EditText countryState;
     private Button profileSubmit;
+
+
 
 
     private static  User user = new User();

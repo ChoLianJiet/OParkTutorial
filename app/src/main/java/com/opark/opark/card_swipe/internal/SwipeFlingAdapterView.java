@@ -34,7 +34,7 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
     private static final float SCALE_STEP = 0.08f; // view叠加缩放的步长
     //缩放层叠效果
 
-    private int MAX_VISIBLE = 4; // 值建议最小为4
+    private int MAX_VISIBLE = 1; // 值建议最小为4
     private int MIN_ADAPTER_STACK = 6;
     private float ROTATION_DEGREES = 2f;
     private int LAST_OBJECT_IN_STACK = 0;
