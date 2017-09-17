@@ -7,15 +7,22 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
-import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
+import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -28,7 +35,19 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.opark.opark.R;
+import com.opark.opark.motion_vehicle_tracker.AppConstants;
+
+import java.util.Iterator;
+import java.util.Random;
 
 
 public class Map extends FragmentActivity implements OnMapReadyCallback,
@@ -58,8 +77,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
         //Check If Google Services Is Available
         if (getServicesAvailable()) {
             // Building the GoogleApi client
-            buildGoogleApiClient();
-            createLocationRequest();
+            //buildGoogleApiClient();
+            //createLocationRequest();
             Toast.makeText(this, "Google Service Is Available!!", Toast.LENGTH_SHORT).show();
         }
 
@@ -67,6 +86,49 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        FirebaseApp.initializeApp(getApplicationContext());
+
+
+        //Get ID of the user to be tracked from intent's extra
+        //String keyOfTrackedUser = getIntent().getStringExtra("userKey");
+        String keyOfTrackedUser = "firebase-hq";
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("geofire");
+        GeoFire geoFire = new GeoFire(ref);
+        geoFire.getLocation(keyOfTrackedUser, new LocationCallback() {
+            @Override
+            public void onLocationResult(String key, GeoLocation location) {
+                Log.i("Hello location result", String.valueOf(location.latitude) + " " + String.valueOf(location.longitude));
+                addMarker(mMap,location.latitude,location.longitude);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        ref.child(keyOfTrackedUser).child("l").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String[] loc = new String[2];
+                Iterator<DataSnapshot> iter = dataSnapshot.getChildren().iterator();
+                while (iter.hasNext()){
+                    DataSnapshot snap = iter.next();
+                    loc[Integer.parseInt(snap.getKey())] = snap.getValue().toString();
+                }
+
+                addMarker(mMap,Double.parseDouble(loc[0]),Double.parseDouble(loc[1]));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        //randomLocationGenerator(geoFire);
+
 
     }
 
@@ -80,6 +142,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
@@ -101,8 +164,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     // Add A Map Pointer To The MAp
     public void addMarker(GoogleMap googleMap, double lat, double lon) {
 
+        LatLng latlong = new LatLng(lat, lon);
+
         if(markerCount==1){
-            animateMarker(mLastLocation,mk);
+            animateMarker(lat,lon,mk);
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latlong));
         }
 
         else if (markerCount==0){
@@ -114,12 +180,11 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
             Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
             mMap = googleMap;
 
-            LatLng latlong = new LatLng(lat, lon);
+
             mk= mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon))
                     //.icon(BitmapDescriptorFactory.fromResource(R.drawable.pin3))
                     .icon(BitmapDescriptorFactory.fromBitmap((smallMarker))));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 16));
-
             //Set Marker Count to 1 after first marker is created
             markerCount=1;
 
@@ -128,7 +193,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
                 return;
             }
             //mMap.setMyLocationEnabled(true);
-            startLocationUpdates();
+            //startLocationUpdates();
         }
     }
 
@@ -136,6 +201,75 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     @Override
     public void onInfoWindowClick (Marker marker){
         Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
+    }
+
+    private void randomLocationGenerator(GeoFire geoFire, Location origin) {
+
+        generateLocationWithinRadius(origin,100);
+        geoFire.setLocation("firebase-hq", new GeoLocation(37.7853889, -122.4056973));
+
+    }
+
+    private GeoLocation generateLocationWithinRadius(Location currentLocation, double radius) {
+        double a = currentLocation.getLongitude();
+        double b = currentLocation.getLatitude();
+        double r = radius;
+        Random random = new Random();
+
+        // x must be in (a-r, a + r) range
+        double xMin = a - r;
+        double xMax = a + r;
+        double xRange = xMax - xMin;
+
+        // get a random x within the range
+        double x = xMin + random.nextDouble() * xRange;
+
+        // circle equation is (y-b)^2 + (x-a)^2 = r^2
+        // based on the above work out the range for y
+        double yDelta = Math.sqrt(Math.pow(r,  2) - Math.pow((x - a), 2));
+        double yMax = b + yDelta;
+        double yMin = b - yDelta;
+        double yRange = yMax - yMin;
+        // Get a random y within its range
+        double y = yMin + random.nextDouble() * yRange;
+
+        // And finally return the location
+
+        return new GeoLocation(x, y);
+    }
+
+    private void lookForParkingSpaceNearby(Location location, double radius){
+
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("geofire");
+        GeoFire geoFire = new GeoFire(ref);
+        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), radius);
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                //update a list and refresh the card swipe
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
     }
 
 
@@ -164,7 +298,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     protected void onStart() {
         super.onStart();
         if (mGoogleApiClient != null) {
-            mGoogleApiClient.connect();
+            //mGoogleApiClient.connect();
         }
 //        startLocationUpdates();
     }
@@ -176,54 +310,22 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
         getServicesAvailable();
 
         // Resuming the periodic location updates
-        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
-            startLocationUpdates();
-        }
+        //if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
+            //startLocationUpdates();
+        //}
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
+        //if (mGoogleApiClient.isConnected()) {
+        //    mGoogleApiClient.disconnect();
+        //}
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-    }
-
-    //Method to display the location on UI
-    private void displayLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            // Check Permissions Now
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_LOCATION);
-        } else {
-
-
-            mLastLocation = LocationServices.FusedLocationApi
-                    .getLastLocation(mGoogleApiClient);
-
-            if (mLastLocation != null) {
-                double latitude = mLastLocation.getLatitude();
-                double longitude = mLastLocation.getLongitude();
-                String loc = "" + latitude + " ," + longitude + " ";
-                Toast.makeText(this,loc, Toast.LENGTH_SHORT).show();
-
-                //Add pointer to the map at location
-                addMarker(mMap,latitude,longitude);
-
-
-            } else {
-
-                Toast.makeText(this, "Couldn't get the location. Make sure location is enabled on the device",
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
 
@@ -280,7 +382,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     public void onConnected(Bundle arg0) {
 
         // Once connected with google api, get the location
-        displayLocation();
+        //displayLocation();
 
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
@@ -304,11 +406,43 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
         displayLocation();
     }
 
+    //Method to display the location on UI
+    private void displayLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            // Check Permissions Now
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION);
+        } else {
 
-    public static void animateMarker(final Location destination, final Marker marker) {
+
+            mLastLocation = LocationServices.FusedLocationApi
+                    .getLastLocation(mGoogleApiClient);
+
+            if (mLastLocation != null) {
+                double latitude = mLastLocation.getLatitude();
+                double longitude = mLastLocation.getLongitude();
+                String loc = "" + latitude + " ," + longitude + " ";
+                Toast.makeText(this,loc, Toast.LENGTH_SHORT).show();
+
+                //Add pointer to the map at location
+                addMarker(mMap,latitude,longitude);
+
+
+            } else {
+
+                Toast.makeText(this, "Couldn't get the location. Make sure location is enabled on the device",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+    public static void animateMarker(final double latitude, final double longitude, final Marker marker) {
         if (marker != null) {
             final LatLng startPosition = marker.getPosition();
-            final LatLng endPosition = new LatLng(destination.getLatitude(), destination.getLongitude());
+            final LatLng endPosition = new LatLng(latitude,longitude);
 
             final float startRotation = marker.getRotation();
 
@@ -321,8 +455,10 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
                     try {
                         float v = animation.getAnimatedFraction();
                         LatLng newPosition = latLngInterpolator.interpolate(v, startPosition, endPosition);
+
                         marker.setPosition(newPosition);
-                        marker.setRotation(computeRotation(v, startRotation, destination.getBearing()));
+
+                        //marker.setRotation(computeRotation(v, startRotation, destination.getBearing()));
                     } catch (Exception ex) {
                         // I don't care atm..
                     }
@@ -330,6 +466,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
             });
 
             valueAnimator.start();
+
         }
     }
     private static float computeRotation(float fraction, float start, float end) {

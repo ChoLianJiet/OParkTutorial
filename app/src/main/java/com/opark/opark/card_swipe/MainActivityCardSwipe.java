@@ -1,10 +1,21 @@
 package com.opark.opark.card_swipe;
 
+import android.Manifest;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.database.DatabaseUtilsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,6 +26,18 @@ import android.widget.CheckedTextView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import com.opark.opark.R;
 
@@ -23,13 +46,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-import static android.R.attr.type;
+import static java.lang.Double.valueOf;
 
 
 public class MainActivityCardSwipe extends AppCompatActivity implements com.opark.opark.card_swipe.internal.SwipeFlingAdapterView.onFlingListener,
         com.opark.opark.card_swipe.internal.SwipeFlingAdapterView.OnItemClickListener, View.OnClickListener {
 
-    int [] headerIcons = {
+    String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
+    long MIN_TIME = 5000;
+    float MIN_DISTANCE = 1000;
+    final int REQUEST_CODE = 123;
+
+    int[] headerIcons = {
             R.drawable.i1,
             R.drawable.i2,
             R.drawable.i3,
@@ -38,7 +66,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
             R.drawable.i6
     };
 
-    int [] carIcons = {
+    int[] carIcons = {
             R.drawable.c1,
             R.drawable.c2,
             R.drawable.c3,
@@ -47,7 +75,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
             R.drawable.c6
     };
 
-    String[] names = {"张三","李四","王五","小明","小红","小花"};
+    String[] names = {"张三", "李四", "王五", "小明", "小红", "小花"};
 
     String[] citys = {"北京", "上海", "广州", "深圳"};
 
@@ -55,17 +83,27 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
 
     String[] years = {"1年", "2年", "3年", "4年", "5年"};
 
-    String[] distance = {"10","20","30","40","50","60"};
+    String[] distance = {"10", "20", "30", "40", "50", "60"};
 
-    String[] typeOfCar = {"Nissan Almera","Proton Saga","Perodua Bezza","Toyota Hilux","Ford Fiesta","Mercedez Benz"};
+    String[] typeOfCar = {"Nissan Almera", "Proton Saga", "Perodua Bezza", "Toyota Hilux", "Ford Fiesta", "Mercedez Benz"};
 
     Random ran = new Random();
+
+    private double lat;
+    private double lon;
 
     private int cardWidth;
     private int cardHeight;
 
     private com.opark.opark.card_swipe.internal.SwipeFlingAdapterView swipeView;
     private InnerAdapter adapter;
+
+    private Button shareParkingButton;
+
+    private GeoFire geoFire;
+
+    LocationManager mLocationManager;
+    LocationListener mLocationListener;
 
 
     @Override
@@ -76,13 +114,27 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
         initView();
         loadData();
 
+        FirebaseApp.initializeApp(getApplicationContext());
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("geofire");
+        geoFire = new GeoFire(ref);
+        geoFire.setLocation("firebase-hq",new GeoLocation(37.7832, -122.4056));
+
         ImageButton mapButton = (ImageButton) findViewById(R.id.toMapButton);
 
         mapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(com.opark.opark.card_swipe.MainActivityCardSwipe.this,com.opark.opark.motion_vehicle_tracker.Map.class);
+                Intent intent = new Intent(com.opark.opark.card_swipe.MainActivityCardSwipe.this, com.opark.opark.motion_vehicle_tracker.Map.class);
                 startActivity(intent);
+            }
+        });
+
+        shareParkingButton = (Button) findViewById(R.id.shareParkingButton);
+
+        shareParkingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getCurrentLocation();
             }
         });
 
@@ -169,12 +221,12 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
                     talent = new Talent();
                     talent.headerIcon = headerIcons[i % headerIcons.length];
                     talent.carIcon = carIcons[i % carIcons.length];
-                    talent.nickname = names[ran.nextInt(names.length-1)];
-                    talent.cityName = citys[ran.nextInt(citys.length-1)];
-                    talent.educationName = edus[ran.nextInt(edus.length-1)];
-                    talent.workYearName = years[ran.nextInt(years.length-1)];
-                    talent.distanceName = distance[ran.nextInt(distance.length-1)];
-                    talent.typeOfCarName = typeOfCar[ran.nextInt(typeOfCar.length-1)];
+                    talent.nickname = names[ran.nextInt(names.length - 1)];
+                    talent.cityName = citys[ran.nextInt(citys.length - 1)];
+                    talent.educationName = edus[ran.nextInt(edus.length - 1)];
+                    talent.workYearName = years[ran.nextInt(years.length - 1)];
+                    talent.distanceName = distance[ran.nextInt(distance.length - 1)];
+                    talent.typeOfCarName = typeOfCar[ran.nextInt(typeOfCar.length - 1)];
                     list.add(talent);
                 }
                 return list;
@@ -230,7 +282,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
 
         @Override
         public Talent getItem(int position) {
-            if(objs==null ||objs.size()==0) return null;
+            if (objs == null || objs.size() == 0) return null;
             return objs.get(position);
         }
 
@@ -246,7 +298,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
             Talent talent = getItem(position);
             if (convertView == null) {
                 convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_new_item, parent, false);
-                holder  = new ViewHolder();
+                holder = new ViewHolder();
                 convertView.setTag(holder);
                 convertView.getLayoutParams().width = cardWidth;
                 holder.portraitView = (ImageView) convertView.findViewById(R.id.portrait);
@@ -319,5 +371,79 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
         public String distanceName;
         public String typeOfCarName;
     }
+
+    public boolean getServicesAvailable() {
+        GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+        int isAvailable = api.isGooglePlayServicesAvailable(this);
+        if (isAvailable == ConnectionResult.SUCCESS) {
+            return true;
+        } else if (api.isUserResolvableError(isAvailable)) {
+
+            Dialog dialog = api.getErrorDialog(this, isAvailable, 0);
+            dialog.show();
+        } else {
+            Toast.makeText(this, "Cannot Connect To Play Services", Toast.LENGTH_SHORT).show();
+        }
+        return false;
+    }
+
+    private void getCurrentLocation() {
+
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        mLocationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                Log.d("OParkCurrentLocation","onLocationChanged() callback received");
+                lon = valueOf(location.getLongitude());
+                lat = valueOf(location.getLatitude());
+                geoFire.setLocation("firebase-hq",new GeoLocation(lat,lon));
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_CODE);
+
+            return;
+        }
+        mLocationManager.requestLocationUpdates(LOCATION_PROVIDER, MIN_TIME, MIN_DISTANCE, mLocationListener);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == REQUEST_CODE){
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                getCurrentLocation();
+            } else{
+                Log.d("OparkCurrentLocation","Permission Denied :(");
+            }
+        }
+    }
+
 
 }

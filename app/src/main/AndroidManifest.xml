@@ -13,10 +13,6 @@
         android:name="com.facebook.sdk.ApplicationId"
         android:value="@string/facebook_app_id"/>
 
-    <!--GOOGLE LOCATION SERVICE META DATA-->
-    <meta-data
-        android:name="com.google.android.geo.API_KEY"
-        android:value="@string/map_api_key"/>
 
     <activity
         android:name="com.facebook.FacebookActivity"
@@ -42,6 +38,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!--GOOGLE LOCATION SERVICE META DATA-->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/map_api_key"/>
 
         <activity android:name=".LoginActivity">
             <intent-filter>

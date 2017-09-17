@@ -32,6 +32,7 @@ dependencies {
     compile    'com.android.support:design:25.3.1'
     compile    'com.google.firebase:firebase-core:11.2.0'
     compile    'com.google.firebase:firebase-auth:11.2.0'
+    compile 'com.google.firebase:firebase-database:11.2.0'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
 
@@ -42,6 +43,11 @@ dependencies {
     compile  files('libs/signalr-client-sdk.jar')
     compile  files('libs/signalr-client-sdk-android.jar')
     compile 'com.github.johnkil.android-appmsg:appmsg:1.2.0'
+
+//    GEOFIRE
+    compile 'com.firebase:geofire-android:2.1.2'
+
+//    FIREBASE
 
 }
 
