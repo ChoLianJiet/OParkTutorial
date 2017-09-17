@@ -30,6 +30,9 @@ import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
+import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.FirebaseApp;
@@ -46,6 +49,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import static android.R.attr.key;
+import static com.opark.opark.R.string.error;
 import static java.lang.Double.valueOf;
 
 
@@ -101,6 +106,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
     private Button shareParkingButton;
 
     private GeoFire geoFire;
+    private GeoQuery geoQuery;
 
     LocationManager mLocationManager;
     LocationListener mLocationListener;
@@ -117,7 +123,10 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
         FirebaseApp.initializeApp(getApplicationContext());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("geofire");
         geoFire = new GeoFire(ref);
-        geoFire.setLocation("firebase-hq",new GeoLocation(37.7832, -122.4056));
+
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(lat,lon),2.5);
+        getOtherUsersLocation();
+        getGeoQuery();
 
         ImageButton mapButton = (ImageButton) findViewById(R.id.toMapButton);
 
@@ -398,7 +407,18 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
                 Log.d("OParkCurrentLocation","onLocationChanged() callback received");
                 lon = valueOf(location.getLongitude());
                 lat = valueOf(location.getLatitude());
-                geoFire.setLocation("firebase-hq",new GeoLocation(lat,lon));
+                Log.d("OParkCurrentLatitude","Latitude is: " + lat);
+                Log.d("OparkCurrentLongitude","Longitude is: " + lon);
+                geoFire.setLocation("firebase-hq2",new GeoLocation(lat,lon), new GeoFire.CompletionListener() {
+                    @Override
+                    public void onComplete(String key, DatabaseError error) {
+                        if (error != null) {
+                            System.err.println("There was an error saving the location to GeoFire: " + error);
+                        } else {
+                            System.out.println("Location saved on server successfully!");
+                        }
+                    }
+                });
             }
 
             @Override
@@ -445,5 +465,61 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
         }
     }
 
+    private void getOtherUsersLocation(){
+        geoFire.getLocation("firebase-hq1", new LocationCallback() {
+            @Override
+            public void onLocationResult(String key, GeoLocation location) {
+                if (location != null) {
+                    System.out.println(String.format("The location for key %s is [%f,%f]", key, location.latitude, location.longitude));
+                } else {
+                    System.out.println(String.format("There is no location for key %s in GeoFire", key));
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.err.println("There was an error getting the GeoFire location: " + databaseError);
+            }
+        });
+    }
+
+    private void getGeoQuery() {
+
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
+                Log.d("Opark","onKeyEntered callback received");
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+                System.out.println(String.format("Key %s is no longer in the search area", key));
+                Log.d("Opark","onKeyExited callback received");
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+                System.out.println(String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
+                Log.d("Opark","onKeyMoved callback received");
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+                System.out.println("All initial data has been loaded and events have been fired!");
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+                System.err.println("There was an error with this query: " + error);
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        geoFire.removeLocation("firebase-hq");
+        geoQuery.removeAllListeners();
+    }
 }
