@@ -335,7 +335,6 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
 
             holder.portraitView.setImageResource(talent.headerIcon);
             holder.carView.setImageResource(talent.carIcon);
-            Log.i("hello",String.valueOf(holder.carView.getHeight()));
 
             holder.nameView.setText(String.format("%s", talent.nickname));
             //holder.jobView.setText(talent.jobName);
