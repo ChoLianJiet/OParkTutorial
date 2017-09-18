@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '26.0.1'
+    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.opark.opark"
         minSdkVersion 15
@@ -34,8 +34,6 @@ dependencies {
     compile 'com.google.firebase:firebase-storage:11.2.0'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
-    compile 'com.stepstone.apprating:app-rating:1.2.0'
-    compile 'com.github.blennerSilva:AwesomeDialog:2.0.1'
     testCompile 'junit:junit:4.12'
 }
 
