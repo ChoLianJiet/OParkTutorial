@@ -24,77 +24,84 @@
         android:background="@color/colorAccent"
         android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/portrait"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:contentDescription="null"
-            android:scaleType="fitCenter"/>
+        <com.jackandphantom.circularimageview.CircleImage
+            android:id="@+id/circleImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1" />
 
         <LinearLayout
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_weight="0.16"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/education"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="36dp"
-                android:layout_marginRight="36dp"
-                android:layout_marginTop="8dp"
-                android:layout_weight="0.16"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="12dp"
+                android:layout_weight="1"
+                android:autoText="false"
                 android:maxLines="1"
                 android:text=""
+                android:textAlignment="center"
                 android:textColor="#ffffff"
-                android:textSize="18sp"
-                android:layout_centerVertical="true"/>
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:layout_weight="0.16"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:layout_weight="1"
                 android:text=""
+                android:textAlignment="center"
                 android:textColor="#ffffff"
-                android:textSize="18sp"
-                android:layout_marginLeft="36dp"
-                android:layout_marginRight="36dp"/>
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/work_year"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.16"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:layout_weight="1"
                 android:maxLines="1"
                 android:text=""
+                android:textAlignment="center"
                 android:textColor="#ffffff"
-                android:textSize="18sp"
-                android:layout_marginLeft="36dp"
-                android:layout_marginRight="36dp"/>
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/city"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.16"
+                android:layout_marginBottom="12dp"
+                android:layout_marginTop="3dp"
+                android:layout_weight="1"
                 android:maxLines="1"
                 android:text=""
+                android:textAlignment="center"
                 android:textColor="#ffffff"
-                android:textSize="18sp"
-                android:layout_marginLeft="36dp"
-                android:layout_marginRight="36dp"/>
+                android:textSize="12sp" />
 
         </LinearLayout>
 
-        <ImageView
+        <com.github.chuross.AspectRatioImageView
             android:id="@+id/car_image"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:contentDescription="null"
-            android:scaleType="fitCenter"/>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scaleType="centerCrop"
+            app:ariv_widthRatio="91"
+            app:ariv_heightRatio="100"/>
+
 
     </LinearLayout>
 

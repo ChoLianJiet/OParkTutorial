@@ -5,9 +5,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -42,6 +45,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import com.jackandphantom.circularimageview.CircleImage;
 import com.opark.opark.R;
 
 import java.util.ArrayList;
@@ -72,12 +76,12 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
     };
 
     int[] carIcons = {
-            R.drawable.c1,
-            R.drawable.c2,
-            R.drawable.c3,
-            R.drawable.c4,
-            R.drawable.c5,
-            R.drawable.c6
+            R.drawable.i1,
+            R.drawable.i2,
+            R.drawable.i3,
+            R.drawable.i4,
+            R.drawable.i5,
+            R.drawable.i6
     };
 
     String[] names = {"张三", "李四", "王五", "小明", "小红", "小花"};
@@ -117,8 +121,9 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_card_swipe);
 
-        initView();
         loadData();
+        initView();
+
 
         FirebaseApp.initializeApp(getApplicationContext());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("geofire");
@@ -310,9 +315,9 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
                 holder = new ViewHolder();
                 convertView.setTag(holder);
                 convertView.getLayoutParams().width = cardWidth;
-                holder.portraitView = (ImageView) convertView.findViewById(R.id.portrait);
+                holder.portraitView = (CircleImage) convertView.findViewById(R.id.circleImage);
                 //holder.portraitView.getLayoutParams().width = cardWidth;
-                holder.portraitView.getLayoutParams().height = cardHeight;
+                //holder.portraitView.getLayoutParams().height = cardHeight;
                 holder.carView = (ImageView) convertView.findViewById(R.id.car_image);
                 holder.nameView = (TextView) convertView.findViewById(R.id.name);
                 //parentView.getLayoutParams().width = cardWidth;
@@ -330,6 +335,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
 
             holder.portraitView.setImageResource(talent.headerIcon);
             holder.carView.setImageResource(talent.carIcon);
+            Log.i("hello",String.valueOf(holder.carView.getHeight()));
 
             holder.nameView.setText(String.format("%s", talent.nickname));
             //holder.jobView.setText(talent.jobName);
@@ -358,7 +364,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
     }
 
     private static class ViewHolder {
-        ImageView portraitView;
+        CircleImage portraitView;
         ImageView carView;
         TextView nameView;
         TextView cityView;
