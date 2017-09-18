@@ -129,7 +129,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("geofire");
         geoFire = new GeoFire(ref);
 
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(lat,lon),2.5);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(3.05908772,101.67382481),0.5);
         getOtherUsersLocation();
         getGeoQuery();
 
@@ -495,6 +495,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
             public void onKeyEntered(String key, GeoLocation location) {
                 System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
                 Log.d("Opark","onKeyEntered callback received");
+
             }
 
             @Override
