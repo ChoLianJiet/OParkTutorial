@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.database.DatabaseUtilsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -38,6 +39,8 @@ import com.firebase.geofire.GeoQueryEventListener;
 import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -45,9 +48,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
 import com.jackandphantom.circularimageview.CircleImage;
 import com.opark.opark.R;
+import com.opark.opark.User;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -115,6 +130,8 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
     LocationManager mLocationManager;
     LocationListener mLocationListener;
 
+    ArrayList<User> userObjList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,8 +145,8 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
         FirebaseApp.initializeApp(getApplicationContext());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("geofire");
         geoFire = new GeoFire(ref);
-
         geoQuery = geoFire.queryAtLocation(new GeoLocation(3.05908772,101.67382481),0.5);
+
         getOtherUsersLocation();
         getGeoQuery();
 
@@ -488,6 +505,26 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
         });
     }
 
+    public static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line).append("\n");
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    public static String getStringFromFile (File fl) throws Exception {
+
+        FileInputStream fin = new FileInputStream(fl);
+        String ret = convertStreamToString(fin);
+        //Make sure you close all streams.
+        fin.close();
+        return ret;
+    }
+
     private void getGeoQuery() {
 
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
@@ -495,6 +532,32 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
             public void onKeyEntered(String key, GeoLocation location) {
                 System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
                 Log.d("Opark","onKeyEntered callback received");
+                StorageReference userRef = FirebaseStorage.getInstance().getReference().child("users").child(key).child("profile.txt");
+
+                final long ONE_MEGABYTE = 1024 * 1024;
+                userRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        try {
+
+                            userObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
+
+                            if(userObjList.size() == 3 ){
+                                for (int i = 0; i < userObjList.size(); i++){
+                                    Log.i("Hello",userObjList.get(i).getUserName().getFirstName());
+                                }
+                            }
+
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                    }
+                });
 
             }
 

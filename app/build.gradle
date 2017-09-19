@@ -51,6 +51,7 @@ dependencies {
     compile    'com.google.firebase:firebase-core:11.2.0'
     compile    'com.google.firebase:firebase-auth:11.2.0'
     compile 'com.google.firebase:firebase-database:11.2.0'
+    compile 'com.google.firebase:firebase-storage:11.2.0'
 
 }
 
