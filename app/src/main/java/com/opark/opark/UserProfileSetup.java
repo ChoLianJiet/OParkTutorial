@@ -141,25 +141,6 @@ public class UserProfileSetup extends AppCompatActivity {
                 });
 
 
-       /* profileSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                collectUserName();
-//                collectCar();
-//                collectAddress();
-                FirebaseStorage storage = FirebaseStorage.getInstance();
-                StorageReference storageRef = storage.getReference();
-
-                StorageReference userFolder = storageRef.child("users/" + firebaseUserUID + "/profile.txt");
-                objToByteStreamUpload(user, userFolder);
-
-                //TODO intent to card swipe or other page ? maybe upload prof pic ?
-                Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
-                finish();
-                startActivity(intent);
-            }
-        });*/
-
 
     }
 
@@ -170,9 +151,9 @@ public class UserProfileSetup extends AppCompatActivity {
         nameNumEditText[1]= lastName;
         nameNumEditText[2]= phoneNum;
 
-        user.userName.firstName = firstName.getText().toString();
-        user.userName.lastName = lastName.getText().toString();
-        user.userName.phoneNum = phoneNum.getText().toString();
+      nameNumString[0]=  user.userName.firstName = firstName.getText().toString();
+      nameNumString[1]=  user.userName.lastName = lastName.getText().toString();
+      nameNumString[2]=  user.userName.phoneNum = phoneNum.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -434,24 +415,20 @@ public class UserProfileSetup extends AppCompatActivity {
         boolean checkAddress = false;
         boolean checkCar = false;
 
-        boolean nameNumCancel = false;
-        boolean cancel = false;
-        boolean addressCancel = false;
-        View nameNumView = null;
-        View addressFocusView = null;
-        View focusView = null;
-
-//        collectUserName();
-
+        collectUserName();
         collectCar();
-//        collectAddress();
-       checkCar= emptyCheck(carString,carEditText, cancel,  focusView, 4);
-//       checkAddress= emptyCheck(addressString,addressEditText,addressCancel,addressFocusView, 5);
-//        checkNameNum = emptyCheck(nameNumString,nameNumEditText,cancel,focusView,3);
+        collectAddress();
 
-        if((checkCar) /*|| (checkAddress)*/ /*|| (checkNameNum)*/) {
+       checkCar= emptyCheck(carString,carEditText, 4);
+       checkAddress= emptyCheck(addressString,addressEditText, 5);
+        checkNameNum = emptyCheck(nameNumString,nameNumEditText,3);
+
+// do empty check if returns true, break operation
+        if((checkCar) || (checkAddress) || (checkNameNum)) {
             return;
         }
+
+
 else {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
@@ -466,11 +443,11 @@ else {
     }
 
 
+// CHECK IF FIELD IS EMPTY
+    private boolean emptyCheck (String[] string, EditText[] editTexts /*,boolean cancel, View focusView*/, int size){
 
-    private boolean emptyCheck (String[] string, EditText[] editTexts ,boolean cancel, View focusView, int size){
-
-        cancel =false;
-        focusView =null;
+       boolean cancel =false;
+       View focusView =null;
 
         for (int i = 0; i < size; i++){
             if (string[i].isEmpty()) {
