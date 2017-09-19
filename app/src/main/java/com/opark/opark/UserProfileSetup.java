@@ -2,9 +2,12 @@ package com.opark.opark;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,21 +16,24 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
+import com.google.zxing.common.StringUtils;
+import com.opark.opark.model.User;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+
+import static android.R.id.list;
+import static android.R.string.cancel;
 
 public class UserProfileSetup extends AppCompatActivity {
 
@@ -62,6 +68,12 @@ public class UserProfileSetup extends AppCompatActivity {
     private Button buttonSignOut;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private String [] carString = new String[4];
+    private EditText [] carEditText =new EditText[4] ;
+    private String [] nameNumString = new String[3];
+    private EditText [] nameNumEditText = new EditText[3];
+    private String [] addressString = new String [5];
+    private EditText[] addressEditText = new EditText[5];
 
 
     private User user = new User(); // Changed User from static to non static
@@ -89,6 +101,7 @@ public class UserProfileSetup extends AppCompatActivity {
             public void onClick(View v) {
 
                 nameNumExpand();
+
             }
         });
 
@@ -98,6 +111,8 @@ public class UserProfileSetup extends AppCompatActivity {
             public void onClick(View v) {
 
                addressExpand();
+
+
             }
         });
 
@@ -107,6 +122,7 @@ public class UserProfileSetup extends AppCompatActivity {
             public void onClick(View v) {
 
                carExpand();
+
             }
         });
 
@@ -125,12 +141,12 @@ public class UserProfileSetup extends AppCompatActivity {
                 });
 
 
-        profileSubmit.setOnClickListener(new View.OnClickListener() {
+       /* profileSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 collectUserName();
-                collectCar();
-                collectAddress();
+//                collectCar();
+//                collectAddress();
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference storageRef = storage.getReference();
 
@@ -142,32 +158,65 @@ public class UserProfileSetup extends AppCompatActivity {
                 finish();
                 startActivity(intent);
             }
-        });
+        });*/
 
 
     }
 
     private void collectUserName(){
 
+
+        nameNumEditText[0]= firstName;
+        nameNumEditText[1]= lastName;
+        nameNumEditText[2]= phoneNum;
+
         user.userName.firstName = firstName.getText().toString();
         user.userName.lastName = lastName.getText().toString();
         user.userName.phoneNum = phoneNum.getText().toString();
+
+        boolean cancel = false;
+        View focusView = null;
+
+
     }
 
+
+
     private void collectCar(){
-        user.userCar.carColour = carColour.getText().toString();
-        user.userCar.carBrand = carBrand.getText().toString();
-        user.userCar.carModel = carModel.getText().toString();
-        user.userCar.carPlate = carPlate.getText().toString();
+        carEditText[0]=carColour;
+        carEditText[1]=carBrand ;
+        carEditText[2]=carModel ;
+        carEditText[3]=carPlate ;
+
+
+        carString[0]= user.userCar.carColour = carColour.getText().toString();
+        carString[1]= user.userCar.carBrand = carBrand.getText().toString();
+        carString[2]= user.userCar.carModel = carModel.getText().toString();
+        carString[3]= user.userCar.carPlate = carPlate.getText().toString();
+
+        boolean cancel = false;
+        View focusView = null;
+
 
     }
 
     private void collectAddress(){
-        user.userAddress.firstline = firstLine.getText().toString();
-        user.userAddress.secondline = secondLine.getText().toString();
-        user.userAddress.city = city.getText().toString();
-        user.userAddress.postcode = postcode.getText().toString();
-        user.userAddress.countryState = countryState.getText().toString();
+        addressEditText[0]=firstLine ;
+        addressEditText[1]=secondLine ;
+        addressEditText[2]=city ;
+        addressEditText[3]=postcode ;
+        addressEditText[4]=countryState;
+
+      addressString[0]=  user.userAddress.firstline = firstLine.getText().toString();
+      addressString[1]=  user.userAddress.secondline = secondLine.getText().toString();
+      addressString[2]=  user.userAddress.city = city.getText().toString();
+      addressString[3]=  user.userAddress.postcode = postcode.getText().toString();
+      addressString[4]=  user.userAddress.countryState = countryState.getText().toString();
+
+        boolean cancel = false;
+        View focusView = null;
+
+
     }
 
 
@@ -374,4 +423,80 @@ public class UserProfileSetup extends AppCompatActivity {
         expandableCountryState.collapse();
     }
 
+    public void profileSubmit(View v) {
+        attemptProfileSetup();
+    }
+
+    private void attemptProfileSetup() {
+
+
+        boolean checkNameNum = false;
+        boolean checkAddress = false;
+        boolean checkCar = false;
+
+        boolean nameNumCancel = false;
+        boolean cancel = false;
+        boolean addressCancel = false;
+        View nameNumView = null;
+        View addressFocusView = null;
+        View focusView = null;
+
+//        collectUserName();
+
+        collectCar();
+//        collectAddress();
+       checkCar= emptyCheck(carString,carEditText, cancel,  focusView, 4);
+//       checkAddress= emptyCheck(addressString,addressEditText,addressCancel,addressFocusView, 5);
+//        checkNameNum = emptyCheck(nameNumString,nameNumEditText,cancel,focusView,3);
+
+        if((checkCar) /*|| (checkAddress)*/ /*|| (checkNameNum)*/) {
+            return;
+        }
+else {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+
+        StorageReference userFolder = storageRef.child("users/" + firebaseUserUID + "/profile.txt");
+        objToByteStreamUpload(user, userFolder);
+
+        //TODO intent to card swipe or other page ? maybe upload prof pic ?
+        Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
+        finish();
+        startActivity(intent);}
+    }
+
+
+
+    private boolean emptyCheck (String[] string, EditText[] editTexts ,boolean cancel, View focusView, int size){
+
+        cancel =false;
+        focusView =null;
+
+        for (int i = 0; i < size; i++){
+            if (string[i].isEmpty()) {
+                editTexts[i].setError(getString(R.string.error_field_required));
+                focusView = editTexts[i];
+                cancel = true;
+            }
+
+
+
+            if (cancel) {
+                // There was an error; don't attempt login and focus the first
+                // form field with an error.
+                focusView.requestFocus();
+                    }
+
+        }
+
+        return cancel;
+
+    }
 }
+
+
+
+
+
+
+

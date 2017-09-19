@@ -377,10 +377,11 @@
         android:id="@+id/profile_submit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/profile_submit"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="14dp"/>
+        android:layout_marginBottom="14dp"
+        android:onClick="profileSubmit"
+        android:text="@string/profile_submit"/>
 
     <Button
         android:id="@+id/not_you_sign_out_button"

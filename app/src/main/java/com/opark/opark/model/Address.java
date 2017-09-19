@@ -1,4 +1,4 @@
-package com.opark.opark;
+package com.opark.opark.model;
 
 /**
  * Created by Yz on 08-Sep-17.

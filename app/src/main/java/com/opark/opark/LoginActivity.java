@@ -7,6 +7,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
@@ -30,11 +35,15 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+import com.mindorks.placeholderview.PlaceHolderView;
 
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
@@ -49,7 +58,6 @@ import java.security.NoSuchAlgorithmException;
 public class LoginActivity extends AppCompatActivity {
 
 
-
     private FirebaseAuth mAuth;
     // UI references.
 
@@ -59,10 +67,23 @@ public class LoginActivity extends AppCompatActivity {
     LoginButton loginButton;
     private Button registerButton;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private PlaceHolderView mDrawerView;
+    private DrawerLayout mDrawer;
+    private Toolbar mToolbar;
+    private PlaceHolderView mGalleryView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        mDrawer = (DrawerLayout)findViewById(R.id.drawerLayout);
+//        mDrawerView = (PlaceHolderView)findViewById(R.id.drawerView);
+//        mToolbar = (Toolbar)findViewById(R.id.toolbar);
+//        mGalleryView = (PlaceHolderView)findViewById(R.id.galleryView);
+//        setupDrawer();
+
+
         FacebookSdk.setApplicationId("113991652589123");
         FacebookSdk.sdkInitialize(getApplicationContext());
         if (BuildConfig.DEBUG) {
@@ -73,27 +94,22 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        mAuthListener = new FirebaseAuth.AuthStateListener(){
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user!=null){
+                if (user != null) {
                     System.out.println("User logged in");
-                }
-                else{
+                } else {
                     System.out.println("User not logged in");
                 }
             }
         };
 
 
-
-
-
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email_login_autocompletetextview) ;
-        mPasswordView = (EditText) findViewById(R.id.password_edit_text) ;
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.email_login_autocompletetextview);
+        mPasswordView = (EditText) findViewById(R.id.password_edit_text);
         registerButton = (Button) findViewById(R.id.register_button);
-
 
 
         // attempt login
@@ -117,10 +133,9 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
-
         //FACEBOOK LOGIN BUTTON
         loginButton = (LoginButton) findViewById(R.id.login_button);
-        loginButton.setReadPermissions("email","public_profile");
+        loginButton.setReadPermissions("email", "public_profile");
 
 
         //FACEBOOK HASH KEY Generating
@@ -138,7 +153,6 @@ public class LoginActivity extends AppCompatActivity {
         } catch (NoSuchAlgorithmException e) {
 
         }
-
 
 
         // FACEBOOK CALLBACK MANAGER
@@ -169,6 +183,32 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    private void setupDrawer(){
+        mDrawerView
+                .addView(new DrawerHeader())
+                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_PROFILE))
+                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_REQUESTS))
+                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MESSAGE))
+                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_GROUPS))
+                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_NOTIFICATIONS))
+                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_TERMS))
+                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_SETTINGS))
+                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_LOGOUT));
+
+        ActionBarDrawerToggle  drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.open_drawer, R.string.close_drawer){
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+        };
+
+        mDrawer.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+    }
 
 
 
@@ -189,7 +229,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-
     private void updateUI(FirebaseUser currentUser) {
 
         if (currentUser != null) {
@@ -200,7 +239,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(Uri uri) {
                     // file exists
-                    Log.d("login","user logged in");
+                    Log.d("login", "user logged in");
                     Log.d("urlget", "uri: " + uri.toString());
                     Toast.makeText(LoginActivity.this, "Log in Successful! :D ",
                             Toast.LENGTH_SHORT).show();
@@ -213,16 +252,16 @@ public class LoginActivity extends AppCompatActivity {
                 public void onFailure(@NonNull Exception e) {
                     //file not found
                     String firebaseUserUID = mAuth.getCurrentUser().getUid();
-                    Log.d("urlget","New User, No profile");
+                    Log.d("urlget", "New User, No profile");
                     Intent intent = new Intent(LoginActivity.this, UserProfileSetup.class);
-                    intent.putExtra("firebaseUser",firebaseUserUID);
+                    intent.putExtra("firebaseUser", firebaseUserUID);
                     finish();
                     startActivity(intent);
                 }
-            });}
-         else {
+            });
+        } else {
             // No user is signed in
-            Log.d("login","no user");
+            Log.d("login", "no user");
             return;
         }
     }
@@ -255,11 +294,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // Executed when Sign in button pressed
-    public void signInRegisteredUser(View v)   {
+    public void signInRegisteredUser(View v) {
         attemptLogin();
 
     }
-
 
 
     // Executed when Register button pressed
@@ -270,27 +308,25 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-// Attempt Login Method
+    // Attempt Login Method
     private void attemptLogin() {
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
-        if (email.equals("")|| password.equals(""))
-        {
+        if (email.equals("") || password.equals("")) {
             return;
         }
 
-        Toast.makeText(this,"Login you to Opark !",Toast.LENGTH_SHORT).show();
-        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        Toast.makeText(this, "Login you to Opark !", Toast.LENGTH_SHORT).show();
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                Log.d ("OparkLogin", "Log in successfull ? " + task.isSuccessful() );
+                Log.d("OparkLogin", "Log in successfull ? " + task.isSuccessful());
 
-                if (!task.isSuccessful()){
+                if (!task.isSuccessful()) {
                     Log.d("OparkLogin", "Problem signing in : " + task.getException());
                     showErrorDialog("Problem signing you in. Try again maybe ? ");
-                }
-                else {
+                } else {
                     FirebaseUser currentUser = mAuth.getCurrentUser();
 
                     updateUI(currentUser);
@@ -303,7 +339,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-
 // AlertDialog
 
 
@@ -311,11 +346,14 @@ public class LoginActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Oops")
                 .setMessage(message)
-                .setPositiveButton(android.R.string.ok,null)
+                .setPositiveButton(android.R.string.ok, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
 }
+
+
+
 
 
 
