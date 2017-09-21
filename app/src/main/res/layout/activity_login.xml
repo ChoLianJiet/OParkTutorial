@@ -1,83 +1,104 @@
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                        xmlns:app="http://schemas.android.com/apk/res-auto"
-                                        xmlns:tools="http://schemas.android.com/tools"
-                                        android:id="@+id/drawer_layout"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent">
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:tools="http://schemas.android.com/tools"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:background="#F79d7f"
-                  android:gravity="bottom|center_horizontal"
-                  android:orientation="vertical"
-                  android:weightSum="1"
-                  tools:layout_editor_absoluteX="8dp"
-                  tools:layout_editor_absoluteY="1dp">
+    <Button
+        android:id="@+id/sign_in_button"
+        android:layout_width="0dp"
+        android:layout_height="75dp"
+        android:background="#F26141"
+        android:onClick="signInRegisteredUser"
+        android:text="@string/app_sign_in"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="@+id/textInputLayout"
+        app:layout_constraintRight_toRightOf="@+id/textInputLayout"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toTopOf="@+id/register_button"
+        android:layout_marginBottom="37dp"/>
+
+    <Button
+        android:id="@+id/register_button"
+        android:layout_width="0dp"
+        android:layout_height="75dp"
+        android:background="#F26141"
+        android:text="@string/app_register"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toLeftOf="@+id/sign_in_button"
+        app:layout_constraintRight_toRightOf="@+id/sign_in_button"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="161dp"/>
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/login_button"
+        android:layout_width="201dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginTop="41dp"
+        app:layout_constraintLeft_toLeftOf="@+id/register_button"
+        app:layout_constraintRight_toRightOf="@+id/register_button"
+        app:layout_constraintTop_toBottomOf="@+id/register_button"
+        tools:layout_constraintTop_creator="1"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textInputLayout2"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toTopOf="@+id/sign_in_button"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="129dp"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="132dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp">
+
+        <AutoCompleteTextView
+            android:id="@+id/email_login_autocompletetextview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="@string/app_username_autocomplete"
+            android:imeOptions="actionNext"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textInputLayout"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toTopOf="@+id/sign_in_button"
+        app:layout_constraintRight_toRightOf="@+id/textInputLayout2"
+        android:layout_marginBottom="46dp"
+        app:layout_constraintLeft_toLeftOf="@+id/textInputLayout2"
+        >
+
+        <EditText
+            android:id="@+id/password_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/app_password_edit_text"
+            android:imeActionId="@+id/login"
+            android:imeActionLabel="@string/app_sign_in"
+            android:imeOptions="actionUnspecified"
+            android:inputType="textPassword"
+            android:maxLines="1"/>
+    </android.support.design.widget.TextInputLayout>
+</android.support.constraint.ConstraintLayout>
 
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="350dp"
-            android:layout_height="50dp">
-
-            <AutoCompleteTextView
-                android:id="@+id/email_login_autocompletetextview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:hint="@string/app_username_autocomplete"
-                android:imeOptions="actionNext"
-                android:inputType="textEmailAddress"
-                android:maxLines="1"/>
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="350dp"
-            android:layout_height="50dp">
-
-            <EditText
-                android:id="@+id/password_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/app_password_edit_text"
-                android:imeActionId="@+id/login"
-                android:imeActionLabel="@string/app_sign_in"
-                android:imeOptions="actionUnspecified"
-                android:inputType="textPassword"
-                android:maxLines="1"/>
-        </android.support.design.widget.TextInputLayout>
-
-        <Button
-            android:id="@+id/sign_in_button"
-            android:layout_width="350dp"
-            android:layout_height="75dp"
-            android:layout_marginTop="50dp"
-            android:background="#F26141"
-            android:onClick="signInRegisteredUser"
-            android:text="@string/app_sign_in"/>
 
 
-        <Button
-            android:id="@+id/register_button"
-            android:layout_width="350dp"
-            android:layout_height="75dp"
-            android:layout_marginBottom="75dp"
-            android:layout_marginTop="20dp"
-            android:background="#F26141"
-            android:text="@string/app_register"/>
 
-        <com.facebook.login.widget.LoginButton
-            android:id="@+id/login_button"
-            android:layout_width="201dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="30dp"
-            />
-
-
-    </LinearLayout>
-
-
-</android.support.v4.widget.DrawerLayout>

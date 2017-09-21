@@ -36,6 +36,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.mindorks.placeholderview.PlaceHolderView;
+import com.opark.opark.card_swipe.MainActivityCardSwipe;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -233,7 +234,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (currentUser != null) {
 
-            String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
             StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
             storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
@@ -245,6 +246,10 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
 
                     //TODO Add Intent to Card Swipe onSuccess
+//                    Intent intent = new Intent(LoginActivity.this, MainActivityCardSwipe.class);
+//                    intent.putExtra("firebaseUser", currentUserID);
+//                    finish();
+//                    startActivity(intent);
 
                 }
             }).addOnFailureListener(new OnFailureListener() {

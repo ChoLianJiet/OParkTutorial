@@ -35,6 +35,7 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
 
+
     compile 'com.google.android.gms:play-services-location:11.2.0'
     compile 'com.google.android.gms:play-services-places:11.2.0'
     compile 'com.google.android.gms:play-services-maps:11.2.0'
