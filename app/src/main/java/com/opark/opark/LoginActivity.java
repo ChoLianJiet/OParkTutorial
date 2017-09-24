@@ -78,12 +78,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        mDrawer = (DrawerLayout)findViewById(R.id.drawerLayout);
-//        mDrawerView = (PlaceHolderView)findViewById(R.id.drawerView);
-//        mToolbar = (Toolbar)findViewById(R.id.toolbar);
-//        mGalleryView = (PlaceHolderView)findViewById(R.id.galleryView);
-//        setupDrawer();
-
 
         FacebookSdk.setApplicationId("113991652589123");
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -220,10 +214,10 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
 
                     //TODO Add Intent to Card Swipe onSuccess
-//                    Intent intent = new Intent(LoginActivity.this, MainActivityCardSwipe.class);
-//                    intent.putExtra("firebaseUser", currentUserID);
-//                    finish();
-//                    startActivity(intent);
+                    Intent intent = new Intent(LoginActivity.this, DrawerActivityMain.class);
+                    intent.putExtra("firebaseUser", currentUserID);
+                    finish();
+                    startActivity(intent);
 
                 }
             }).addOnFailureListener(new OnFailureListener() {

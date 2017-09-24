@@ -13,7 +13,6 @@
         android:name="com.facebook.sdk.ApplicationId"
         android:value="@string/facebook_app_id"/>
 
-
     <activity
         android:name="com.facebook.FacebookActivity"
         android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -39,7 +38,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--GOOGLE LOCATION SERVICE META DATA-->
+        <!-- GOOGLE LOCATION SERVICE META DATA -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/map_api_key"/>
@@ -51,12 +50,17 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.opark.opark.card_swipe.MainActivityCardSwipe">
+        <activity android:name=".card_swipe.MainActivityCardSwipe">
         </activity>
-        <activity android:name="com.opark.opark.motion_vehicle_tracker.Map">
+        <activity android:name=".motion_vehicle_tracker.Map">
         </activity>
         <activity android:name=".RegisterActivity"/>
         <activity android:name=".UserProfileSetup">
+        </activity>
+        <activity
+            android:name=".DrawerActivityMain"
+            android:label="@string/title_activity_drawer_main"
+            android:theme="@style/AppTheme">
         </activity>
     </application>
 

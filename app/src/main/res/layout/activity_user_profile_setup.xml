@@ -390,6 +390,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:onClick="signOutUser"
         android:text="@string/notyousignout"/>
 
 

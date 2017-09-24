@@ -126,19 +126,19 @@ public class UserProfileSetup extends AppCompatActivity {
             }
         });
 
-        
-        buttonSignOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Log.d("signout", "signoutbutton Clicked");
-                mAuth = FirebaseAuth.getInstance();
-                mAuth.signOut();
-                Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
-                finish();
-                startActivity(intent);
-                    }
-                });
+//
+//        buttonSignOut.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                Log.d("signout", "signoutbutton Clicked");
+//                mAuth = FirebaseAuth.getInstance();
+//                mAuth.signOut();
+//                Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
+//                finish();
+//                startActivity(intent);
+//                    }
+//                });
 
 
 
@@ -408,6 +408,22 @@ public class UserProfileSetup extends AppCompatActivity {
         attemptProfileSetup();
     }
 
+    public void signOutUser (View v) {
+        attemptUserSignOut();
+    }
+
+    private void attemptUserSignOut(){
+        Log.d("signout", "signoutbutton Clicked");
+        mAuth = FirebaseAuth.getInstance();
+        mAuth.signOut();
+        Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
+        finish();
+        startActivity(intent);
+    }
+
+
+
+
     private void attemptProfileSetup() {
 
 
@@ -444,7 +460,7 @@ else {
 
 
 // CHECK IF FIELD IS EMPTY
-    private boolean emptyCheck (String[] string, EditText[] editTexts /*,boolean cancel, View focusView*/, int size){
+    private boolean emptyCheck (String[] string, EditText[] editTexts , int size){
 
        boolean cancel =false;
        View focusView =null;

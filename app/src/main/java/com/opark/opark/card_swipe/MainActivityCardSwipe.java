@@ -5,17 +5,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.database.DatabaseUtilsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -39,11 +35,9 @@ import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import com.jackandphantom.circularimageview.CircleImage;
 import com.opark.opark.R;
@@ -53,8 +47,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-import static android.R.attr.key;
-import static com.opark.opark.R.string.error;
 import static java.lang.Double.valueOf;
 
 
@@ -107,6 +99,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
     private com.opark.opark.card_swipe.internal.SwipeFlingAdapterView swipeView;
     private InnerAdapter adapter;
 
+    private Button signOutButton;
     private Button shareParkingButton;
 
     private GeoFire geoFire;
@@ -120,6 +113,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_card_swipe);
+        signOutButton = (Button) findViewById(R.id.not_you_sign_out_button);
 
         loadData();
         initView();
@@ -145,12 +139,6 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
 
         shareParkingButton = (Button) findViewById(R.id.shareParkingButton);
 
-        shareParkingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getCurrentLocation();
-            }
-        });
 
 
     }
