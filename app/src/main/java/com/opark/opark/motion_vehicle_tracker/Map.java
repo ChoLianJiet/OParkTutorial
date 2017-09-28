@@ -95,6 +95,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
         String keyOfTrackedUser = "firebase-hq";
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("geofire");
         GeoFire geoFire = new GeoFire(ref);
+        geoFire.setLocation("firebase-hq", new GeoLocation(3.059071, 101.673742));
         geoFire.getLocation(keyOfTrackedUser, new LocationCallback() {
             @Override
             public void onLocationResult(String key, GeoLocation location) {
@@ -184,7 +185,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
             mk= mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon))
                     //.icon(BitmapDescriptorFactory.fromResource(R.drawable.pin3))
                     .icon(BitmapDescriptorFactory.fromBitmap((smallMarker))));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 16));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 20));
             //Set Marker Count to 1 after first marker is created
             markerCount=1;
 
@@ -206,7 +207,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     private void randomLocationGenerator(GeoFire geoFire, Location origin) {
 
         generateLocationWithinRadius(origin,100);
-        geoFire.setLocation("firebase-hq", new GeoLocation(37.7853889, -122.4056973));
+        //geoFire.setLocation("firebase-hq", new GeoLocation(37.7853889, -122.4056973));
 
     }
 
