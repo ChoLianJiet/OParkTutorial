@@ -166,6 +166,8 @@
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.12" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="facebook-applinks-4.27.0" level="project" />
+    <orderEntry type="library" exported="" name="geofire-android-2.1.2" level="project" />
+    <orderEntry type="library" exported="" name="facebook-applinks-4.27.0" level="project" />
     <orderEntry type="library" exported="" name="firebase-analytics-impl-11.2.0" level="project" />
     <orderEntry type="library" exported="" name="geofire-android-2.1.2" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-25.3.1" level="project" />
