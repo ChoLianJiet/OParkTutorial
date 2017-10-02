@@ -129,6 +129,7 @@
     <orderEntry type="library" exported="" name="bolts-applinks-1.4.0" level="project" />
     <orderEntry type="library" exported="" name="firebase-storage-common-11.2.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-places-11.2.0" level="project" />
+    <orderEntry type="library" exported="" name="firebase-storage-common-11.2.0" level="project" />
     <orderEntry type="library" exported="" name="firebase-common-11.2.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-tasks-11.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-25.3.1" level="project" />
