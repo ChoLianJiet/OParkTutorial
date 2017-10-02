@@ -85,7 +85,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="41dp"
+        android:layout_marginTop="28dp"
         android:layout_below="@+id/name_num_2"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">
@@ -211,13 +211,16 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/edit_profile_details"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="37dp"
-        android:text="Button"
         android:layout_below="@+id/address_all"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="37dp"
+        android:background="@color/colorPrimaryDark"
+        android:elevation="24dp"
+        android:text="@string/edit_profile_button"/>
 
 </RelativeLayout>
 
