@@ -138,7 +138,6 @@
     <orderEntry type="library" exported="" name="gson-2.2.4" level="project" />
     <orderEntry type="library" exported="" name="gson-2.2.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-11.2.0" level="project" />
-    <orderEntry type="library" exported="" name="placeholderview-0.2.7" level="project" />
     <orderEntry type="library" exported="" name="constraint-layout-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="firebase-iid-11.2.0" level="project" />
     <orderEntry type="library" exported="" name="facebook-android-sdk-4.27.0" level="project" />
