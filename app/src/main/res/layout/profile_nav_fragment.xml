@@ -16,11 +16,12 @@
         android:id="@+id/name_num_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_marginTop="142dp"
         android:orientation="horizontal"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:weightSum="1">
 
         <RelativeLayout
             android:id="@+id/relativeLayout2"
@@ -60,7 +61,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/name_num_1"
         android:layout_centerHorizontal="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="1">
 
         <TextView
             android:id="@+id/phone_num_edit"
@@ -84,11 +86,12 @@
         android:id="@+id/car_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="28dp"
-        android:layout_below="@+id/name_num_2"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/name_num_2"
+        android:layout_marginTop="28dp"
+        android:orientation="horizontal"
+        android:weightSum="1">
 
         <RelativeLayout
             android:id="@+id/relativeLayout"
@@ -141,12 +144,13 @@
         android:id="@+id/car_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/car_1"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_below="@+id/car_1"
         android:layout_marginBottom="58dp"
 
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="1">
 
         <TextView
             android:id="@+id/car_plate_edit"
@@ -159,14 +163,15 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/address_all"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/address_all"
-        android:layout_marginTop="50dp"
-        android:layout_below="@+id/car_1"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/car_1"
+        android:layout_marginTop="50dp"
+        android:orientation="vertical"
+        android:weightSum="1">
 
         <TextView
             android:id="@+id/first_line_edit"

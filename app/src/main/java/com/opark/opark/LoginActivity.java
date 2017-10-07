@@ -35,7 +35,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
-import com.mindorks.placeholderview.PlaceHolderView;
 import com.opark.opark.card_swipe.MainActivityCardSwipe;
 
 import android.os.Bundle;
@@ -68,10 +67,8 @@ public class LoginActivity extends AppCompatActivity {
     LoginButton loginButton;
     private Button registerButton;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private PlaceHolderView mDrawerView;
     private DrawerLayout mDrawer;
     private Toolbar mToolbar;
-    private PlaceHolderView mGalleryView;
 
 
     @Override
