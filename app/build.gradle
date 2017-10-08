@@ -37,7 +37,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-places:11.2.0'
     compile 'com.google.android.gms:play-services-maps:11.2.0'
     compile  files('libs/signalr-client-sdk.jar')
-    compile  files('libs/gson-2.2.2')
+    compile  files('libs/gson-2.2.2.jar')
     compile  files('libs/signalr-client-sdk-android.jar')
     compile 'com.github.johnkil.android-appmsg:appmsg:1.2.0'
     compile 'com.jackandphantom.android:circularimageview:1.2.0'

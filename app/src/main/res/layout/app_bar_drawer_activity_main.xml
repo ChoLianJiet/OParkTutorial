@@ -12,13 +12,20 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:background="@color/colorPrimaryDark"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme"/>
+
+        <include
+            android:id="@+id/custom_toobar_edit"
+            layout="@layout/custom_toolbar"
+            />
+
+
+        <!--<android.support.v7.widget.Toolbar-->
+            <!--android:id="@+id/toolbar"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:background="@color/colorPrimaryDark"-->
+            <!--android:minHeight="?attr/actionBarSize"-->
+            <!--android:theme="?attr/actionBarTheme"/>-->
     </android.support.design.widget.AppBarLayout>
 
     <include

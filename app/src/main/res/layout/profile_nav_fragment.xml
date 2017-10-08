@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="false"
                 android:layout_centerInParent="false"
-                android:text="First Name"
+                android:text=" "
                 android:textColor="@color/black"/>
 
             <TextView
@@ -49,7 +49,7 @@
                 android:layout_marginStart="15dp"
                 android:layout_toEndOf="@+id/first_name_edit"
                 android:layout_toRightOf="@+id/first_name_edit"
-                android:text="Last Name"
+                android:text=" "
                 android:textAlignment="center"
                 android:textColor="@color/black"/>
         </RelativeLayout>
@@ -68,7 +68,7 @@
             android:id="@+id/phone_num_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Phone Number"
+            android:text=" "
             android:textAlignment="center"
             android:textColor="@color/black"/>
 
@@ -76,7 +76,7 @@
             android:id="@+id/email_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Email"
+            android:text=" "
             android:textAlignment="center"
             android:textColor="@color/black"/>
 
@@ -109,7 +109,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerInParent="false"
 
-                android:text="Car Colour"
+                android:text=" "
                 android:textColor="@color/black"/>
 
             <TextView
@@ -122,7 +122,7 @@
                 android:layout_marginStart="15dp"
                 android:layout_toEndOf="@+id/car_colour_edit"
                 android:layout_toRightOf="@+id/car_colour_edit"
-                android:text="Car Brand"
+                android:text=" "
                 android:textAlignment="center"
                 android:textColor="@color/black"/>
 
@@ -135,7 +135,7 @@
                 android:layout_marginStart="17dp"
                 android:layout_toEndOf="@+id/car_brand_edit"
                 android:layout_toRightOf="@+id/car_brand_edit"
-                android:text="Car Model"
+                android:text=" "
                 android:textColor="@color/black"/>
         </RelativeLayout>
     </LinearLayout>
@@ -156,7 +156,7 @@
             android:id="@+id/car_plate_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Car Plate"
+            android:text=" "
             android:textAlignment="center"
             android:textColor="@color/black"/>
 
@@ -177,7 +177,7 @@
             android:id="@+id/first_line_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="First Line"
+            android:text=" "
             android:textAlignment="center"
             android:textColor="@color/black"/>
 
@@ -185,7 +185,7 @@
             android:id="@+id/second_line_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Second Line"
+            android:text=" "
             android:textAlignment="center"
             android:textColor="@color/black"/>
 
@@ -193,7 +193,7 @@
             android:id="@+id/city_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="City"
+            android:text=" "
             android:textAlignment="center"
             android:textColor="@color/black"/>
 
@@ -201,7 +201,7 @@
             android:id="@+id/post_code_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Postcode"
+            android:text=" "
             android:textAlignment="center"
             android:textColor="@color/black"/>
 
@@ -209,23 +209,23 @@
             android:id="@+id/country_state_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Country State"
+            android:text=" "
             android:textAlignment="center"
             android:textColor="@color/black"/>
 
     </LinearLayout>
 
     <Button
-        android:id="@+id/edit_profile_details"
-        style="@style/Widget.AppCompat.Button"
+        android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/address_all"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="37dp"
+        android:layout_marginTop="42dp"
         android:background="@color/colorPrimaryDark"
-        android:elevation="24dp"
-        android:text="@string/edit_profile_button"/>
+        android:fontFamily="sans-serif"
+        android:text="Edit Profile"
+        android:textAppearance="@style/TextAppearance.AppCompat"/>
 
 </RelativeLayout>
 

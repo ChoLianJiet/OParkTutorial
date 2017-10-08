@@ -26,6 +26,8 @@ import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.opark.opark.model.User;
 
+import org.w3c.dom.Text;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -45,7 +47,7 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class ProfileNavFragment extends Fragment {
 
-    private TextView firstName, lastName, phoneNum;
+    private TextView firstName, lastName, phoneNum, email;
     private TextView carColour, carBrand, carModel, carPlate;
     private TextView firstLine, secondLine, city, postcode, countryState;
     String firebaseUserUID;
@@ -87,14 +89,15 @@ public class ProfileNavFragment extends Fragment {
                             firstName.setText(userObjList.get(i).getUserName().getFirstName());
                             lastName.setText(userObjList.get(i).getUserName().getLastName());
                             phoneNum.setText(userObjList.get(i).getUserName().getPhoneNum());
+                            email.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
                             carColour.setText(userObjList.get(i).getUserCar().getCarColour());
                             carBrand.setText(userObjList.get(i).getUserCar().getCarBrand());
                             carModel.setText(userObjList.get(i).getUserCar().getCarModel());
+                            carPlate.setText(userObjList.get(i).getUserCar().getCarPlate());
                             firstLine.setText(userObjList.get(i).getUserAddress().getFirstline());
                             secondLine.setText(userObjList.get(i).getUserAddress().getSecondline());
                             Log.d("secondline","secondline success");
                             city.setText(userObjList.get(i).getUserAddress().getCity());
-
                             postcode.setText(userObjList.get(i).getUserAddress().getPostcode());
                             countryState.setText(userObjList.get(i).getUserAddress().getCountryState());
 
@@ -124,6 +127,7 @@ public class ProfileNavFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         //you can set the title for your toolbar here for different fragments different titles
         getActivity().setTitle("Profile");
     }
@@ -137,6 +141,7 @@ public class ProfileNavFragment extends Fragment {
         firstName = (TextView) view.findViewById(R.id.first_name_edit);
         lastName = (TextView) view.findViewById(R.id.last_name_edit);
         phoneNum = (TextView) view.findViewById(R.id.phone_num_edit);
+        email = (TextView) view.findViewById(R.id.email_edit);
         carColour = (TextView) view.findViewById(R.id.car_colour_edit);
         carBrand = (TextView) view.findViewById(R.id.car_brand_edit);
         carModel = (TextView) view.findViewById(R.id.car_model_edit);

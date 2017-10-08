@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.opark.opark">
 
+
+
     <!-- Uses permission -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.LOCATION_HARDWARE"/>
@@ -34,6 +36,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
         </activity>
         <activity android:name=".card_swipe.MainActivityCardSwipe">
         </activity>
@@ -45,6 +48,7 @@
         <activity
             android:name=".DrawerActivityMain"
             android:label="@string/title_activity_drawer_main"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
         </activity>
 
