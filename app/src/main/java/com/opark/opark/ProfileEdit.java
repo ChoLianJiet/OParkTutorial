@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import static android.R.id.list;
 import static android.R.string.cancel;
 
-public class UserProfileSetup extends AppCompatActivity {
+public class ProfileEdit extends AppCompatActivity {
 
     private ExpandableLayout expandableFirstName;
     private ExpandableLayout expandableLastName;
@@ -61,11 +61,11 @@ public class UserProfileSetup extends AppCompatActivity {
     private EditText city ;
     private EditText postcode ;
     private EditText countryState;
-    private Button profileSubmit;
+    private Button profileUpdate;
     private Button buttonExpandAddressLayout;
     private Button buttonExpandNameNumLayout;
     private Button buttonExpandCarLayout;
-    private Button buttonSignOut;
+
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String [] carString = new String[4];
@@ -75,15 +75,13 @@ public class UserProfileSetup extends AppCompatActivity {
     private String [] addressString = new String [5];
     private EditText[] addressEditText = new EditText[5];
 
-
     private User user = new User(); // Changed User from static to non static
     String firebaseUserUID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_profile_setup);
-
+        setContentView(R.layout.activity_profile_edit);
         // Retrieve FirebaseUser object via intent string extra
         // String is converted into FirebaseUser object via Gson
         firebaseUserUID = getIntent().getStringExtra("firebaseUser");
@@ -110,35 +108,22 @@ public class UserProfileSetup extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-               addressExpand();
+                addressExpand();
 
 
             }
         });
 
- //Expand Car layout
+        //Expand Car layout
         buttonExpandCarLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-               carExpand();
+                carExpand();
 
             }
         });
 
-        //TODO Signout code
-//        buttonSignOut.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                Log.d("signout", "signoutbutton Clicked");
-//                mAuth = FirebaseAuth.getInstance();
-//                mAuth.signOut();
-//                Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
-//                finish();
-//                startActivity(intent);
-//                    }
-//                });
 
 
 
@@ -151,9 +136,9 @@ public class UserProfileSetup extends AppCompatActivity {
         nameNumEditText[1]= lastName;
         nameNumEditText[2]= phoneNum;
 
-      nameNumString[0]=  user.userName.firstName = firstName.getText().toString();
-      nameNumString[1]=  user.userName.lastName = lastName.getText().toString();
-      nameNumString[2]=  user.userName.phoneNum = phoneNum.getText().toString();
+        nameNumString[0]=  user.userName.firstName = firstName.getText().toString();
+        nameNumString[1]=  user.userName.lastName = lastName.getText().toString();
+        nameNumString[2]=  user.userName.phoneNum = phoneNum.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -188,11 +173,11 @@ public class UserProfileSetup extends AppCompatActivity {
         addressEditText[3]=postcode ;
         addressEditText[4]=countryState;
 
-      addressString[0]=  user.userAddress.firstline = firstLine.getText().toString();
-      addressString[1]=  user.userAddress.secondline = secondLine.getText().toString();
-      addressString[2]=  user.userAddress.city = city.getText().toString();
-      addressString[3]=  user.userAddress.postcode = postcode.getText().toString();
-      addressString[4]=  user.userAddress.countryState = countryState.getText().toString();
+        addressString[0]=  user.userAddress.firstline = firstLine.getText().toString();
+        addressString[1]=  user.userAddress.secondline = secondLine.getText().toString();
+        addressString[2]=  user.userAddress.city = city.getText().toString();
+        addressString[3]=  user.userAddress.postcode = postcode.getText().toString();
+        addressString[4]=  user.userAddress.countryState = countryState.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -205,7 +190,7 @@ public class UserProfileSetup extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish();
-        Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
+        Intent intent = new Intent(ProfileEdit.this, DrawerActivityMain.class);
         startActivity(intent);
     }
 
@@ -244,34 +229,34 @@ public class UserProfileSetup extends AppCompatActivity {
 
     private void bindViews(){
 
-        firstName = (EditText) findViewById(R.id.edittext_first_name);
-        lastName = (EditText) findViewById(R.id.edittext_last_name);
-        phoneNum = (EditText) findViewById(R.id.edittext_phone_num);
-        carColour = (EditText) findViewById(R.id.edittext_car_colour);
-        carBrand = (EditText) findViewById(R.id.edittext_car_brand);
-        carModel = (EditText) findViewById(R.id.edittext_car_model);
-        carPlate = (EditText) findViewById(R.id.edittext_car_plate);
-        firstLine = (EditText) findViewById(R.id.edittext_first_line);
-        secondLine = (EditText) findViewById(R.id.edittext_second_line);
-        city = (EditText) findViewById(R.id.edittext_city);
-        postcode = (EditText) findViewById(R.id.edittext_postcode);
-        countryState = (EditText) findViewById(R.id.edittext_state);
-         buttonExpandAddressLayout = (Button) findViewById(R.id.expand_address_button);
-         buttonExpandNameNumLayout = (Button) findViewById(R.id.expand_name_button);
-         buttonExpandCarLayout = (Button) findViewById(R.id.expand_car_button);
-        expandableFirstName = (ExpandableLayout) findViewById(R.id.expand_first_name);
-        expandableLastName = (ExpandableLayout) findViewById(R.id.expand_last_name);
-        expandablePhoneNum = (ExpandableLayout) findViewById(R.id.expand_phone_number);
-        expandableCarColour =(ExpandableLayout) findViewById(R.id.expand_car_colour);
-        expandableCarBrand = (ExpandableLayout) findViewById(R.id.expand_car_brand);
-        expandableCarModel = (ExpandableLayout) findViewById(R.id.expand_car_model);
-        expandableCarPlate = (ExpandableLayout) findViewById(R.id.expand_car_plate);
-        expandableFirstLineAddress = (ExpandableLayout) findViewById(R.id.expand_firstline_address);
-        expandableSecondLineAddress = (ExpandableLayout) findViewById(R.id.expand_secondline_address);
-        expandableCity = (ExpandableLayout) findViewById(R.id.expand_city_address);
-        expandablePostcode = (ExpandableLayout) findViewById(R.id.expand_postcode_address);
-        expandableCountryState = (ExpandableLayout) findViewById(R.id.expand_countryState_address);
-        profileSubmit = (Button) findViewById(R.id.profile_submit_button) ;
+        firstName = (EditText) findViewById(R.id.edittext_first_name_update);
+        lastName = (EditText) findViewById(R.id.edittext_last_name_update);
+        phoneNum = (EditText) findViewById(R.id.edittext_phone_num_update);
+        carColour = (EditText) findViewById(R.id.edittext_car_colour_update);
+        carBrand = (EditText) findViewById(R.id.edittext_car_brand_update);
+        carModel = (EditText) findViewById(R.id.edittext_car_model_update);
+        carPlate = (EditText) findViewById(R.id.edittext_car_plate_update);
+        firstLine = (EditText) findViewById(R.id.edittext_first_line_update);
+        secondLine = (EditText) findViewById(R.id.edittext_second_line_update);
+        city = (EditText) findViewById(R.id.edittext_city_update);
+        postcode = (EditText) findViewById(R.id.edittext_postcode_update);
+        countryState = (EditText) findViewById(R.id.edittext_state_update);
+        buttonExpandAddressLayout = (Button) findViewById(R.id.expand_address_button_update);
+        buttonExpandNameNumLayout = (Button) findViewById(R.id.expand_name_button_update);
+        buttonExpandCarLayout = (Button) findViewById(R.id.expand_car_button_update);
+        expandableFirstName = (ExpandableLayout) findViewById(R.id.expand_first_name_update);
+        expandableLastName = (ExpandableLayout) findViewById(R.id.expand_last_name_update);
+        expandablePhoneNum = (ExpandableLayout) findViewById(R.id.expand_phone_number_update);
+        expandableCarColour =(ExpandableLayout) findViewById(R.id.expand_car_colour_update);
+        expandableCarBrand = (ExpandableLayout) findViewById(R.id.expand_car_brand_update);
+        expandableCarModel = (ExpandableLayout) findViewById(R.id.expand_car_model_update);
+        expandableCarPlate = (ExpandableLayout) findViewById(R.id.expand_car_plate_update);
+        expandableFirstLineAddress = (ExpandableLayout) findViewById(R.id.expand_firstline_address_update);
+        expandableSecondLineAddress = (ExpandableLayout) findViewById(R.id.expand_secondline_address_update);
+        expandableCity = (ExpandableLayout) findViewById(R.id.expand_city_address_update);
+        expandablePostcode = (ExpandableLayout) findViewById(R.id.expand_postcode_address_update);
+        expandableCountryState = (ExpandableLayout) findViewById(R.id.expand_countryState_address_update);
+        profileUpdate = (Button) findViewById(R.id.confirm_profile_update_button) ;
     }
 
     private void expandableListener(){
@@ -422,8 +407,8 @@ public class UserProfileSetup extends AppCompatActivity {
         collectCar();
         collectAddress();
 
-       checkCar= emptyCheck(carString,carEditText, 4);
-       checkAddress= emptyCheck(addressString,addressEditText, 5);
+        checkCar= emptyCheck(carString,carEditText, 4);
+        checkAddress= emptyCheck(addressString,addressEditText, 5);
         checkNameNum = emptyCheck(nameNumString,nameNumEditText,3);
 
 // do empty check if returns true, break operation
@@ -432,25 +417,23 @@ public class UserProfileSetup extends AppCompatActivity {
         }
 
 
-else {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference();
+        else {
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference();
 
-        StorageReference userFolder = storageRef.child("users/" + firebaseUserUID + "/profile.txt");
-        objToByteStreamUpload(user, userFolder);
+            StorageReference userFolder = storageRef.child("users/" + firebaseUserUID + "/profile.txt");
+            objToByteStreamUpload(user, userFolder);
 
-        //TODO intent to card swipe or other page ? maybe upload prof pic ?
-        Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
-        finish();
-        startActivity(intent);}
+            //TODO intent to card swipe or other page ? maybe upload prof pic ?
+           }
     }
 
 
-// CHECK IF FIELD IS EMPTY
+    // CHECK IF FIELD IS EMPTY
     private boolean emptyCheck (String[] string, EditText[] editTexts , int size){
 
-       boolean cancel =false;
-       View focusView =null;
+        boolean cancel =false;
+        View focusView =null;
 
         for (int i = 0; i < size; i++){
             if (string[i].isEmpty()) {
@@ -465,7 +448,7 @@ else {
                 // There was an error; don't attempt login and focus the first
                 // form field with an error.
                 focusView.requestFocus();
-                    }
+            }
 
         }
 
@@ -473,10 +456,3 @@ else {
 
     }
 }
-
-
-
-
-
-
-

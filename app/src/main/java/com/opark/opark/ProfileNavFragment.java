@@ -13,9 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,8 +53,10 @@ public class ProfileNavFragment extends Fragment {
     private TextView firstName, lastName, phoneNum, email;
     private TextView carColour, carBrand, carModel, carPlate;
     private TextView firstLine, secondLine, city, postcode, countryState;
+    private Button signOutButton, profileEditButton;
     String firebaseUserUID;
     ArrayList<User> userObjList = new ArrayList<>();
+    private FirebaseAuth mAuth;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
@@ -116,6 +121,32 @@ public class ProfileNavFragment extends Fragment {
 
 
 
+        profileEditButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAuth = FirebaseAuth.getInstance();
+                mAuth.signOut();
+                LoginManager.getInstance().logOut();
+
+                Intent intent = new Intent(getApplicationContext(), ProfileEdit.class);
+                startActivity(intent);
+            }
+        });
+
+signOutButton.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        mAuth = FirebaseAuth.getInstance();
+        mAuth.signOut();
+        LoginManager.getInstance().logOut();
+
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(intent);
+
+    }
+});
+
+
 
         return view;
 
@@ -151,13 +182,8 @@ public class ProfileNavFragment extends Fragment {
         postcode = (TextView) view.findViewById(R.id.post_code_edit);
         city = (TextView)view.findViewById(R.id.city_edit);
         countryState = (TextView) view.findViewById(R.id.country_state_edit);
-
-    }
-
-
-    private void retrieveProfileFromStorage() {
-
-
+        signOutButton = (Button) view.findViewById(R.id.sign_out_from_fragment);
+        profileEditButton = (Button) view.findViewById(R.id.edit_profile_button);
 
     }
 
@@ -165,57 +191,45 @@ public class ProfileNavFragment extends Fragment {
 
 
 
-    public static String convertStreamToString(InputStream is) throws Exception {
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-
-        while ((line = reader.readLine()) != null) {
-
-            sb.append(line).append("\n");
-
-        }
-
-
-        reader.close();
-        return sb.toString();
-
-    }
 
 
 
-
-    private void profileEdit (View v) {
-
-
-
-    }
-
-
-    public void objFromByteStreamDownload(String objStr, StorageReference destination){
-
-       Object obj = new Gson().fromJson(objStr,String.class);
-        InputStream in = new ByteArrayInputStream(objStr.getBytes( Charset.forName("UTF-8")));
-        UploadTask uploadTask = destination.putStream(in);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                showErrorDialog("Failed to update your profile. Try again maybe? ");
-                // Use analytics to find out why is the error
-                // then only implement the best corresponding measures
+//    public static String convertStreamToString(InputStream is) throws Exception {
+//
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+//        StringBuilder sb = new StringBuilder();
+//        String line = null;
+//
+//        while ((line = reader.readLine()) != null) {
+//
+//            sb.append(line).append("\n");
+//
+//        }
+//
+//
+//        reader.close();
+//        return sb.toString();
+//
+//    }
 
 
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(getApplicationContext(), "Profile update successful!", Toast.LENGTH_LONG).show();
-                Log.i("Hello", "Profile update successful!");
-                // Use analytics to calculate the success rate
-            }
-        });
-    }
+//
+//public void editProfile(View v){
+//
+//        attemptEditProfile();
+//}
+//
+//private void attemptEditProfile(){
+//    mAuth = FirebaseAuth.getInstance();
+//    Intent intent = new Intent(getContext(), ProfileEdit.class);
+//    intent.putExtra("firebaseUser", firebaseUserUID);
+//    startActivity(intent);
+//
+//}
+
+
+
+
 
 
     private void showErrorDialog(String message) {

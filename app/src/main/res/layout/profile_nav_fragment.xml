@@ -19,7 +19,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="142dp"
+        android:layout_marginTop="100dp"
         android:orientation="horizontal"
         android:weightSum="1">
 
@@ -37,7 +37,7 @@
                 android:layout_centerHorizontal="false"
                 android:layout_centerInParent="false"
                 android:text=" "
-                android:textColor="@color/black"/>
+                android:textColor="@color/grey"/>
 
             <TextView
                 android:id="@+id/last_name_edit"
@@ -51,7 +51,7 @@
                 android:layout_toRightOf="@+id/first_name_edit"
                 android:text=" "
                 android:textAlignment="center"
-                android:textColor="@color/black"/>
+                android:textColor="@color/grey"/>
         </RelativeLayout>
     </LinearLayout>
 
@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:text=" "
             android:textAlignment="center"
-            android:textColor="@color/black"/>
+            android:textColor="@color/grey"/>
 
         <TextView
             android:id="@+id/email_edit"
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:text=" "
             android:textAlignment="center"
-            android:textColor="@color/black"/>
+            android:textColor="@color/grey"/>
 
     </LinearLayout>
 
@@ -110,7 +110,7 @@
                 android:layout_centerInParent="false"
 
                 android:text=" "
-                android:textColor="@color/black"/>
+                android:textColor="@color/grey"/>
 
             <TextView
                 android:id="@+id/car_brand_edit"
@@ -124,7 +124,7 @@
                 android:layout_toRightOf="@+id/car_colour_edit"
                 android:text=" "
                 android:textAlignment="center"
-                android:textColor="@color/black"/>
+                android:textColor="@color/grey"/>
 
             <TextView
                 android:id="@+id/car_model_edit"
@@ -136,7 +136,7 @@
                 android:layout_toEndOf="@+id/car_brand_edit"
                 android:layout_toRightOf="@+id/car_brand_edit"
                 android:text=" "
-                android:textColor="@color/black"/>
+                android:textColor="@color/grey"/>
         </RelativeLayout>
     </LinearLayout>
 
@@ -158,7 +158,7 @@
             android:layout_height="wrap_content"
             android:text=" "
             android:textAlignment="center"
-            android:textColor="@color/black"/>
+            android:textColor="@color/grey"/>
 
     </LinearLayout>
 
@@ -179,7 +179,7 @@
             android:layout_height="wrap_content"
             android:text=" "
             android:textAlignment="center"
-            android:textColor="@color/black"/>
+            android:textColor="@color/grey"/>
 
         <TextView
             android:id="@+id/second_line_edit"
@@ -187,7 +187,7 @@
             android:layout_height="wrap_content"
             android:text=" "
             android:textAlignment="center"
-            android:textColor="@color/black"/>
+            android:textColor="@color/grey"/>
 
         <TextView
             android:id="@+id/city_edit"
@@ -195,7 +195,7 @@
             android:layout_height="wrap_content"
             android:text=" "
             android:textAlignment="center"
-            android:textColor="@color/black"/>
+            android:textColor="@color/grey"/>
 
         <TextView
             android:id="@+id/post_code_edit"
@@ -203,7 +203,7 @@
             android:layout_height="wrap_content"
             android:text=" "
             android:textAlignment="center"
-            android:textColor="@color/black"/>
+            android:textColor="@color/grey"/>
 
         <TextView
             android:id="@+id/country_state_edit"
@@ -211,21 +211,33 @@
             android:layout_height="wrap_content"
             android:text=" "
             android:textAlignment="center"
-            android:textColor="@color/black"/>
+            android:textColor="@color/grey"/>
 
     </LinearLayout>
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/edit_profile_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/address_all"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="42dp"
-        android:background="@color/colorPrimaryDark"
+        android:layout_marginTop="27dp"
+        android:background="@color/grey"
         android:fontFamily="sans-serif"
+
+        android:onClick="editProfile"
         android:text="Edit Profile"
         android:textAppearance="@style/TextAppearance.AppCompat"/>
+
+    <Button
+        android:id="@+id/sign_out_from_fragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="signOutFragment"
+        android:layout_below="@+id/edit_profile_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:text="@string/notyousignout"/>
 
 </RelativeLayout>
 
