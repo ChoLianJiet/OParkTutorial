@@ -81,8 +81,6 @@ public class ProfileNavFragment extends Fragment {
             @Override
             public void onSuccess(byte[] bytes) {
                 Log.d("Byte","getByte success");
-
-
                 try {
                     userObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
                     Log.d("Gson","Gsonfrom json success");
@@ -137,6 +135,7 @@ public class ProfileNavFragment extends Fragment {
     public void onClick(View v) {
         mAuth = FirebaseAuth.getInstance();
         mAuth.signOut();
+        LoginManager.getInstance().logOut();
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(intent);
 
@@ -183,49 +182,6 @@ public class ProfileNavFragment extends Fragment {
         profileEditButton = (Button) view.findViewById(R.id.edit_profile_button);
 
     }
-
-
-
-
-
-
-
-
-//    public static String convertStreamToString(InputStream is) throws Exception {
-//
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-//        StringBuilder sb = new StringBuilder();
-//        String line = null;
-//
-//        while ((line = reader.readLine()) != null) {
-//
-//            sb.append(line).append("\n");
-//
-//        }
-//
-//
-//        reader.close();
-//        return sb.toString();
-//
-//    }
-
-
-//
-//public void editProfile(View v){
-//
-//        attemptEditProfile();
-//}
-//
-//private void attemptEditProfile(){
-//    mAuth = FirebaseAuth.getInstance();
-//    Intent intent = new Intent(getContext(), ProfileEdit.class);
-//    intent.putExtra("firebaseUser", firebaseUserUID);
-//    startActivity(intent);
-//
-//}
-
-
-
 
 
 
