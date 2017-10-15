@@ -125,21 +125,18 @@ public class ProfileNavFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mAuth = FirebaseAuth.getInstance();
-                mAuth.signOut();
-                LoginManager.getInstance().logOut();
-
+                String firebaseUserUID = mAuth.getCurrentUser().getUid();
                 Intent intent = new Intent(getApplicationContext(), ProfileEdit.class);
+                intent.putExtra("firebaseUser", firebaseUserUID);
                 startActivity(intent);
             }
         });
 
-signOutButton.setOnClickListener(new View.OnClickListener() {
+        signOutButton.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
         mAuth = FirebaseAuth.getInstance();
         mAuth.signOut();
-        LoginManager.getInstance().logOut();
-
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(intent);
 

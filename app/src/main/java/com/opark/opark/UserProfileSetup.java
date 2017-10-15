@@ -126,19 +126,6 @@ public class UserProfileSetup extends AppCompatActivity {
             }
         });
 
-        //TODO Signout code
-//        buttonSignOut.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                Log.d("signout", "signoutbutton Clicked");
-//                mAuth = FirebaseAuth.getInstance();
-//                mAuth.signOut();
-//                Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
-//                finish();
-//                startActivity(intent);
-//                    }
-//                });
 
 
 

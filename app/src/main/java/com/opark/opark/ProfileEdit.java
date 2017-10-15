@@ -86,6 +86,7 @@ public class ProfileEdit extends AppCompatActivity {
         // String is converted into FirebaseUser object via Gson
         firebaseUserUID = getIntent().getStringExtra("firebaseUser");
 
+
         // LINKING VARIABLES TO RESPECTIVE IDs
         bindViews();
 
@@ -97,34 +98,31 @@ public class ProfileEdit extends AppCompatActivity {
         buttonExpandNameNumLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 nameNumExpand();
-
             }
         });
-
-// Expand Address Layout
+        // Expand Address Layout
         buttonExpandAddressLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 addressExpand();
-
-
             }
         });
-
         //Expand Car layout
         buttonExpandCarLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 carExpand();
-
             }
         });
 
 
+        profileUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptProfileUpdate();
+            }
+        });
 
 
     }
@@ -145,9 +143,6 @@ public class ProfileEdit extends AppCompatActivity {
 
 
     }
-
-
-
     private void collectCar(){
         carEditText[0]=carColour;
         carEditText[1]=carBrand ;
@@ -165,7 +160,6 @@ public class ProfileEdit extends AppCompatActivity {
 
 
     }
-
     private void collectAddress(){
         addressEditText[0]=firstLine ;
         addressEditText[1]=secondLine ;
@@ -205,7 +199,6 @@ public class ProfileEdit extends AppCompatActivity {
                 showErrorDialog("Failed to update your profile. Try again maybe? ");
                 // Use analytics to find out why is the error
                 // then only implement the best corresponding measures
-
 
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -388,16 +381,7 @@ public class ProfileEdit extends AppCompatActivity {
         expandableCountryState.collapse();
     }
 
-    public void profileSubmit(View v) {
-        attemptProfileSetup();
-    }
-
-
-
-
-
-    private void attemptProfileSetup() {
-
+    private void attemptProfileUpdate() {
 
         boolean checkNameNum = false;
         boolean checkAddress = false;
@@ -413,6 +397,7 @@ public class ProfileEdit extends AppCompatActivity {
 
 // do empty check if returns true, break operation
         if((checkCar) || (checkAddress) || (checkNameNum)) {
+            Log.d("emptyCheck","is Empty");
             return;
         }
 
@@ -422,7 +407,29 @@ public class ProfileEdit extends AppCompatActivity {
             StorageReference storageRef = storage.getReference();
 
             StorageReference userFolder = storageRef.child("users/" + firebaseUserUID + "/profile.txt");
-            objToByteStreamUpload(user, userFolder);
+
+
+            userFolder.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    // File deleted successfully
+                    Log.d("profileUpdate", "Profile Deleted Successful");
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference storageRef = storage.getReference();
+                    StorageReference userFolder = storageRef.child("users/" + firebaseUserUID + "/profile.txt");
+                    objToByteStreamUpload(user, userFolder);
+                    Log.d("profileUpdate","Profile update successful");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    Log.d("profileUpdate", "Profile Delete FAILED");
+                    showErrorDialog("Profile delete Failed");
+
+                }
+            });
+
 
             //TODO intent to card swipe or other page ? maybe upload prof pic ?
            }
