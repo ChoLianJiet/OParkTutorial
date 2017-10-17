@@ -35,6 +35,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import com.google.gson.Gson;
+import com.opark.opark.card_swipe.MainActivityCardSwipe;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;

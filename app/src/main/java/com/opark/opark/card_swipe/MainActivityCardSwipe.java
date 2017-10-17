@@ -145,7 +145,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
         FirebaseApp.initializeApp(getApplicationContext());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("geofire");
         geoFire = new GeoFire(ref);
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(3.05908772,101.67382481),0.5);
+//        geoQuery = geoFire.queryAtLocation(new GeoLocation(3.05908772,101.67382481),0.5);
 
         geoQuery = geoFire.queryAtLocation(new GeoLocation(lat,lon),2.5);
         getOtherUsersLocation();
@@ -531,6 +531,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
+                Log.d("Key","Key entered success");
                 System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
                 Log.d("Opark","onKeyEntered callback received");
                 StorageReference userRef = FirebaseStorage.getInstance().getReference().child("users").child(key).child("profile.txt");
@@ -543,7 +544,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
 
                             userObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
 
-                            if(userObjList.size() == 3 ){
+                            if(userObjList.size() > 1 ){
                                 for (int i = 0; i < userObjList.size(); i++){
                                     Log.i("Hello",userObjList.get(i).getUserName().getFirstName());
                                 }

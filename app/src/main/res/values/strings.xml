@@ -70,4 +70,5 @@
     <string name="map_api_key">AIzaSyAGN1FMsVKJHTjnNOw_HpmJMx4CUVrhREY</string>
     <string name="title_activity_drawer_main">DrawerActivityMain</string>
     <string name="edit_profile_button">Edit Profile</string>
+    <string name="confirm_profile_update">Update Profile</string>
 </resources>

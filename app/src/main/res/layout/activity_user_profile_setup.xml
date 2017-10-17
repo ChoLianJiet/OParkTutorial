@@ -383,16 +383,6 @@
         android:onClick="profileSubmit"
         android:text="@string/profile_submit"/>
 
-    <Button
-        android:id="@+id/not_you_sign_out_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:onClick="signOutUser"
-        android:text="@string/notyousignout"/>
-
 
     <!--================================================-->
 
