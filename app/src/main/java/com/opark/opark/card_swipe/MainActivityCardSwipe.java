@@ -166,6 +166,7 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
         shareParkingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("OPark","Location set onto database");
                 getCurrentLocation();
             }
         });
@@ -591,6 +592,6 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
     protected void onPause() {
         super.onPause();
 //        geoFire.removeLocation("firebase-hq");
-        geoQuery.removeAllListeners();
+//        geoQuery.removeAllListeners();
     }
 }

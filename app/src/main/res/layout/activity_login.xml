@@ -123,7 +123,8 @@
                 android:inputType="textPassword"
                 android:maxLines="1"
                 tools:layout_editor_absoluteX="8dp"
-                tools:layout_editor_absoluteY="33dp"/>
+                tools:layout_editor_absoluteY="33dp"
+                tools:ignore="InvalidImeActionId"/>
         </android.support.design.widget.TextInputLayout>
 
     </android.support.constraint.ConstraintLayout>
