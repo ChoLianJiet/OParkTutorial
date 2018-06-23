@@ -12,7 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationManager;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -34,7 +33,6 @@ import com.firebase.geofire.GeoQueryEventListener;
 import com.firebase.geofire.LocationCallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -47,8 +45,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -58,15 +54,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.opark.opark.LoginActivity;
-import com.opark.opark.MapsMainActivity;
 import com.opark.opark.Matchmaking;
 import com.opark.opark.NoUserPopUp;
 import com.opark.opark.R;
-import com.opark.opark.UserPopUp;
 import com.opark.opark.UserProfileSetup;
-import com.opark.opark.motion_vehicle_tracker.AppConstants;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -111,7 +102,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     private Query adatemQueryList;
     private static ArrayList<String> newArrayList = new ArrayList<>();
     private static ArrayList<String> oldArrayList = new ArrayList<>();
-    private static ArrayList<Pair<String,Marker>> markerArrayList = new ArrayList<>();
+    private static ArrayList<Pair<String,Marker>> markerArrayList = new ArrayList<Pair<String,Marker>>();
     private HashSet<String> newHashSet = new HashSet<>();
     private HashSet<String> oldHashSet = new HashSet<>();
     private int firstUser = 0;
@@ -362,7 +353,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-
     @Override
     public void onInfoWindowClick (Marker marker){
         Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
@@ -421,7 +411,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
                 System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
                 foundLatitude = location.latitude;
                 foundLongitude = location.longitude;
-                
+                LatLng kenaParkerLocation = new LatLng(foundLatitude, foundLongitude);
+                marker = mMap.addMarker(new MarkerOptions().position(kenaParkerLocation).icon(BitmapDescriptorFactory.fromResource(R.drawable.home01_icon_location)));
                 oldHashSet.addAll(oldArrayList);
                 oldArrayList.clear();
                 oldArrayList.addAll(oldHashSet);
@@ -433,14 +424,17 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
 
                 } else if (currentUserID.equals(key)) {
 
-                }   else {
+                } else {
 
                     newArrayList.add(key);
                     newHashSet.addAll(newArrayList);
                     newArrayList.clear();
                     newArrayList.addAll(newHashSet);
+                    markerArrayList.add(Pair.create(key,marker));
 
                 }
+
+                Log.d("OPark","lalala is " + markerArrayList);
 
                 for (firstUser = 0; firstUser < newArrayList.size(); firstUser++) {
                     foundUser = newArrayList.get(firstUser);
@@ -490,13 +484,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
                                         saveFoundUserId();
 
                                         loadingCircle.setVisibility(View.INVISIBLE);
-                                        if (marker == null){
-                                            LatLng kenaParkerLocation = new LatLng(foundLatitude, foundLongitude);
-                                            marker = mMap.addMarker(new MarkerOptions().position(kenaParkerLocation).icon(BitmapDescriptorFactory.fromResource(R.drawable.home01_icon_location)));
-                                        } else {
-                                            LatLng kenaParkerLocation = new LatLng(foundLatitude, foundLongitude);
-                                            marker = mMap.addMarker(new MarkerOptions().position(kenaParkerLocation).icon(BitmapDescriptorFactory.fromResource(R.drawable.home01_icon_location)));
-                                        }
 
 
                                     } else if (adatemValue.equals(ADATEM1)) {
@@ -554,7 +541,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
                         marker.remove();
-                        marker = null;
 
                         Log.d("OPark",key + "exited!");
                         newArrayList.remove(key);
