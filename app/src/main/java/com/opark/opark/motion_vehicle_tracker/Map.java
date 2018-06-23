@@ -2,17 +2,29 @@ package com.opark.opark.motion_vehicle_tracker;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.util.Pair;
+import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -38,14 +50,26 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.opark.opark.LoginActivity;
+import com.opark.opark.MapsMainActivity;
+import com.opark.opark.Matchmaking;
+import com.opark.opark.NoUserPopUp;
 import com.opark.opark.R;
+import com.opark.opark.UserPopUp;
+import com.opark.opark.UserProfileSetup;
 import com.opark.opark.motion_vehicle_tracker.AppConstants;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -54,8 +78,47 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
         GoogleMap.OnInfoWindowClickListener,GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+    //CONSTANT
+    final int REQUEST_CODE = 123;
+    long MIN_TIME = 5000;
+    long MIN_DISTANCE = 1000;
+    String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
+    String ADATEM0 = "0";
+    String ADATEM1 = "1";
+    public static String USER_ID_PREFS;
+    public static String USER_ID_KEY;
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
     private static final int REQUEST_LOCATION = 0;
+
+    //MEMBER VARIALBLE
+    private GoogleMap mMap;
+    private Button shareParkingButton;
+    private Button findParkingButton;
+    private Button signOutButton;
+    private Marker mk = null;
+    private Marker marker;
+    LocationManager mLocationManager;
+    android.location.LocationListener mLocationListener;
+    private DatabaseReference geofireRef;
+    private GeoFire geoFire;
+    private GeoQuery geoQuery;
+    private double longitude;
+    private double latitude;
+    private double foundLatitude;
+    private double foundLongitude;
+    private DatabaseReference matchmakingRef;
+    private String currentUserID;
+    private Query adatemQueryList;
+    private static ArrayList<String> newArrayList = new ArrayList<>();
+    private static ArrayList<String> oldArrayList = new ArrayList<>();
+    private static ArrayList<Pair<String,Marker>> markerArrayList = new ArrayList<>();
+    private HashSet<String> newHashSet = new HashSet<>();
+    private HashSet<String> oldHashSet = new HashSet<>();
+    private int firstUser = 0;
+    private static String foundUser;
+    private ProgressBar loadingCircle;
+
+
     private Location mLastLocation;
     // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
@@ -63,7 +126,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     private boolean mRequestingLocationUpdates = false;
     private LocationRequest mLocationRequest;
     private static final String TAG = "";
-    private GoogleMap mMap;
     private int markerCount;
 
 
@@ -87,19 +149,55 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        shareParkingButton = (Button) findViewById(R.id.share_parking_button);
+        findParkingButton = (Button) findViewById(R.id.find_parking_button);
+        shareParkingButton.setVisibility(View.INVISIBLE);
+        findParkingButton.setVisibility(View.INVISIBLE);
+        loadingCircle = (ProgressBar) findViewById(R.id.progress_bar);
+        loadingCircle.setVisibility(View.VISIBLE);
         FirebaseApp.initializeApp(getApplicationContext());
+        currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        geofireRef = FirebaseDatabase.getInstance().getReference().child("geofire");
+        geoFire = new GeoFire(geofireRef);
+        matchmakingRef = FirebaseDatabase.getInstance().getReference().child("matchmaking");
+        CardView cardView = (CardView) findViewById(R.id.cardView);
+        ImageView profilePicture = (ImageView) findViewById(R.id.profilePicture);
+        TextView name = (TextView) findViewById(R.id.name);
+        TextView carModel = (TextView) findViewById(R.id.carModel);
+        TextView carColor = (TextView) findViewById(R.id.carColor);
+        signOutButton = (Button) findViewById(R.id.sign_out_button);
+
+        getAndSetCurrentLocation();
+
+        shareParkingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setMatchkingFolderInDatabse();
+            }
+        });
+
+        findParkingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findOtherUsersLocation();
+            }
+        });
+
+        signOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signOut();
+            }
+        });
 
 
         //Get ID of the user to be tracked from intent's extra
         //String keyOfTrackedUser = getIntent().getStringExtra("userKey");
-        String keyOfTrackedUser = "firebase-hq";
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("geofire");
-        GeoFire geoFire = new GeoFire(ref);
-        geoFire.getLocation(keyOfTrackedUser, new LocationCallback() {
+        geoFire.getLocation(currentUserID, new LocationCallback() {
             @Override
             public void onLocationResult(String key, GeoLocation location) {
-                Log.i("Hello location result", String.valueOf(location.latitude) + " " + String.valueOf(location.longitude));
-                addMarker(mMap,location.latitude,location.longitude);
+                Log.i("Hello location result", String.valueOf(latitude) + " " + String.valueOf(longitude));
+                addMarker(mMap,latitude,longitude);
             }
 
             @Override
@@ -108,7 +206,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
             }
         });
 
-        ref.child(keyOfTrackedUser).child("l").addValueEventListener(new ValueEventListener() {
+
+        geofireRef.child(currentUserID).child("l").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String[] loc = new String[2];
@@ -118,7 +217,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
                     loc[Integer.parseInt(snap.getKey())] = snap.getValue().toString();
                 }
 
-                addMarker(mMap,Double.parseDouble(loc[0]),Double.parseDouble(loc[1]));
+                addMarker(mMap,latitude,longitude);
             }
 
             @Override
@@ -130,6 +229,72 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
         //randomLocationGenerator(geoFire);
 
 
+    }
+
+    //GET CURRENT LOCATION
+    private void getAndSetCurrentLocation() {
+
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        mLocationListener = new android.location.LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                Log.i("OPark", "onLocationChanged() callback received");
+
+                longitude = location.getLongitude();
+                latitude = location.getLatitude();
+
+                Log.i("OPark","longitude is: " + longitude);
+                Log.i("OPark","latitude is " + latitude);
+
+                geoFire.setLocation(currentUserID, new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onComplete(String key, DatabaseError error) {
+                        if (error != null) {
+                            System.err.println("There was an error saving the location to GeoFire: " + error);
+                        } else {
+                            System.out.println("Location saved on server successfully as lat[" + latitude + "], lon[" + longitude + "]!");
+                            shareParkingButton.setVisibility(View.VISIBLE);
+                            findParkingButton.setVisibility(View.VISIBLE);
+                            loadingCircle.setVisibility(View.INVISIBLE);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+                Log.i("OPark", "onProviderDisabled() callback received");
+            }
+        };
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_CODE);
+
+            return;
+        }
+        mLocationManager.requestLocationUpdates(LOCATION_PROVIDER, MIN_TIME, MIN_DISTANCE, mLocationListener);
     }
 
     /**
@@ -160,7 +325,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
        // mMap.setMyLocationEnabled(true);
     }
 
-    Marker mk = null;
+
     // Add A Map Pointer To The MAp
     public void addMarker(GoogleMap googleMap, double lat, double lon) {
 
@@ -192,8 +357,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
                 // TODO: Consider calling
                 return;
             }
-            //mMap.setMyLocationEnabled(true);
-            //startLocationUpdates();
+//            mMap.setMyLocationEnabled(true);
+//            startLocationUpdates();
         }
     }
 
@@ -206,7 +371,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     private void randomLocationGenerator(GeoFire geoFire, Location origin) {
 
         generateLocationWithinRadius(origin,100);
-        geoFire.setLocation("firebase-hq", new GeoLocation(37.7853889, -122.4056973));
+        geoFire.setLocation("firebase-hq", new GeoLocation(latitude, longitude));
 
     }
 
@@ -238,38 +403,216 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
         return new GeoLocation(x, y);
     }
 
-    private void lookForParkingSpaceNearby(Location location, double radius){
+    private void setMatchkingFolderInDatabse(){
 
+        String key = matchmakingRef.child(currentUserID+"/SessionKey").push().getKey();
+        Matchmaking bothAdatemAndKey = new Matchmaking(ADATEM0,key);
+        matchmakingRef.child(currentUserID).setValue(bothAdatemAndKey);
+        Log.i("Opark", "Session key is:" + key);
+    }
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("geofire");
-        GeoFire geoFire = new GeoFire(ref);
-        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), radius);
+    //FIND OTHER USERS LOCATION
+    private void findOtherUsersLocation() {
+        loadingCircle.setVisibility(View.VISIBLE);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), 1.0);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-                //update a list and refresh the card swipe
+                System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
+                foundLatitude = location.latitude;
+                foundLongitude = location.longitude;
+                
+                oldHashSet.addAll(oldArrayList);
+                oldArrayList.clear();
+                oldArrayList.addAll(oldHashSet);
+
+                System.out.print("oldArrayList consists " + oldArrayList);
+                //the user shared parking//
+                if (oldArrayList.contains(key)) {
+                    newArrayList.remove(key);
+
+                } else if (currentUserID.equals(key)) {
+
+                }   else {
+
+                    newArrayList.add(key);
+                    newHashSet.addAll(newArrayList);
+                    newArrayList.clear();
+                    newArrayList.addAll(newHashSet);
+
+                }
+
+                for (firstUser = 0; firstUser < newArrayList.size(); firstUser++) {
+                    foundUser = newArrayList.get(firstUser);
+                    break;
+                }
+
+                if (newArrayList.isEmpty()){
+
+                    newArrayList.addAll(oldArrayList);
+                    newHashSet.addAll(newArrayList);
+                    newArrayList.clear();
+                    newArrayList.addAll(newHashSet);
+                    oldArrayList.clear();
+
+                } else {
+                    Log.i("OPark","newArrayList is not empty lalala");
+                }
+
+                if (foundUser == null) {
+                    System.out.println("There are no foundUsers");
+                    Intent intent2 = new Intent(Map.this, NoUserPopUp.class);
+                    startActivity(intent2);
+                    loadingCircle.setVisibility(View.INVISIBLE);
+                } else {
+                    adatemQueryList = matchmakingRef.child(foundUser);
+                    System.out.println("found user is " + foundUser);
+                    adatemQueryList.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            try {
+                                if (newArrayList != null) {
+
+                                    Log.i("Opark", "newArrayList is not empty. Keys are " + newArrayList);
+                                    Log.i("OPark", "adatem value is " + dataSnapshot);
+
+                                    String adatemValue = dataSnapshot.child("adatem").getValue().toString();
+                                    Log.i("OPark", foundUser + "'s adatemValue is " + adatemValue);
+
+
+                                    if (adatemValue.equals(ADATEM0)) {
+
+                                        System.out.println("Found Adatem 0!");
+                                        Log.i("OPark", "foundUser is " + foundUser);
+                                        matchmakingRef.child(foundUser).child("adatem").setValue("1");
+
+                                        saveFoundUserId();
+
+                                        loadingCircle.setVisibility(View.INVISIBLE);
+                                        if (marker == null){
+                                            LatLng kenaParkerLocation = new LatLng(foundLatitude, foundLongitude);
+                                            marker = mMap.addMarker(new MarkerOptions().position(kenaParkerLocation).icon(BitmapDescriptorFactory.fromResource(R.drawable.home01_icon_location)));
+                                        } else {
+                                            LatLng kenaParkerLocation = new LatLng(foundLatitude, foundLongitude);
+                                            marker = mMap.addMarker(new MarkerOptions().position(kenaParkerLocation).icon(BitmapDescriptorFactory.fromResource(R.drawable.home01_icon_location)));
+                                        }
+
+
+                                    } else if (adatemValue.equals(ADATEM1)) {
+
+                                        System.out.println("Adatem is not 1, get next key");
+
+
+                                    } else {
+                                        System.out.println("Can't find users with Adatem 0! =( arrayList got key but all 1");
+
+                                        Intent intent2 = new Intent(Map.this, NoUserPopUp.class);
+                                        startActivity(intent2);
+
+                                        loadingCircle.setVisibility(View.INVISIBLE);
+                                    }
+
+                                    adatemQueryList.removeEventListener(this);
+
+
+                                } else if (newArrayList == null) {
+
+                                    Log.i("Opark","newArrayList is empty");
+                                    System.out.println("Can't find users with Adatem 0! =(");
+
+                                    Intent intent2 = new Intent(Map.this, NoUserPopUp.class);
+                                    startActivity(intent2);
+
+                                    loadingCircle.setVisibility(View.INVISIBLE);
+
+                                }
+
+
+                            } catch (NullPointerException e) {
+                                System.out.println(e);
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+                }
+
             }
 
             @Override
-            public void onKeyExited(String key) {
+            public void onKeyExited(final String key) {
+                System.out.println(String.format("Key %s is no longer in the search area", key));
+                ValueEventListener exitListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
+                        marker.remove();
+                        marker = null;
+
+                        Log.d("OPark",key + "exited!");
+                        newArrayList.remove(key);
+                        newHashSet.addAll(newArrayList);
+                        newArrayList.clear();
+                        newArrayList.addAll(newHashSet);
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                };
+                for (int firstUser = 0; firstUser < newArrayList.size(); firstUser++) {
+                    matchmakingRef.child(newArrayList.get(firstUser)).addListenerForSingleValueEvent(exitListener);
+                    break;
+                }
             }
 
             @Override
             public void onKeyMoved(String key, GeoLocation location) {
-
+                System.out.println(String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
             }
 
             @Override
             public void onGeoQueryReady() {
-
+                System.out.println("All initial data has been loaded and events have been fired!");
             }
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
-
+                System.err.println("There was an error with this query: " + error);
             }
         });
+    }
+
+    private void saveFoundUserId(){
+        SharedPreferences prefs = getSharedPreferences(USER_ID_PREFS,0);
+        prefs.edit().putString(USER_ID_KEY, foundUser).apply();
+    }
+
+    private void signOut(){
+        Log.d("signout", "signoutbutton Clicked");
+        UserProfileSetup.mAuth = FirebaseAuth.getInstance();
+        UserProfileSetup.mAuth.signOut();
+        Intent intent = new Intent(Map.this, LoginActivity.class);
+        finish();
+        startActivity(intent);
+    }
+
+    public static ArrayList<String> getNewArrayList(){
+        return newArrayList;
+    }
+
+    public static ArrayList<String> getOldArrayList(){
+        return oldArrayList;
     }
 
 
@@ -318,9 +661,16 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     @Override
     protected void onStop() {
         super.onStop();
+
         //if (mGoogleApiClient.isConnected()) {
         //    mGoogleApiClient.disconnect();
         //}
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        geofireRef.child(currentUserID).removeValue();
     }
 
     @Override
@@ -398,6 +748,26 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     public void onLocationChanged(Location location) {
         // Assign the new location
         mLastLocation = location;
+        longitude = mLastLocation.getLongitude();
+        latitude = mLastLocation.getLatitude();
+
+        Log.i("OPark","longitude is: " + longitude);
+        Log.i("OPark","latitude is " + latitude);
+
+        geoFire.setLocation(currentUserID, new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
+            @SuppressLint("MissingPermission")
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+                if (error != null) {
+                    System.err.println("There was an error saving the location to GeoFire: " + error);
+                } else {
+                    System.out.println("Location saved on server successfully as lat[" + latitude + "], lon[" + longitude + "]!");
+                    shareParkingButton.setVisibility(View.VISIBLE);
+                    findParkingButton.setVisibility(View.VISIBLE);
+                    loadingCircle.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
         Toast.makeText(getApplicationContext(), "Location changed!",
                 Toast.LENGTH_SHORT).show();
@@ -437,6 +807,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
             }
         }
     }
+
 
 
     public static void animateMarker(final double latitude, final double longitude, final Marker marker) {
