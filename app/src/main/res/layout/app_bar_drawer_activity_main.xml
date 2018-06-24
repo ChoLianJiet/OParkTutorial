@@ -37,20 +37,20 @@
         android:layout_height="571dp">
 
         <Button
-            android:id="@+id/find_parking_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="247dp"
-            android:layout_marginTop="300dp"
-            android:text="@string/find_parking"/>
-
-        <Button
             android:id="@+id/share_parking_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="300dp"
             android:text="@string/share_parking"/>
+
+        <Button
+            android:id="@+id/find_parking_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="247dp"
+            android:layout_marginTop="300dp"
+            android:text="@string/find_parking"/>
 
     </RelativeLayout>
 

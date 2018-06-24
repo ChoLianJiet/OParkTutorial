@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#f79d7f</color>
-    <color name="colorPrimaryDark">#f26141</color>
-    <color name="colorAccent">#f26141</color>
-    <color name="white">#FFFFFF</color>
+    <color name="colorPrimary">#eadedb</color>
+    <color name="colorPrimaryDark">#ff8979</color>
+    <color name="colorBackground">#FFEADEDB</color>
+    <color name="colorAccent">#f79d7f</color>
+    <color name="white">#ffffff</color>
     <color name="black">#000000</color>
     <color name="grey">#6b6b6b</color>
     <color name="brand_red">#d51826</color>

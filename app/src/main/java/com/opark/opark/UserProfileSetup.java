@@ -84,11 +84,12 @@ public class UserProfileSetup extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile_setup);
 
-        // Retrieve FirebaseUser object via intent string extra
-        // String is converted into FirebaseUser object via Gson
+//         Retrieve FirebaseUser object via intent string extra
+//         String is converted into FirebaseUser object via Gson
         firebaseUserUID = getIntent().getStringExtra("firebaseUser");
 
         // LINKING VARIABLES TO RESPECTIVE IDs
+
         bindViews();
 
         //Provided by Library but haven't test if useful or not
@@ -427,7 +428,7 @@ else {
         objToByteStreamUpload(user, userFolder);
 
         //TODO intent to card swipe or other page ? maybe upload prof pic ?
-        Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
+        Intent intent = new Intent(UserProfileSetup.this, DrawerActivityMain.class);
         finish();
         startActivity(intent);}
     }
