@@ -1,55 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/cardView"
-        android:layout_width="300dp"
-        android:layout_height="60dp"
-        android:layout_below="@+id/sign_out_button"
-        android:layout_centerHorizontal="true"
-        android:background="@android:color/background_light">
-
-        <com.jackandphantom.circularimageview.CircleImage
-            android:id="@+id/profilePicture"
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@color/white"
-            app:rounded_radius="1000"
-            app:shadow_radius="1000"/>
-
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="100dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center_horizontal"
-            android:text="name"
-            android:textAlignment="center"/>
-
-        <TextView
-            android:id="@+id/carPlateNumber"
-            android:layout_width="100dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center"
-            android:text="car model"
-            android:textAlignment="center"/>
-
-        <TextView
-            android:id="@+id/carColor"
-            android:layout_width="100dp"
-            android:layout_height="20dp"
-            android:layout_gravity="bottom"
-            android:layout_marginLeft="100dp"
-            android:text="car color"
-            android:textAlignment="center"/>
-    </android.support.v7.widget.CardView>
+                android:layout_height="match_parent">
 
     <Button
         android:id="@+id/sign_out_button"
@@ -111,7 +63,15 @@
                   android:name="com.google.android.gms.maps.SupportMapFragment"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
-                  tools:context=".motion_vehicle_tracker.Map"/>
+                  tools:context=".MapsMainActivity"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+        </LinearLayout>
 
 
     </LinearLayout>

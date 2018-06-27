@@ -73,4 +73,5 @@
 
     <string name="share_parking">Share Parking</string>
     <string name="find_parking">Find Parking</string>
+    <string name="title_activity_maps_main">Map</string>
 </resources>

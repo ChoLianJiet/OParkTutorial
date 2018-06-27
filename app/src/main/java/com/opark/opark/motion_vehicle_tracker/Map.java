@@ -69,6 +69,29 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
         GoogleMap.OnInfoWindowClickListener,GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+    // After Creating the Map Set Initial Location
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        mMap = googleMap;
+
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
+                (this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        //Uncomment To Show Google Location Blue Pointer
+        // mMap.setMyLocationEnabled(true);
+    }
+
     //CONSTANT
     final int REQUEST_CODE = 123;
     long MIN_TIME = 5000;
@@ -132,13 +155,9 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
             // Building the GoogleApi client
             //buildGoogleApiClient();
             //createLocationRequest();
+            initMap();
             Toast.makeText(this, "Google Service Is Available!!", Toast.LENGTH_SHORT).show();
         }
-
-        //Create The MapView Fragment
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
 
         shareParkingButton = (Button) findViewById(R.id.share_parking_button);
         findParkingButton = (Button) findViewById(R.id.find_parking_button);
@@ -222,6 +241,13 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
 
     }
 
+    private void initMap() {
+        //Create The MapView Fragment
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
+
     //GET CURRENT LOCATION
     private void getAndSetCurrentLocation() {
 
@@ -292,29 +318,6 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
      * GOOGLE MAPS AND MAPS OBJECTS
      *
      * */
-
-    // After Creating the Map Set Initial Location
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
-        mMap = googleMap;
-
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
-                (this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        //Uncomment To Show Google Location Blue Pointer
-       // mMap.setMyLocationEnabled(true);
-    }
 
 
     // Add A Map Pointer To The MAp
@@ -683,7 +686,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
 
 
     //Starting the location updates
-    protected void startLocationUpdates() {
+    protected void  startLocationUpdates() {
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission

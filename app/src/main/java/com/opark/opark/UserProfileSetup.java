@@ -66,7 +66,7 @@ public class UserProfileSetup extends AppCompatActivity {
     private Button buttonExpandNameNumLayout;
     private Button buttonExpandCarLayout;
     private Button buttonSignOut;
-    private FirebaseAuth mAuth;
+    public static FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String [] carString = new String[4];
     private EditText [] carEditText =new EditText[4] ;
@@ -212,7 +212,7 @@ public class UserProfileSetup extends AppCompatActivity {
     public void objToByteStreamUpload(Object obj, StorageReference destination){
 
         String objStr = new Gson().toJson(obj);
-        InputStream in = new ByteArrayInputStream(objStr.getBytes( Charset.forName("UTF-8")));
+        InputStream in = new ByteArrayInputStream(objStr.getBytes(Charset.forName("UTF-8")));
         UploadTask uploadTask = destination.putStream(in);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override

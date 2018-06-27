@@ -36,6 +36,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.opark.opark.card_swipe.MainActivityCardSwipe;
+import com.opark.opark.motion_vehicle_tracker.Map;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -208,8 +209,8 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Log in Successful! :D ",
                             Toast.LENGTH_SHORT).show();
 
-                    //TODO Add Intent to Card Swipe onSuccess
-                    Intent intent = new Intent(LoginActivity.this, DrawerActivityMain.class);
+                    //TODO Add Intent to Drawer Activity onSuccess
+                    Intent intent = new Intent(LoginActivity.this, Map.class);
                     intent.putExtra("firebaseUser", currentUserID);
                     finish();
                     startActivity(intent);

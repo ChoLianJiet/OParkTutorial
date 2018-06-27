@@ -37,6 +37,19 @@
             android:layout_marginTop="300dp"
             android:text="@string/find_parking"/>
 
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="110dp"
+            android:layout_height="104dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="194dp"
+            android:background="@drawable/home01_bg_card"
+            android:indeterminateDrawable="@drawable/loading"
+            android:max="100"
+            android:progress="20"/>
+
         <Button
             android:id="@+id/share_parking_button"
             android:layout_width="wrap_content"
@@ -45,7 +58,18 @@
             android:layout_marginTop="300dp"
             android:text="@string/share_parking"/>
 
+        <Button
+            android:id="@+id/sign_out_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="36dp"
+            android:text="Button"/>
+
     </RelativeLayout>
+
+    
 
     <!--<android.support.design.widget.FloatingActionButton-->
         <!--android:id="@+id/fab"-->
