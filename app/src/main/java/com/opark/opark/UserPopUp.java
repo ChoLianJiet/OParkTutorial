@@ -1,39 +1,29 @@
 package com.opark.opark;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
-import com.opark.opark.R;
 import com.opark.opark.model.User;
-import com.opark.opark.share_parking.ShareParking;
-
-import org.w3c.dom.Text;
+import com.opark.opark.share_parking.MapsMainActivity;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-
-import com.opark.opark.DrawerActivityMain;
 
 public class UserPopUp extends Activity {
 

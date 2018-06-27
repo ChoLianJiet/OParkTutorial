@@ -70,7 +70,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MapsMainActivity"
+            android:name=".share_parking.MapsMainActivity"
             android:label="@string/title_activity_maps_main">
         </activity>
     </application>

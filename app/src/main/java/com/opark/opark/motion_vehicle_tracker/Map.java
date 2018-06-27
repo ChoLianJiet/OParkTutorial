@@ -54,7 +54,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.opark.opark.LoginActivity;
-import com.opark.opark.Matchmaking;
+import com.opark.opark.share_parking.Matchmaking;
 import com.opark.opark.NoUserPopUp;
 import com.opark.opark.R;
 import com.opark.opark.UserProfileSetup;
@@ -721,7 +721,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     public void onConnected(Bundle arg0) {
 
         // Once connected with google api, get the location
-        //displayLocation();
+        displayLocation();
 
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
@@ -762,7 +762,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
                 Toast.LENGTH_SHORT).show();
 
         // Displaying the new location on UI
-        displayLocation();
+//        displayLocation();
     }
 
     //Method to display the location on UI
