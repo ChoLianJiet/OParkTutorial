@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -18,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +34,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -40,6 +43,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -48,13 +52,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
 import com.opark.opark.LoginActivity;
 import com.opark.opark.NoUserPopUp;
 import com.opark.opark.R;
 import com.opark.opark.UserPopUp;
 import com.opark.opark.UserProfileSetup;
+import com.opark.opark.model.User;
 import com.opark.opark.motion_vehicle_tracker.Map;
 
+import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -73,9 +82,10 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     private static int UPDATE_INTERVAL = 5000;
     private static int FASTEST_INTERVAL = 3000;
     private static int DISTANCE = 10;
-    long MIN_TIME = 5000;
-    long MIN_DISTANCE = 1000;
-    String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
+    private float DEFAULT_ZOOM = 18f;
+//    long MIN_TIME = 5000;
+//    long MIN_DISTANCE = 1000;
+//    String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
     String ADATEM0 = "0";
     String ADATEM1 = "1";
     public static String USER_ID_PREFS;
@@ -89,6 +99,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     private Button shareParkingButton;
     private Button findParkingButton;
     private Button signOutButton;
+    private Button recenterButton;
     LocationManager mLocationManager;
     private GeoFire geoFire;
     private GeoQuery geoQuery;
@@ -96,6 +107,9 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     private double latitude;
     private DatabaseReference matchmakingRef;
     private DatabaseReference geofireRef;
+    FirebaseStorage firebaseStorage;
+    StorageReference storageRef;
+    ArrayList<User> userObjList = new ArrayList<>();
     TextView kenaParkerName;
     TextView carModel;
     TextView carPlateNumber;
@@ -126,6 +140,8 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
         findParkingButton = (Button) findViewById(R.id.find_parking_button);
         shareParkingButton.setVisibility(View.INVISIBLE);
         findParkingButton.setVisibility(View.INVISIBLE);
+        recenterButton = (Button) findViewById(R.id.recenter_button);
+        recenterButton.setVisibility(View.INVISIBLE);
         loadingCircle = (ProgressBar) findViewById(R.id.progress_bar);
         loadingCircle.setVisibility(View.VISIBLE);
         FirebaseApp.initializeApp(getApplicationContext());
@@ -133,6 +149,8 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
         geofireRef = FirebaseDatabase.getInstance().getReference().child("geofire");
         geoFire = new GeoFire(geofireRef);
         matchmakingRef = FirebaseDatabase.getInstance().getReference().child("matchmaking");
+        firebaseStorage = FirebaseStorage.getInstance();
+        storageRef = firebaseStorage.getReference();
         signOutButton = (Button) findViewById(R.id.sign_out_button);
 
         loadLocationForThisUser();
@@ -149,6 +167,15 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 findOtherUsersLocation();
+            }
+        });
+
+        recenterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG,"Recentered Button is Pressed");
+                LatLng latlong = new LatLng(latitude,longitude);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlong,DEFAULT_ZOOM));
             }
         });
 
@@ -173,13 +200,6 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         Toast.makeText(this,"Map is ready",Toast.LENGTH_SHORT).show();
         mMap = googleMap;
-    }
-
-    private void initMap() {
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(latitude,longitude);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("I'm here!").icon(BitmapDescriptorFactory.fromResource(R.mipmap.icon_car)));
     }
 
     private void getLocationPermission() {
@@ -231,6 +251,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
                         System.out.println("Location saved on server successfully as lat[" + latitude + "], lon[" + longitude + "]!");
                         shareParkingButton.setVisibility(View.VISIBLE);
                         findParkingButton.setVisibility(View.VISIBLE);
+                        recenterButton.setVisibility(View.VISIBLE);
                         loadingCircle.setVisibility(View.INVISIBLE);
                     }
                 }
@@ -441,20 +462,24 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
                 kenaParker.setLongitude(foundLongitude);
                 LatLng kenaParkerLocation = new LatLng(foundLatitude, foundLongitude);
 
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(kenaParkerLocation,DEFAULT_ZOOM));
+
                 //Function calculates distance between peterParker and kenaParker
                 distance(peterParker,kenaParker);
 
-                //Clear all markers
-                mMap.clear();
-
                 //Marker for kenaParker
-                if(key == currentUserID){
+                if(!key.equals(currentUserID)){
+                    //Clear all markers
+//                    mMap.clear();
 
-                } else {
+                    //Add kenaParker Marker
                     Marker marker = mMap.addMarker(new MarkerOptions()
                             .position(kenaParkerLocation)
+                            .title("KenaParker")
                             .snippet("Distance " + new DecimalFormat("#.#").format(distance(peterParker, kenaParker) / 1000) + "m")
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                } else {
+
                 }
 
                 oldHashSet.addAll(oldArrayList);
@@ -663,7 +688,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             mk= mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon))
                     //.icon(BitmapDescriptorFactory.fromResource(R.drawable.pin3))
                     .icon(BitmapDescriptorFactory.fromBitmap((smallMarker))));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong, 16));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlong,DEFAULT_ZOOM));
             //Set Marker Count to 1 after first marker is created
             markerCount=1;
 

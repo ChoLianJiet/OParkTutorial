@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </RelativeLayout>
 
     <Button
         android:id="@+id/sign_out_button"
@@ -30,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="60dp"
         android:layout_marginStart="20dp"
         android:layout_weight="1"
         android:background="@color/colorPrimary"
@@ -49,31 +57,22 @@
         android:text="Search"
         android:textSize="20dp"/>
 
-    <LinearLayout
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:orientation="vertical">
+        tools:context=".share_parking.MapsMainActivity"/>
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:map="http://schemas.android.com/apk/res-auto"
-                  xmlns:tools="http://schemas.android.com/tools"
-                  android:id="@+id/map"
-                  android:name="com.google.android.gms.maps.SupportMapFragment"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  tools:context=".share_parking.MapsMainActivity"/>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-        </LinearLayout>
-
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/recenter_button"
+        android:layout_width="70dp"
+        android:layout_height="30dp"
+        android:textSize="12dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/share_parking_button"
+        android:layout_marginBottom="130dp"
+        android:background="@android:color/holo_blue_light"
+        android:text="Recenter"/>
 
 </RelativeLayout>
