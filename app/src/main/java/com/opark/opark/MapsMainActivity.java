@@ -94,6 +94,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     private int firstUser = 0;
     private static String foundUser;
     private ProgressBar loadingCircle;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -445,8 +446,8 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
 
     private void signOut(){
         Log.d("signout", "signoutbutton Clicked");
-        UserProfileSetup.mAuth = FirebaseAuth.getInstance();
-        UserProfileSetup.mAuth.signOut();
+        mAuth = FirebaseAuth.getInstance();
+        mAuth.signOut();
         Intent intent = new Intent(MapsMainActivity.this, LoginActivity.class);
         finish();
         startActivity(intent);

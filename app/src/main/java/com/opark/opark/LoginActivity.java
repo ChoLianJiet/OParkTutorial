@@ -19,6 +19,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.facebook.LoggingBehavior;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
@@ -75,14 +76,14 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         FacebookSdk.setApplicationId("113991652589123");
         FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
         if (BuildConfig.DEBUG) {
             FacebookSdk.setIsDebugEnabled(true);
             FacebookSdk.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
         }
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login_relative);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -131,6 +132,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
         //FACEBOOK HASH KEY Generating
+        //TODO to remove in-app keyhash generator
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
                     "com.opark.opark",
@@ -210,7 +212,6 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Log in Successful! :D ",
                             Toast.LENGTH_SHORT).show();
 
-                    //TODO Add Intent to Card Swipe onSuccess
                     Intent intent = new Intent(LoginActivity.this, DrawerActivityMain.class);
                     intent.putExtra("firebaseUser", currentUserID);
                     finish();

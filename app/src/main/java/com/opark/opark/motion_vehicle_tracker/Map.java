@@ -82,6 +82,8 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
     private static final int REQUEST_LOCATION = 0;
 
     //MEMBER VARIALBLE
+    private FirebaseAuth mAuth;
+
     private GoogleMap mMap;
     private Button shareParkingButton;
     private Button findParkingButton;
