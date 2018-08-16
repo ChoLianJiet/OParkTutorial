@@ -7,7 +7,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
@@ -15,6 +19,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
 import com.facebook.LoggingBehavior;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
@@ -30,6 +35,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import com.google.gson.Gson;
+import com.opark.opark.card_swipe.MainActivityCardSwipe;
 import com.opark.opark.share_parking.MapsMainActivity;
 
 import android.os.Bundle;
@@ -37,6 +45,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
@@ -60,6 +70,7 @@ public class LoginActivity extends AppCompatActivity {
     LoginButton loginButton;
     private Button registerButton;
     private FirebaseAuth.AuthStateListener mAuthListener;
+
     private DrawerLayout mDrawer;
     private Toolbar mToolbar;
 
@@ -69,11 +80,12 @@ public class LoginActivity extends AppCompatActivity {
 
         FacebookSdk.setApplicationId("113991652589123");
         FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(this);
         if (BuildConfig.DEBUG) {
             FacebookSdk.setIsDebugEnabled(true);
             FacebookSdk.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
         }
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login_relative);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -122,6 +134,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
         //FACEBOOK HASH KEY Generating
+        //TODO to remove in-app keyhash generator
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
                     "com.opark.opark",
@@ -186,7 +199,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void updateUI(FirebaseUser currentUser) {
+    public void updateUI(FirebaseUser currentUser) {
 
         if (currentUser != null) {
 
@@ -201,8 +214,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Log in Successful! :D ",
                             Toast.LENGTH_SHORT).show();
 
-                    //TODO Add Intent to Drawer Activity onSuccess
-                    Intent intent = new Intent(LoginActivity.this, MapsMainActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, MapsMainActivityRev1.class);
                     intent.putExtra("firebaseUser", currentUserID);
                     finish();
                     startActivity(intent);
@@ -270,7 +282,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     // Attempt Login Method
-    private void attemptLogin() {
+    public void attemptLogin() {
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 

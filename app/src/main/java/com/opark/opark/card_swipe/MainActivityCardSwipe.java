@@ -153,13 +153,13 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
 
         ImageButton mapButton = (ImageButton) findViewById(R.id.toMapButton);
 
-        mapButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(com.opark.opark.card_swipe.MainActivityCardSwipe.this, com.opark.opark.motion_vehicle_tracker.Map.class);
-                startActivity(intent);
-            }
-        });
+//        mapButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(com.opark.opark.card_swipe.MainActivityCardSwipe.this, com.opark.opark.motion_vehicle_tracker.Map.class);
+//                startActivity(intent);
+//            }
+//        });
 
         shareParkingButton = (Button) findViewById(R.id.shareParkingButton);
 

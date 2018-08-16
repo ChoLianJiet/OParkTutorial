@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,13 +11,20 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:background="@color/colorPrimaryDark"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme"/>
+
+        <include
+            android:id="@+id/custom_toobar_edit"
+            layout="@layout/custom_toolbar"
+            />
+
+
+        <!--<android.support.v7.widget.Toolbar-->
+            <!--android:id="@+id/toolbar"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:background="@color/colorPrimaryDark"-->
+            <!--android:minHeight="?attr/actionBarSize"-->
+            <!--android:theme="?attr/actionBarTheme"/>-->
     </android.support.design.widget.AppBarLayout>
 
     <include
@@ -30,12 +36,12 @@
         android:layout_height="571dp">
 
         <Button
-            android:id="@+id/find_parking_button"
+            android:id="@+id/share_parking_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="247dp"
+            android:layout_marginLeft="20dp"
             android:layout_marginTop="300dp"
-            android:text="@string/find_parking"/>
+            android:text="@string/share_parking"/>
 
         <ProgressBar
             android:id="@+id/progress_bar"
@@ -51,12 +57,12 @@
             android:progress="20"/>
 
         <Button
-            android:id="@+id/share_parking_button"
+            android:id="@+id/find_parking_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="247dp"
             android:layout_marginTop="300dp"
-            android:text="@string/share_parking"/>
+            android:text="@string/find_parking"/>
 
         <Button
             android:id="@+id/sign_out_button"

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              tools:layout_editor_absoluteX="0dp"
+              tools:layout_editor_absoluteY="25dp"
+              android:layout_width="match_parent"
+              android:layout_height="300dp"
+              android:layout_gravity="center_horizontal"
+              android:layout_marginLeft="18dp"
+              android:layout_marginRight="18dp"
+              android:layout_marginTop="48dp"
+              android:layout_marginBottom="100dp"
+              android:background="@drawable/background_user_profilexxhdpi"
+              android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold"
+        android:textSize="50sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="Sorry, there are no peter nearby! :("/>
+
+    <Button
+        android:id="@+id/back_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="Back"/>
+</LinearLayout>

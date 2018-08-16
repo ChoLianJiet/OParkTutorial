@@ -5,14 +5,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </RelativeLayout>
+
     <Button
         android:id="@+id/sign_out_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/recenter_button"
-        android:layout_toEndOf="@+id/progress_bar"
-        android:text="Sign Out"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:text="Sign Out"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="110dp"
+        android:layout_height="104dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="215dp"
+        android:background="@drawable/home01_bg_card"
+        android:indeterminateDrawable="@drawable/loading"
+        android:max="100"
+        android:progress="20"/>
 
     <Button
         android:id="@+id/share_parking_button"
