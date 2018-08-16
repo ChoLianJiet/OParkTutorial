@@ -24,10 +24,17 @@
         <item name="spinBars">false</item>
         <item name="color">@android:color/white</item>
     </style>
+    
+    <style name="AppTheme.CustomTheme">
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
 
     <style name="Toolbar.TitleStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize"> 15dp </item>
     </style>
 
+    <style name="SplashTheme" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splashscreen_background</item>
+    </style>
 
 </resources>

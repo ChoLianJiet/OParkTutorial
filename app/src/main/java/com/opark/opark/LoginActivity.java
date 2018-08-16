@@ -38,6 +38,7 @@ import com.google.firebase.storage.StorageReference;
 
 import com.google.gson.Gson;
 import com.opark.opark.card_swipe.MainActivityCardSwipe;
+import com.opark.opark.share_parking.MapsMainActivity;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -76,6 +77,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         FacebookSdk.setApplicationId("113991652589123");
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
@@ -197,7 +199,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void updateUI(FirebaseUser currentUser) {
+    public void updateUI(FirebaseUser currentUser) {
 
         if (currentUser != null) {
 
@@ -212,7 +214,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Log in Successful! :D ",
                             Toast.LENGTH_SHORT).show();
 
-                    Intent intent = new Intent(LoginActivity.this, DrawerActivityMain.class);
+                    Intent intent = new Intent(LoginActivity.this, MapsMainActivityRev1.class);
                     intent.putExtra("firebaseUser", currentUserID);
                     finish();
                     startActivity(intent);
@@ -280,7 +282,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     // Attempt Login Method
-    private void attemptLogin() {
+    public void attemptLogin() {
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 

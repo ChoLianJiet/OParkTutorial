@@ -1,4 +1,4 @@
-package com.opark.opark;
+package com.opark.opark.share_parking;
 
 /**
  * Created by User on 12/12/2017.

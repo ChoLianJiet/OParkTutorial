@@ -37,7 +37,7 @@ android {
         }
 
 
-}
+    }
 
     packagingOptions {
         exclude 'lib/getLibs.ps1'
@@ -45,49 +45,52 @@ android {
         exclude 'lib/gson-2.2.2.jar'
     }
 
-dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    dependencies {
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+        androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+            exclude group: 'com.android.support', module: 'support-annotations'
+        })
+//noinspection GradleCompatible
+        implementation 'com.android.support:appcompat-v7:27.1.1'
+        implementation 'com.android.support:design:27.1.1'
+        implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+        implementation 'com.facebook.android:facebook-android-sdk:4.34.0'
+        implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
+        implementation 'com.akhgupta:android-easylocation:1.0.1'
+        implementation 'com.google.android.gms:play-services-location:15.0.1'
+        implementation 'com.google.android.gms:play-services-places:15.0.1'
+        implementation 'com.google.android.gms:play-services-maps:15.0.1'
+        implementation files('libs/gson-2.2.2.jar')
+        implementation files('libs/signalr-client-sdk.jar')
+        implementation files('libs/signalr-client-sdk-android.jar')
+        implementation 'com.github.johnkil.android-appmsg:appmsg:1.2.0'
+        implementation 'com.jackandphantom.android:circularimageview:1.2.0'
+        implementation 'com.github.chuross:aspect-ratio-imageview:v1.0.2'
+        testImplementation 'junit:junit:4.12'
+        //    GEOFIRE
+        implementation 'com.firebase:geofire-android:2.1.2'
+        //    FIREBASE
+        implementation 'com.google.firebase:firebase-core:15.0.2'
+        implementation 'com.google.firebase:firebase-auth:15.1.0'
+        implementation 'com.google.firebase:firebase-database:15.0.1'
+        implementation 'com.google.firebase:firebase-storage:15.0.2'
+        //CHATHEAD
+        implementation project(':chatHeadLib')
+        implementation 'com.github.flipkart-incubator:circular-image:1.0'
+        implementation 'com.github.stfalcon:chatkit:0.2.2'
+        implementation 'com.squareup.picasso:picasso:2.5.2'
+        //STATIC MAP
+        implementation 'com.github.renaudcerrato:static-maps-api:1.0.4'
 
-    implementation 'com.android.support:appcompat-v7:27.0.2'
-    implementation 'com.android.support:design:27.0.2'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.facebook.android:facebook-android-sdk:4.34.0'
-    implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
-    implementation 'com.akhgupta:android-easylocation:1.0.1'
-    implementation 'com.google.android.gms:play-services-location:11.2.0'
-    implementation 'com.google.android.gms:play-services-places:11.2.0'
-    implementation 'com.google.android.gms:play-services-maps:11.2.0'
-    implementation files('libs/gson-2.2.2.jar')
-    implementation files('libs/signalr-client-sdk.jar')
-    implementation files('libs/signalr-client-sdk-android.jar')
-    implementation 'com.github.johnkil.android-appmsg:appmsg:1.2.0'
-    implementation 'com.jackandphantom.android:circularimageview:1.2.0'
-    implementation 'com.github.chuross:aspect-ratio-imageview:v1.0.2'
-    testImplementation 'junit:junit:4.12'
-    //    GEOFIRE
-    implementation 'com.firebase:geofire-android:2.1.2'
-    //    FIREBASE
-    implementation 'com.google.firebase:firebase-core:11.2.0'
-    implementation 'com.google.firebase:firebase-auth:11.2.0'
-    implementation 'com.google.firebase:firebase-database:11.2.0'
-    implementation 'com.google.firebase:firebase-storage:11.2.0'
-    //CHATHEAD
-    implementation project(':chatHeadLib')
-    implementation 'com.github.flipkart-incubator:circular-image:1.0'
-    implementation 'com.github.stfalcon:chatkit:0.2.2'
-    implementation 'com.squareup.picasso:picasso:2.5.2'
-    //STATIC MAP
-    implementation 'com.github.renaudcerrato:static-maps-api:1.0.4'
+    }
+
 
 }
 
 
 
+apply plugin: 'com.google.gms.google-services'
 
-
-
-
-apply plugin: 'com.google.gms.google-services'}
+dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:+'
+}

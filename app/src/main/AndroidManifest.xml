@@ -3,75 +3,101 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="com.opark.opark">
 
-    <!-- Uses permission -->
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.LOCATION_HARDWARE" tools:ignore="ProtectedPermissions"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
+<!-- Uses permission -->
 
-    <!-- FACEBOOK META DATA ELEMENT -->
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission
+    android:name="android.permission.LOCATION_HARDWARE"
+    tools:ignore="ProtectedPermissions"/>
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+<uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW"/>
 
+<!-- FACEBOOK META DATA ELEMENT -->
+<application
+    android:allowBackup="true"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:roundIcon="@mipmap/ic_launcher"
+    android:supportsRtl="true"
+    android:theme="@style/AppTheme">
 
+    <!-- GOOGLE LOCATION SERVICE META DATA -->
 
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher"
-        android:supportsRtl="true"
+    <meta-data
+        android:name="com.google.android.geo.API_KEY"
+        android:value="@string/map_api_key"/>
+
+    <activity android:name=".LoginActivity">
+    </activity>
+    <activity android:name=".card_swipe.MainActivityCardSwipe">
+    </activity>
+    <activity android:name=".motion_vehicle_tracker.Map">
+    </activity>
+    <activity android:name=".RegisterActivity"/>
+    <activity android:name=".UserProfileSetup">
+    </activity>
+    <activity
+        android:name=".DrawerActivityMain"
+        android:label="@string/title_activity_drawer_main"
+        android:screenOrientation="portrait"
         android:theme="@style/AppTheme">
+    </activity>
+    <activity
+        android:name=".UserPopUp"
+        android:theme="@style/AppTheme.CustomTheme">
+    </activity>
+    <activity
+        android:name=".NoUserPopUp"
+        android:theme="@style/AppTheme.CustomTheme">
+    </activity>
+    <activity
+        android:name="com.facebook.FacebookActivity"
+        android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+        android:label="@string/app_name"/>
+    <activity
+        android:name="com.facebook.CustomTabActivity"
+        android:exported="true">
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW"/>
 
-        <!-- GOOGLE LOCATION SERVICE META DATA -->
+            <category android:name="android.intent.category.DEFAULT"/>
+            <category android:name="android.intent.category.BROWSABLE"/>
+
+            <data android:scheme="@string/fb_login_protocol_scheme"/>
+        </intent-filter>
+
         <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/map_api_key"/>
-
-        <activity android:name=".LoginActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-        <activity android:name=".card_swipe.MainActivityCardSwipe">
-        </activity>
-        <activity android:name=".motion_vehicle_tracker.Map">
-        </activity>
-        <activity android:name=".RegisterActivity"/>
-        <activity android:name=".UserProfileSetup">
-        </activity>
-        <activity
-            android:name=".DrawerActivityMain"
-            android:label="@string/title_activity_drawer_main"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme">
-        </activity>
-
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-                   android:value="@string/facebook_app_id"/>
-
-        <activity android:name="com.facebook.FacebookActivity"
-                  android:configChanges=
-                      "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-                  android:label="@string/app_name" />
-        <activity
-            android:name="com.facebook.CustomTabActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="@string/fb_login_protocol_scheme" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".ProfileEdit">
-        </activity>
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
+    </activity>
+    <activity
+        android:name=".share_parking.MapsMainActivity"
+        android:label="@string/title_activity_maps_main">
+    </activity>
+    <activity android:name=".ProfileEdit">
+    </activity>
+    <activity android:name=".RegisterScroll">
+    </activity>
+    <!-- <activity android:name=".OtherInfoFragment"> -->
+    <!-- </activity> -->
+    <activity android:name=".MapsMainActivityRev1">
+    </activity>
 
 
-    </application>
+    <activity android:name=".splash_screen.SplashActivity"
+              android:theme="@style/SplashTheme">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent-filter>
+    </activity>
 
+
+</application>
 
 </manifest>
+
+
