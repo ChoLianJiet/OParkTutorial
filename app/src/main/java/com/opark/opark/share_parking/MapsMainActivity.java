@@ -73,7 +73,7 @@ import javax.security.auth.Subject;
 public class MapsMainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnInfoWindowClickListener,
-        LocationListener {
+        LocationListener, GoogleMap.OnCameraMoveStartedListener {
 
     //CONSTANT
     private static final String TAG = "MapsMainActivity";
@@ -126,6 +126,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     public static String foundUser;
     private ProgressBar loadingCircle;
     private String adatemValue;
+    public static UserPopUpFragment userPopUpFragment;
     private PopupWindow popUpWindow;
     private LayoutInflater layoutInflater;
 
@@ -158,6 +159,8 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
         storageRef = firebaseStorage.getReference();
         signOutButton = (Button) findViewById(R.id.sign_out_button);
 
+
+
         shareParkingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,7 +180,10 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Recentered Button is Pressed");
+                markerInMiddle = true;
                 addMarker(mMap, peterParkerLocation.latitude, peterParkerLocation.longitude);
+                Log.d(TAG,"markerInMiddle is " + markerInMiddle);
+                setRecenterButton();
             }
         });
 
@@ -203,6 +209,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         Toast.makeText(this, "Map is ready", Toast.LENGTH_SHORT).show();
         mMap = googleMap;
+        mMap.setOnCameraMoveStartedListener(this);
     }
 
     private void getLocationPermission() {
@@ -256,7 +263,6 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
                         loadLocationForThisUser();
                         shareParkingButton.setVisibility(View.VISIBLE);
                         findParkingButton.setVisibility(View.VISIBLE);
-                        recenterButton.setVisibility(View.VISIBLE);
                         dismissLoading();
                     }
                 }
@@ -359,6 +365,14 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             matchmakingRef.child(currentUserID).removeValue();
         }
         super.onDestroy();
+    }
+
+    private void setRecenterButton(){
+        if(markerInMiddle == true){
+            recenterButton.setVisibility(View.INVISIBLE);
+        } else {
+            recenterButton.setVisibility(View.VISIBLE);
+        }
     }
 
     //Retrieve location for peterParker
@@ -533,14 +547,14 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             });
             saveFoundUserId();
             dismissLoading();
-            Intent intent = new Intent(MapsMainActivity.this, UserPopUp.class);
-            startActivity(intent);
-//            UserPopUpFragment userPopUpFragment = new UserPopUpFragment();
-//            FragmentManager manager = getFragmentManager();
-//            FragmentTransaction transaction = manager.beginTransaction();
-//            transaction.add(R.id.popupuser,userPopUpFragment,null);
-//            transaction.addToBackStack(null);
-//            transaction.commit();
+//            Intent intent = new Intent(MapsMainActivity.this, UserPopUp.class);
+//            startActivity(intent);
+            userPopUpFragment = new UserPopUpFragment();
+            FragmentManager manager = getFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+            transaction.add(R.id.popupuser,userPopUpFragment,null);
+            transaction.addToBackStack(null);
+            transaction.commit();
 //            UserPopUpFragment userPopUpFragment = new UserPopUpFragment();
 //            userPopUpFragment.show(getFragmentManager(),"userPopUpFragment");
 
@@ -610,16 +624,19 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
 
     int markerCount = 0;
     private Marker mk = null;
+    boolean markerInMiddle = false;
 
     // Add A Map Pointer To The MAp
     public void addMarker(GoogleMap googleMap, double lat, double lon) {
 
         LatLng latlong = new LatLng(lat, lon);
 
-        if (markerCount == 1) {
+        if (markerCount == 1 && markerInMiddle == true) {
             animateMarker(peterParker, mk);
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latlong));
-        } else if (markerCount == 0) {
+        } else if (markerCount == 1 && markerInMiddle == false) {
+            animateMarker(peterParker, mk);
+        }else if (markerCount == 0) {
             //Set Custom BitMap for Pointer
             int height = 80;
             int width = 45;
@@ -633,12 +650,14 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latlong, DEFAULT_ZOOM, DEFAULT_TILT, 0)));
             //Set Marker Count to 1 after first marker is created
             markerCount = 1;
+            markerInMiddle = true;
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 return;
             }
             startLocationUpdates();
+            setRecenterButton();
         }
     }
 
@@ -686,6 +705,15 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
 
         float result = fraction * rotation + start;
         return (result + 360) % 360;
+    }
+
+    @Override
+    public void onCameraMoveStarted(int reason) {
+        if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE){
+            markerInMiddle = false;
+            Log.d(TAG,"markerInMiddle is " + markerInMiddle);
+            setRecenterButton();
+        }
     }
 
     private interface LatLngInterpolator {

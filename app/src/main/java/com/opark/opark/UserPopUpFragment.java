@@ -3,6 +3,8 @@ package com.opark.opark;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -50,6 +53,7 @@ public class UserPopUpFragment extends Fragment {
     private DatabaseReference geofireRef;
     private DatabaseReference togetherRef;
 
+    FrameLayout mFrameLayout;
     TextView kenaParkerName;
     TextView carModel;
     TextView carPlateNumber;
@@ -59,6 +63,7 @@ public class UserPopUpFragment extends Fragment {
     Button acceptButton;
     Button declineButton;
     FloatingActionButton xButton;
+    UserPopUpFragment userPopUpFragment;
 
     public static UserPopUpFragment newInstance(){
         return new UserPopUpFragment();
@@ -119,9 +124,12 @@ public class UserPopUpFragment extends Fragment {
         carModel = (TextView) view.findViewById(R.id.carModel);
         carPlateNumber = (TextView) view.findViewById(R.id.carPlateNumber);
         carColor = (TextView) view.findViewById(R.id.carColor);
+        mFrameLayout = (FrameLayout) view.findViewById(R.id.popupuser);
 
         SharedPreferences prefs = this.getActivity().getSharedPreferences(MapsMainActivity.USER_ID_PREFS, Context.MODE_PRIVATE);
         foundUser = prefs.getString(MapsMainActivity.USER_ID_KEY, null);
+
+
 
         matchmakingRef = FirebaseDatabase.getInstance().getReference().child("matchmaking");
 
@@ -195,7 +203,14 @@ public class UserPopUpFragment extends Fragment {
 
     private void returnToMain(){
 
-        getActivity().finish();
+//        mFrameLayout.setVisibility(View.INVISIBLE);
+        FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.remove(MapsMainActivity.userPopUpFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
         matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM0);
     }
+
+
 }

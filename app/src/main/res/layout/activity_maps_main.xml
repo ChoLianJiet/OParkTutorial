@@ -48,6 +48,12 @@
         android:layout_alignParentTop="true"
         tools:context=".share_parking.MapsMainActivity"/>
 
+    <FrameLayout
+
+    android:id="@+id/popupuser"
+    android:layout_width="match_parent"
+    android:layout_height="270dp"/>
+
     <!--<fragment-->
         <!--android:id="@+id/popupuser"-->
         <!--android:name="com.opark.opark.UserPopUpFragment"-->
@@ -57,6 +63,7 @@
         <!--android:layout_alignParentStart="true"-->
         <!--android:layout_marginBottom="-215dp"-->
         <!--android:layout_marginStart="0dp"/>-->
+
 
     <ProgressBar
         android:id="@+id/progress_bar"
