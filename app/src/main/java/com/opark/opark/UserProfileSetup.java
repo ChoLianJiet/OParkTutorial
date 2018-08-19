@@ -84,12 +84,11 @@ public class UserProfileSetup extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile_setup);
 
-//         Retrieve FirebaseUser object via intent string extra
-//         String is converted into FirebaseUser object via Gson
+        // Retrieve FirebaseUser object via intent string extra
+        // String is converted into FirebaseUser object via Gson
         firebaseUserUID = getIntent().getStringExtra("firebaseUser");
 
         // LINKING VARIABLES TO RESPECTIVE IDs
-
         bindViews();
 
         //Provided by Library but haven't test if useful or not
@@ -127,6 +126,19 @@ public class UserProfileSetup extends AppCompatActivity {
             }
         });
 
+        //TODO Signout code
+//        buttonSignOut.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                Log.d("signout", "signoutbutton Clicked");
+//                mAuth = FirebaseAuth.getInstance();
+//                mAuth.signOut();
+//                Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
+//                finish();
+//                startActivity(intent);
+//                    }
+//                });
 
 
 
@@ -260,6 +272,7 @@ public class UserProfileSetup extends AppCompatActivity {
         expandablePostcode = (ExpandableLayout) findViewById(R.id.expand_postcode_address);
         expandableCountryState = (ExpandableLayout) findViewById(R.id.expand_countryState_address);
         profileSubmit = (Button) findViewById(R.id.profile_submit_button) ;
+        buttonSignOut = (Button) findViewById(R.id.not_you_sign_out_button);
     }
 
     private void expandableListener(){
@@ -395,6 +408,18 @@ public class UserProfileSetup extends AppCompatActivity {
         attemptProfileSetup();
     }
 
+    public void signOutUser (View v) {
+        attemptUserSignOut();
+    }
+
+    private void attemptUserSignOut(){
+        Log.d("signout", "signoutbutton Clicked");
+        mAuth = FirebaseAuth.getInstance();
+        mAuth.signOut();
+        Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
+        finish();
+        startActivity(intent);
+    }
 
 
 
@@ -428,7 +453,7 @@ else {
         objToByteStreamUpload(user, userFolder);
 
         //TODO intent to card swipe or other page ? maybe upload prof pic ?
-        Intent intent = new Intent(UserProfileSetup.this, DrawerActivityMain.class);
+        Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
         finish();
         startActivity(intent);}
     }

@@ -24,5 +24,4 @@
         app:layout_constraintVertical_bias="0.482"
         tools:layout_editor_absoluteY="-8dp"/>
 
-
 </android.support.constraint.ConstraintLayout>

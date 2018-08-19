@@ -1,17 +1,22 @@
 package com.opark.opark;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.firebase.geofire.GeoFire;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
@@ -20,45 +25,48 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.opark.opark.model.User;
-import com.opark.opark.MapsMainActivityRev1;
+import com.opark.opark.share_parking.MapsMainActivity;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Map;
-
-import static com.opark.opark.MapsMainActivityRev1.oldArrayList;
 
 public class UserPopUp extends Activity {
 
+    final String TAG = "UserPopUp";
+    public static String USER_DECLINE_PREFS;
+    public static String USER_DECLINE_KEY;
+    public static String DECLINED = "declined";
     final long ONE_MEGABYTE = 1024 * 1024;
 
+    PopupWindow window;
     FirebaseStorage firebaseStorage;
     StorageReference storageRef;
     private DatabaseReference matchmakingRef;
-    public static boolean userDeclined;
+    private DatabaseReference geofireRef;
+    private DatabaseReference togetherRef;
     TextView kenaParkerName;
     TextView carModel;
     TextView carPlateNumber;
     TextView carColor;
     ArrayList<User> userObjList = new ArrayList<>();
     String foundUser;
-    private ArrayList<String> newArrayList;
-    private ArrayList<String> oldArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pop_up_user);
+
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TOUCHABLE_WHEN_WAKING);
         Button acceptButton = (Button) findViewById(R.id.accept);
         Button declineButton = (Button) findViewById(R.id.decline);
         FloatingActionButton xButton = (FloatingActionButton) findViewById(R.id.floatingXButton);
-        newArrayList = (ArrayList<String>) MapsMainActivityRev1.getNewArrayList();
-        oldArrayList = (ArrayList<String>) MapsMainActivityRev1.getOldArrayList();
 
         xButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                MapsMainActivity.kenaMarker.remove();
+                MapsMainActivity.kenaMarker = null;
                 returnToMain();
             }
         });
@@ -73,44 +81,42 @@ public class UserPopUp extends Activity {
         declineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("decline Button Clicked");
                 declineUser();
-
             }
         });
 
 
-
-
-        initView();
-
         firebaseStorage = FirebaseStorage.getInstance();
         storageRef = firebaseStorage.getReference();
+
+        geofireRef = FirebaseDatabase.getInstance().getReference().child("geofire");
+
+        togetherRef = FirebaseDatabase.getInstance().getReference().child("together");
 
         kenaParkerName = (TextView) findViewById(R.id.kenaName);
         carModel = (TextView) findViewById(R.id.carModel);
         carPlateNumber = (TextView) findViewById(R.id.carPlateNumber);
         carColor = (TextView) findViewById(R.id.carColor);
 
-        SharedPreferences prefs = getSharedPreferences(MapsMainActivityRev1.USER_ID_PREFS,MODE_PRIVATE);
-        MapsMainActivityRev1.foundUser = prefs.getString(MapsMainActivityRev1.USER_ID_KEY, null);
-        Log.d("UserPopUp_foundUser","foundUser in UserPopUp is " + (MapsMainActivityRev1.foundUser));
+        SharedPreferences prefs = getSharedPreferences(MapsMainActivity.USER_ID_PREFS,MODE_PRIVATE);
+        foundUser = prefs.getString(MapsMainActivity.USER_ID_KEY, null);
+
         matchmakingRef = FirebaseDatabase.getInstance().getReference().child("matchmaking");
 
         setKenaDetailsOnWindow();
 
     }
 
-    private void initView(){
+//    private void initView(){
 //        DisplayMetrics dm = getResources().getDisplayMetrics();
 //        float density = dm.density;
 //        int width = (int) (dm.widthPixels - (2 * 18 * density));
 //        int height = (int) (dm.heightPixels - (338 * density));
 //        getWindow().setLayout(width,height);
-    }
+//    }
 
     private void setKenaDetailsOnWindow(){
-        final StorageReference getKenaProfileRef = storageRef.child("users/" + MapsMainActivityRev1.matchmakingRef.child(newArrayList.get(0)) + "/profile.txt");
+        final StorageReference getKenaProfileRef = storageRef.child("users/" + foundUser + "/profile.txt");
         getKenaProfileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
@@ -135,23 +141,32 @@ public class UserPopUp extends Activity {
         });
     }
 
-    //TODO to add accept user logic
     private void acceptUser(){
 
+        matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM2);
+        togetherRef.child(foundUser).setValue(MapsMainActivity.currentUserID);
+        Intent intent = new Intent(UserPopUp.this,PeterMap.class);
+        startActivity(intent);
+        finish();
     }
 
     private void declineUser(){
 
-       (MapsMainActivityRev1.matchmakingRef.child(newArrayList.get(0))).child("adatem").setValue("0");
-        MapsMainActivityRev1.newArrayList.remove(MapsMainActivityRev1.foundUser);
-        MapsMainActivityRev1.oldArrayList.add(MapsMainActivityRev1.foundUser);
-//
-//        MapsMainActivityRev1.oldHashSet.addAll(MapsMainActivityRev1.oldArrayList);
-//        MapsMainActivityRev1.oldArrayList.clear();
-//        MapsMainActivityRev1.oldArrayList.addAll(MapsMainActivityRev1.oldHashSet);
+        matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM0);
+        MapsMainActivity.newArrayList.remove(foundUser);
 
-        Log.i("OPark",MapsMainActivityRev1.foundUser + " has been removed from newArrayList");
-        Log.i("OPark","MapsMainActivityRev1 newArraylist " + MapsMainActivityRev1.newArrayList);
+        MapsMainActivity.oldArrayList.add(foundUser);
+        MapsMainActivity.oldHashSet.addAll(MapsMainActivity.oldArrayList);
+        MapsMainActivity.oldArrayList.clear();
+        MapsMainActivity.oldArrayList.addAll(MapsMainActivity.oldHashSet);
+        MapsMainActivity.oldHashSet.clear();
+
+        MapsMainActivity.kenaMarker.remove();
+        MapsMainActivity.kenaMarker = null;
+
+        Log.i(TAG,foundUser + " has been removed from newArrayList due to declining");
+        Log.i(TAG,"MapsMainActivity newArraylist " + MapsMainActivity.newArrayList);
+        Log.i(TAG,"MapsMainActivity oldArraylist" + MapsMainActivity.oldArrayList);
         finish();
 
     }
@@ -163,14 +178,9 @@ public class UserPopUp extends Activity {
     }
 
     private void returnToMain(){
-        finish();
-        matchmakingRef.child(MapsMainActivityRev1.foundUser).child("adatem").setValue("0");
-    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        matchmakingRef.child(MapsMainActivityRev1.foundUser).child("adatem").setValue("0");
+        finish();
+        matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM0);
     }
 
 }

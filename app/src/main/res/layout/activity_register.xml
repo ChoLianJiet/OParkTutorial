@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
+    android:background="@color/colorPrimary"
+
     android:gravity="top"
     android:orientation="vertical"
     tools:context="com.opark.opark.RegisterActivity">
@@ -12,19 +13,11 @@
 
 
     <android.support.design.widget.TextInputLayout
-        android:layout_marginTop="@dimen/register_margin_from_top"
-        android:id="@+id/email_text_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:textColor="@color/black"
-        android:textColorHint="@color/colorAccent"
-        android:layout_centerHorizontal="true">
-
+        android:textColorHint="@color/white">
 
         <AutoCompleteTextView
-
             android:id="@+id/register_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,20 +25,17 @@
             android:imeOptions="actionNext"
             android:inputType="textEmailAddress"
             android:maxLines="1"
-            android:textColor="@color/black"
-            android:textColorHint="@color/colorAccent"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textIsSelectable="false"
             android:textSize="18sp" />
 
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/password_text_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
-        android:textColorHint="@color/colorAccent"
-        android:layout_below="@id/email_text_input">
+        android:textColorHint="@color/white">
 
         <EditText
             android:id="@+id/register_password"
@@ -55,48 +45,43 @@
             android:imeOptions="actionNext"
             android:inputType="textPassword"
             android:maxLines="1"
-            android:textColor="@color/black"
-            android:textColorHint="@color/colorAccent"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="18sp" />
 
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/confirm_password_text_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColorHint="@color/black"
-        android:layout_below="@id/password_text_input">
+        android:textColorHint="@color/white">
 
         <EditText
             android:id="@+id/register_confirm_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:imeActionId="@+id/register_form_finished"
             android:hint="@string/confirm_password_text"
+            android:imeActionId="@+id/register_form_finished"
             android:imeActionLabel="@string/error_invalid_password"
             android:imeOptions="actionUnspecified"
             android:inputType="textPassword"
             android:maxLines="1"
-            android:textColor="@color/black"
-            android:textColorHint="@color/colorPrimaryDark"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
             android:textSize="18sp" />
-        <!--android:imeActionId="@+id/register_form_finished"-->
+
     </android.support.design.widget.TextInputLayout>
 
     <Button
         android:id="@+id/register_sign_up_button"
-        android:layout_width="wrap_content"
+        style="?android:textAppearanceMedium"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/activity_horizontal_margin"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/confirm_password_text_input"
-        android:background="@color/colorAccent"
-        android:elevation="20dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/colorPrimaryDark"
         android:onClick="signUp"
         android:text="@string/app_register"
-        android:textColor="@color/white"
-        android:visibility="visible"/>
+        android:textColor="@color/white" />
 
 
-</RelativeLayout>
+</LinearLayout>

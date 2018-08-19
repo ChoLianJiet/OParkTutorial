@@ -1,107 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:layout_editor_absoluteX="0dp"
-    tools:layout_editor_absoluteY="25dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:layout_marginLeft="18dp"
-    android:layout_marginRight="18dp"
-    android:layout_marginTop="48dp"
-    android:layout_marginBottom="100dp"
-    android:background="@drawable/background_user_profilexxhdpi"
-    android:orientation="vertical">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="250dp"
+              android:layout_gravity="center_horizontal"
+              android:layout_marginBottom="100dp"
+              android:layout_marginLeft="18dp"
+              android:layout_marginRight="18dp"
+              android:layout_marginTop="48dp"
+              android:background="@drawable/background_user_profilexxhdpi"
+              android:orientation="vertical"
+              tools:layout_editor_absoluteX="0dp"
+              tools:layout_editor_absoluteY="25dp">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingXButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@id/distance_map"
-        android:clickable="true"
-        app:srcCompat="@android:drawable/btn_dialog"/>
+        android:layout_height="20dp"
+        android:layout_weight="1">
 
-        <ImageView
-            android:id="@+id/distance_map"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"/>
     </RelativeLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="113dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:background="@color/colorAccent"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
-        <com.jackandphantom.circularimageview.CircleImage
-            android:id="@+id/profilePicture"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/white"
-            android:layout_weight="1"
-            app:rounded_radius="50"
-            app:shadow_radius="20"
-            />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatingXButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:clickable="true"
+            app:srcCompat="@android:drawable/btn_dialog"/>
 
         <LinearLayout
-            android:layout_width="80dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_width="match_parent"
+            android:layout_height="113dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/colorAccent"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/kenaName"
-                android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:layout_marginBottom="3dp"
-                android:layout_marginTop="12dp"
-                android:text=""
-                android:textAlignment="center"
-                android:textColor="#ffffff"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_weight="1"/>
+            <com.jackandphantom.circularimageview.CircleImage
+                android:id="@+id/profilePicture"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_weight="1"
+                android:background="@color/white"
+                app:rounded_radius="50"
+                app:shadow_radius="20"
+                />
 
-            <TextView
-                android:id="@+id/carPlateNumber"
-                android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:layout_marginBottom="12dp"
-                android:layout_marginTop="3dp"
-                android:maxLines="1"
-                android:text=""
-                android:textAlignment="center"
-                android:textColor="#ffffff"
-                android:textSize="15sp"
-                android:layout_weight="1"/>
+            <LinearLayout
+                android:layout_width="80dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/kenaName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textAlignment="center"
+                    android:textColor="#ffffff"
+                    android:textSize="15sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/carPlateNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:text=""
+                    android:textAlignment="center"
+                    android:textColor="#ffffff"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:id="@+id/carModel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:id="@+id/carColor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:text=""
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"/>
+
+                <TextView
+                    android:id="@+id/in_type_of_car"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"/>
+
+            </LinearLayout>
+
+            <com.github.chuross.AspectRatioImageView
+                android:id="@+id/car_image"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_weight="1"
+                android:background="@color/white"/>
+
 
         </LinearLayout>
-
-        <com.github.chuross.AspectRatioImageView
-            android:id="@+id/car_image"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/white"
-            android:layout_weight="1"/>
-
-
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -127,54 +167,17 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/carColor"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_marginBottom="3dp"
-            android:layout_marginTop="3dp"
-            android:maxLines="1"
-            android:text=""
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:layout_weight="1"/>
-
-        <TextView
-            android:id="@+id/carModel"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_marginBottom="3dp"
-            android:layout_marginTop="3dp"
-            android:text=""
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:layout_weight="1"/>
-
-        <TextView
-            android:id="@+id/distance"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_marginBottom="3dp"
-            android:layout_marginTop="3dp"
-            android:text=""
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:layout_weight="1"/>
-
-        <TextView
-            android:id="@+id/in_type_of_car"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_marginBottom="3dp"
-            android:layout_marginTop="3dp"
-            android:text=""
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:layout_weight="1"/>
+            <TextView
+                android:id="@+id/distance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:layout_weight="1"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="15sp"/>
 
         </LinearLayout>
     </LinearLayout>
@@ -185,24 +188,31 @@
 
         <Button
             android:id="@+id/accept"
-            android:layout_marginLeft="10dp"
             android:layout_width="100dp"
             android:layout_height="45dp"
             android:layout_gravity="left"
+            android:layout_marginLeft="10dp"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:text="Accept"/>
 
         <Button
             android:id="@+id/decline"
-            android:layout_marginRight="10dp"
             android:layout_width="100dp"
             android:layout_height="45dp"
             android:layout_gravity="right"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:background="@color/colorPrimaryDark"
             android:text="Decline"/>
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_weight="1">
+
+    </RelativeLayout>
 
 </LinearLayout>

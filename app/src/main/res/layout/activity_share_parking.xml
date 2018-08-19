@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.opark.opark.share_parking.ShareParking">
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:background="@color/colorAccent">
+
+        <ImageButton
+            android:id="@+id/toMapButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/com_facebook_auth_dialog_background"
+            android:scaleType="fitCenter"
+            android:src="@drawable/home01_icon_location"/>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/find_parking_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/find_parking"
+        android:layout_marginTop="300dp"
+        android:layout_marginLeft="247dp"/>
+
+    <Button
+        android:id="@+id/share_parking_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/share_parking"
+        android:layout_marginTop="300dp"
+        android:layout_marginLeft="20dp"/>
+
+</RelativeLayout>
