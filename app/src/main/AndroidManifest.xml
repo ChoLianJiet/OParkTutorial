@@ -31,6 +31,10 @@
         android:value="@string/map_api_key"/>
 
     <activity android:name=".LoginActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent-filter>
     </activity>
     <activity android:name=".card_swipe.MainActivityCardSwipe">
     </activity>
@@ -89,10 +93,7 @@
 
     <activity android:name=".splash_screen.SplashActivity"
               android:theme="@style/SplashTheme">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN"/>
-            <category android:name="android.intent.category.LAUNCHER"/>
-        </intent-filter>
+
     </activity>
 
 
