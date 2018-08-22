@@ -75,7 +75,7 @@ android {
         implementation 'com.google.firebase:firebase-database:15.0.1'
         implementation 'com.google.firebase:firebase-storage:15.0.2'
         //CHATHEAD
-        implementation project(':chatHeadLib')
+
         implementation 'com.github.flipkart-incubator:circular-image:1.0'
         implementation 'com.github.stfalcon:chatkit:0.2.2'
         implementation 'com.squareup.picasso:picasso:2.5.2'

@@ -1,1 +1,1 @@
-include ':app', ':chatHeadLib'
+include ':app'

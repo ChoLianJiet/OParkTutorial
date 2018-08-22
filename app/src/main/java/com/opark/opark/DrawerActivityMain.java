@@ -72,10 +72,10 @@ public class DrawerActivityMain extends AppCompatActivity
         public void onServiceConnected(ComponentName className,
                 IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            ChatHeadService.LocalBinder binder = (ChatHeadService.LocalBinder) service;
-            chatHeadService = binder.getService();
-            bound = true;
-            chatHeadService.minimize();
+//            ChatHeadService.LocalBinder binder = (ChatHeadService.LocalBinder) service;
+//            chatHeadService = binder.getService();
+//            bound = true;
+//            chatHeadService.minimize();
 //                chatHeadService.addChatHead();
 //                Log.i("ChatHead", "Called");
         }
@@ -85,7 +85,7 @@ public class DrawerActivityMain extends AppCompatActivity
             bound = false;
         }
     };
-    private ChatHeadService chatHeadService ;
+//    private ChatHeadService chatHeadService ;
     private boolean bound;
 
     //CONSTANT
@@ -217,7 +217,7 @@ public class DrawerActivityMain extends AppCompatActivity
         if (id == R.id.action_settings) {
 //            addNewBubble();
             if (bound) {
-                chatHeadService.addChatHead();
+//                chatHeadService.addChatHead();
                 Log.i("ChatHead", "Called");
             }
             return true;
@@ -285,9 +285,9 @@ public class DrawerActivityMain extends AppCompatActivity
 //    }
 
     private void startChatHeadService() {
-        Intent intent = new Intent(this, ChatHeadService.class);
-        startService(intent);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+//        Intent intent = new Intent(this, ChatHeadService.class);
+//        startService(intent);
+//        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     //GET CURRENT LOCATION
