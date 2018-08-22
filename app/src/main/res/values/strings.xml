@@ -6,6 +6,7 @@
     <string name="app_password_edit_text">Password</string>
     <item name="visible" type="id"/>
     <item name="masked" type="id"/>
+    <string name="confirm_profile_update">Update Profile</string>
 
 
     <!--//FACEBOOK STRING-->
