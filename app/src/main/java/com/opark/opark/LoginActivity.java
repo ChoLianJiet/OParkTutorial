@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             FacebookSdk.setIsDebugEnabled(true);
             FacebookSdk.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
         }
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login_relative);
 
         mAuth = FirebaseAuth.getInstance();
 
