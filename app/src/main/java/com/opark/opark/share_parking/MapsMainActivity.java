@@ -14,13 +14,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
@@ -57,18 +55,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.opark.opark.LoadingScreen;
-import com.opark.opark.LoginActivity;
+import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.NoUserPopUp;
 import com.opark.opark.R;
-import com.opark.opark.UserPopUp;
 import com.opark.opark.UserPopUpFragment;
 import com.opark.opark.UserProfileSetup;
 
 
 import java.util.ArrayList;
 import java.util.HashSet;
-
-import javax.security.auth.Subject;
 
 public class MapsMainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -124,7 +119,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     private LatLng kenaParkerLocation;
     public static Location peterParker = new Location("");
     public static String foundUser;
-    private ProgressBar loadingCircle;
+    public ProgressBar loadingCircle;
     private String adatemValue;
     public static UserPopUpFragment userPopUpFragment;
     private PopupWindow popUpWindow;
@@ -143,12 +138,18 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
 
         shareParkingButton = (Button) findViewById(R.id.share_parking_button);
         findParkingButton = (Button) findViewById(R.id.find_parking_button);
+
+        //INVISIBLE PARKINGBUTTON
         shareParkingButton.setVisibility(View.INVISIBLE);
         findParkingButton.setVisibility(View.INVISIBLE);
+
+
         recenterButton = (FloatingActionButton) findViewById(R.id.recenter_button);
         recenterButton.setVisibility(View.INVISIBLE);
         loadingCircle = (ProgressBar) findViewById(R.id.progress_bar);
         showLoading();
+
+
         FirebaseApp.initializeApp(getApplicationContext());
         currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         geofireRef = FirebaseDatabase.getInstance().getReference().child("geofire");
@@ -181,7 +182,8 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             public void onClick(View v) {
                 Log.d(TAG, "Recentered Button is Pressed");
                 markerInMiddle = true;
-                addMarker(mMap, peterParkerLocation.latitude, peterParkerLocation.longitude);
+                LatLng latlong = new LatLng(peterParkerLocation.latitude,peterParkerLocation.longitude);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlong,DEFAULT_ZOOM));
                 Log.d(TAG,"markerInMiddle is " + markerInMiddle);
                 setRecenterButton();
             }
@@ -423,46 +425,49 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             @Override
             public void onKeyEntered(final String key, GeoLocation location) {
 
+
                 if (!key.equals(currentUserID)) {
                     matchmakingRef.child(key).child("adatem").addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
+                            try {
+                                adatemValue = dataSnapshot.getValue().toString();
 
-                            adatemValue = dataSnapshot.getValue().toString();
+                                if (oldArrayList.contains(key)) {
+                                    //do nothing
+                                    if (!adatemValue.equals(ADATEM0)) {
+                                        oldArrayList.remove(key);
+                                        Log.d(TAG, key + " has been removed due to becoming not 0, oldArrayList consist of " + oldArrayList);
+                                    }
+                                } else if (adatemValue.equals(ADATEM0) && !oldArrayList.contains(key)) {
 
-                            if (oldArrayList.contains(key)) {
-                                //do nothing
-                                if (!adatemValue.equals(ADATEM0)) {
-                                    oldArrayList.remove(key);
-                                    Log.d(TAG, key + " has been removed due to becoming not 0, oldArrayList consist of " + oldArrayList);
+                                    newArrayList.add(key);
+                                    newHashSet.addAll(newArrayList);
+                                    newArrayList.clear();
+                                    newArrayList.addAll(newHashSet);
+                                    newHashSet.clear();
+
+                                    Log.d(TAG, "newArrayList consist of " + newArrayList);
+
+                                } else if (!adatemValue.equals(ADATEM0)) {
+
+                                    Log.d(TAG, key + " adatem has become not 0, removed from newArrayList");
+
+                                    newArrayList.remove(key);
+                                    newHashSet.addAll(newArrayList);
+                                    newArrayList.clear();
+                                    newArrayList.addAll(newHashSet);
+                                    newHashSet.clear();
+
+                                    Log.d(TAG, "newArrayList consist of " + newArrayList);
+
+                                } else {
+                                    Log.d(TAG, "nothing is triggered, newArrayList is not used");
+                                    //do nothing
                                 }
-                            } else if (adatemValue.equals(ADATEM0) && !oldArrayList.contains(key)) {
-
-                                newArrayList.add(key);
-                                newHashSet.addAll(newArrayList);
-                                newArrayList.clear();
-                                newArrayList.addAll(newHashSet);
-                                newHashSet.clear();
-
-                                Log.d(TAG, "newArrayList consist of " + newArrayList);
-
-                            } else if (!adatemValue.equals(ADATEM0)) {
-
-                                Log.d(TAG, key + " adatem has become not 0, removed from newArrayList");
-
-                                newArrayList.remove(key);
-                                newHashSet.addAll(newArrayList);
-                                newArrayList.clear();
-                                newArrayList.addAll(newHashSet);
-                                newHashSet.clear();
-
-                                Log.d(TAG, "newArrayList consist of " + newArrayList);
-
-                            } else {
-                                Log.d(TAG, "nothing is triggered, newArrayList is not used");
-                                //do nothing
+                            } catch(NullPointerException e)  {
+                                System.out.println(e);
                             }
-
                         }
 
                         @Override
@@ -555,6 +560,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             transaction.add(R.id.popupuser,userPopUpFragment,null);
             transaction.addToBackStack(null);
             transaction.commit();
+
 //            UserPopUpFragment userPopUpFragment = new UserPopUpFragment();
 //            userPopUpFragment.show(getFragmentManager(),"userPopUpFragment");
 
@@ -753,13 +759,13 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
         startActivity(intent);
     }
 
-    void showLoading() {
+   public void showLoading() {
         loadingCircle.setVisibility(View.VISIBLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
-    void dismissLoading() {
+   public void dismissLoading() {
         loadingCircle.setVisibility(View.INVISIBLE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }

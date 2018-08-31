@@ -2,12 +2,9 @@ package com.opark.opark;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.v4.content.res.TypedArrayUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,19 +18,14 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
-import com.google.zxing.common.StringUtils;
+import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.model.User;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-
-import static android.R.id.list;
-import static android.R.string.cancel;
 
 public class UserProfileSetup extends AppCompatActivity {
 

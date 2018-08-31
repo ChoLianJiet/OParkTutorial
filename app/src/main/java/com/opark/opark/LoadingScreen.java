@@ -53,6 +53,7 @@ public class LoadingScreen extends AppCompatActivity {
         matchmakingRef.child(currentUserID).child("adatem").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                try{
                 String adatemValue = dataSnapshot.getValue().toString();
                 if (adatemValue.equals("2")) {
                     Intent intent = new Intent(LoadingScreen.this, KenaMap.class);
@@ -60,6 +61,8 @@ public class LoadingScreen extends AppCompatActivity {
                     finish();
                 } else {
 
+                }} catch (NullPointerException e){
+                    System.out.println(e);
                 }
             }
 

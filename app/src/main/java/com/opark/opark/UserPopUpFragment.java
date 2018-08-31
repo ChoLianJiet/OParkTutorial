@@ -24,8 +24,11 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
@@ -80,7 +83,7 @@ public class UserPopUpFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 MapsMainActivity.kenaMarker.remove();
-                MapsMainActivity.kenaMarker = null;
+//                MapsMainActivity.kenaMarker = null;
                 returnToMain();
             }
         });
@@ -100,6 +103,8 @@ public class UserPopUpFragment extends Fragment {
         });
 
         setKenaDetailsOnWindow();
+
+        listenToDatabase();
 
         return view;
 
@@ -192,25 +197,52 @@ public class UserPopUpFragment extends Fragment {
         MapsMainActivity.oldHashSet.clear();
 
         MapsMainActivity.kenaMarker.remove();
-        MapsMainActivity.kenaMarker = null;
+//        MapsMainActivity.kenaMarker = null;
 
         Log.i(TAG,foundUser + " has been removed from newArrayList due to declining");
         Log.i(TAG,"MapsMainActivity newArraylist " + MapsMainActivity.newArrayList);
         Log.i(TAG,"MapsMainActivity oldArraylist" + MapsMainActivity.oldArrayList);
-        getActivity().finish();
+//        getActivity().finish();
 
     }
 
     private void returnToMain(){
 
 //        mFrameLayout.setVisibility(View.INVISIBLE);
-        FragmentManager manager = getFragmentManager();
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.remove(MapsMainActivity.userPopUpFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+//        FragmentManager manager = getFragmentManager();
+//        FragmentTransaction transaction = manager.beginTransaction();
+//        transaction.remove(MapsMainActivity.userPopUpFragment);
+//        transaction.addToBackStack(null);
+//        transaction.commit();
         matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM0);
     }
 
 
+    private void listenToDatabase(){
+
+        matchmakingRef.child(foundUser).child("adatem").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                try {
+                String adatemValue = dataSnapshot.getValue().toString();
+                if (adatemValue != MapsMainActivity.ADATEM1){
+                    FragmentManager manager = getFragmentManager();
+                    FragmentTransaction transaction = manager.beginTransaction();
+                    transaction.remove(MapsMainActivity.userPopUpFragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+
+                    MapsMainActivity.kenaMarker.remove();
+//                    MapsMainActivity.kenaMarker = null;
+                }} catch (NullPointerException e) {
+                    System.out.println(e);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 }

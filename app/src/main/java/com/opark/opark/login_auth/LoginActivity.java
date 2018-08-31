@@ -1,4 +1,4 @@
-package com.opark.opark;
+package com.opark.opark.login_auth;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -7,9 +7,16 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 
+import com.facebook.login.LoginFragment;
+import com.opark.opark.login_auth.EmailLogin;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -30,6 +37,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.opark.opark.BuildConfig;
+import com.opark.opark.R;
+import com.opark.opark.UserProfileSetup;
 import com.opark.opark.share_parking.MapsMainActivity;
 
 import android.os.Bundle;
@@ -49,7 +59,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class LoginActivity extends AppCompatActivity {
-
+ViewPager mViewPager;
 
     private FirebaseAuth mAuth;
     // UI references.
@@ -57,15 +67,22 @@ public class LoginActivity extends AppCompatActivity {
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private CallbackManager callbackManager;
-    LoginButton loginButton;
+    LoginButton facebookloginButton;
     private Button registerButton;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DrawerLayout mDrawer;
     private Toolbar mToolbar;
-
+    public static EmailLogin emailLogin;
+    ViewPagerAdapter viewPagerAdapter;
+    Button signInButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.container, new EmailLogin())
+//                    .commit();
+//        }
 
         FacebookSdk.setApplicationId("113991652589123");
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -73,13 +90,16 @@ public class LoginActivity extends AppCompatActivity {
             FacebookSdk.setIsDebugEnabled(true);
             FacebookSdk.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
         }
-        setContentView(R.layout.activity_login_relative);
+        setContentView(R.layout.login_viewpager);
+
+/*
 
         mAuth = FirebaseAuth.getInstance();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     System.out.println("User logged in");
@@ -88,14 +108,22 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
+*/
+        mViewPager = (ViewPager) findViewById(R.id.m_view_pager);
+       viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+       mViewPager.setAdapter(viewPagerAdapter);
 
 
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email_login_autocompletetextview);
+
+//        mViewPager.setAdapter(new setViewadapter(getSupportFragmentManager()));
+   /*     mEmailView = (AutoCompleteTextView) findViewById(R.id.email_login_autocompletetextview);
         mPasswordView = (EditText) findViewById(R.id.password_edit_text);
         registerButton = (Button) findViewById(R.id.register_button);
+        signInButton = (Button) findViewById(R.id.sign_in_button);
 
 
-        // attempt login
+
+//         attempt login
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -116,9 +144,16 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signInRegisteredUser(v);
+            }
+        });
+
         //FACEBOOK LOGIN BUTTON
-        loginButton = (LoginButton) findViewById(R.id.login_button);
-        loginButton.setReadPermissions("email", "public_profile");
+        facebookloginButton = (LoginButton) findViewById(R.id.facebook_login_button);
+        facebookloginButton.setReadPermissions("email", "public_profile");
 
 
         //FACEBOOK HASH KEY Generating
@@ -311,23 +346,40 @@ public class LoginActivity extends AppCompatActivity {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-}
 
 
+    }*/
 
 
+//    public class setViewadapter extends FragmentPagerAdapter {
+//        public setViewadapter(FragmentManager fm) {
+//            super(fm);
 
 
+////        }
 
 
+//        @Override
+//        public Fragment getItem(int position) {
+//                 if (position==0){
+//                     EmailLogin eMailLogin = new EmailLogin();
+//
+//                    return eMailLogin;
+//            }
+//
+//            else
+//                return new PhoneAuth();
+//
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return 2;
+//        }
+//    }
 
 
+//}
 
 
-
-
-
-
-
-
-
+    }}

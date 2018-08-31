@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/colorBackground"
     android:layout_height="match_parent"
     tools:context="com.opark.opark.share_parking.ShareParking">
 
@@ -12,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_weight="1"
-        android:background="@color/colorAccent">
+        android:background="@color/colorBackground">
 
         <ImageButton
             android:id="@+id/toMapButton"

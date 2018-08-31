@@ -16,7 +16,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         super(fm);
     }
 
-    
+
 
 
     @Override
