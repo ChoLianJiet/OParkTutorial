@@ -27,6 +27,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.LoggingBehavior;
+import com.facebook.login.Login;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -46,6 +47,8 @@ import com.opark.opark.R;
 import com.opark.opark.UserProfileSetup;
 import com.opark.opark.share_parking.MapsMainActivity;
 
+import java.util.Objects;
+
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 
@@ -54,7 +57,7 @@ public class EmailLogin extends Fragment {
 
     private FirebaseAuth mAuth;
     // UI references.
-
+    private TextView phoneAuthTextButton;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private CallbackManager callbackManager;
@@ -77,6 +80,8 @@ public class EmailLogin extends Fragment {
         facebookloginButton = (LoginButton) v.findViewById(R.id.facebook_login_button);
         signInButton = (Button) v.findViewById(R.id.sign_in_button);
         signInButton = (Button) v.findViewById(R.id.sign_in_button);
+        phoneAuthTextButton = (TextView) v.findViewById(R.id.phone_login_text);
+
 
         FacebookSdk.setApplicationId("113991652589123");
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -118,6 +123,13 @@ public class EmailLogin extends Fragment {
         });
 
 
+        phoneAuthTextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LoginActivity.mViewPager.setCurrentItem(LoginActivity.mViewPager.getCurrentItem() + 1);
+            }
+        });
+
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,14 +147,14 @@ public class EmailLogin extends Fragment {
 
         //FACEBOOK LOGIN BUTTON
         facebookloginButton.setReadPermissions("email", "public_profile");
-
-        facebookloginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                signInRegisteredUser(v);
-            }
-        });
+//
+//        facebookloginButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                signInRegisteredUser(v);
+//            }
+//        });
         //FACEBOOK HASH KEY Generating
 //        try {
 //            PackageInfo info = getPackageManager().getPackageInfo(
@@ -213,51 +225,54 @@ public class EmailLogin extends Fragment {
 //    }
 
 
-    private void updateUI(FirebaseUser currentUser) {
+    public void updateUI(FirebaseUser currentUser) {
+        try {
+            if (currentUser != null) {
 
-        if (currentUser != null) {
-
-            final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
-            storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    // file exists
-                    Log.d("login", "user logged in");
-                    Log.d("urlget", "uri: " + uri.toString());
-                    Toast.makeText(getActivity().getApplicationContext(), "Log in Successful! :D ",
-                            Toast.LENGTH_SHORT).show();
-
-
+                final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
+                storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        // file exists
+                        Log.d("login", "user logged in");
+                        Log.d("urlget", "uri: " + uri.toString());
+                        Toast.makeText(getActivity(), "Log in Successful! :D ",
+                                Toast.LENGTH_SHORT).show();
 
 
-                    //TODO Add Intent to Drawer Activity onSuccess
-                    Intent intent = new Intent(getActivity(), MapsMainActivity.class);
-                    intent.putExtra("firebaseUser", currentUserID);
-                    getActivity().finish();
-                    startActivity(intent);
+                        //TODO Add Intent to Drawer Activity onSuccess
+                        Intent intent = new Intent(getActivity(), MapsMainActivity.class);
+                        intent.putExtra("firebaseUser", currentUserID);
+                        Objects.requireNonNull(getActivity()).finish();
+                        startActivity(intent);
 
 
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    //file not found
-                    String firebaseUserUID = mAuth.getCurrentUser().getUid();
-                    Log.d("urlget", "New User, No profile");
-                    Intent intent = new Intent(getActivity(), UserProfileSetup.class);
-                    intent.putExtra("firebaseUser", firebaseUserUID);
-                    getActivity().finish();
-                    startActivity(intent);
-                }
-            });
-        } else {
-            // No user is signed in
-            Log.d("login", "no user");
-            return;
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        //file not found
+                        String firebaseUserUID = mAuth.getCurrentUser().getUid();
+                        Log.d("urlget", "New User, No profile");
+                        Intent intent = new Intent(getActivity(), UserProfileSetup.class);
+                        intent.putExtra("firebaseUser", firebaseUserUID);
+                        Objects.requireNonNull(getActivity()).finish();
+                        startActivity(intent);
+                    }
+                });
+            } else {
+                // No user is signed in
+                Log.d("login", "no user");
+                return;
+            }
+        } catch (NullPointerException e) {
+
+            Log.d("Login Null", "login null caught");
+
+
         }
     }
-
 
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d("facebook token", "handleFacebookAccessToken:" + token);
@@ -288,7 +303,7 @@ public class EmailLogin extends Fragment {
     // Executed when Sign in button pressed
 
     public void signInRegisteredUser(View v) {
-
+        signInButton.setClickable(false);
         Log.d("loginbutton","loginbutton pressed") ;
         attemptLogin();
 
@@ -296,7 +311,7 @@ public class EmailLogin extends Fragment {
 
     // Executed when Register button pressed
     public void registerNewUser(View v) {
-        Intent intent = new Intent(getActivity().getApplicationContext(), com.opark.opark.RegisterActivity.class);
+        Intent intent = new Intent(getActivity(), com.opark.opark.RegisterActivity.class);
         getActivity().finish();
         startActivity(intent);
     }
@@ -308,6 +323,7 @@ public class EmailLogin extends Fragment {
         String password = mPasswordView.getText().toString();
 
         if (email.equals("") || password.equals("")) {
+            signInButton.setClickable(true);
             return;
         }
 
@@ -318,6 +334,7 @@ public class EmailLogin extends Fragment {
                 Log.d("OparkLogin", "Log in successfull ? " + task.isSuccessful());
 
                 if (!task.isSuccessful()) {
+                    signInButton.setClickable(true);
                     Log.d("OparkLogin", "Problem signing in : " + task.getException());
                     showErrorDialog("Problem signing you in. Try again maybe ? ");
                 } else {
@@ -337,7 +354,7 @@ public class EmailLogin extends Fragment {
 
 
     private void showErrorDialog(String message) {
-        new AlertDialog.Builder(getActivity().getApplicationContext())
+        new AlertDialog.Builder(getActivity())
                 .setTitle("Oops")
                 .setMessage(message)
                 .setPositiveButton(android.R.string.ok, null)

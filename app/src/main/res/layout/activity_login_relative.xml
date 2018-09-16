@@ -2,6 +2,7 @@
 <ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/ScrollView01"
+            android:theme="@style/AppTheme"
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:fillViewport="true"
             android:layout_width="fill_parent"
@@ -10,13 +11,24 @@
     <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorBackground"
+                    android:background="@color/brightPeach"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:gravity="top"
                     android:orientation="vertical"
                     tools:context="com.opark.opark.RegisterActivity">
 
+
+        <TextView
+            android:id="@+id/phone_login_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/login_logo"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:clickable="true"
+            android:text="PhoneAuth"
+            android:focusable="true"/>
 
         <ImageView
             android:id="@+id/login_logo"
@@ -84,7 +96,7 @@
             android:layout_below="@id/password_text_input_layout"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="45dp"
-            android:background="@color/colorAccent"
+            android:background="@drawable/rounded_layout_background"
             android:text="@string/app_sign_in"/>
 
         <Button
@@ -94,7 +106,7 @@
             android:layout_below="@id/sign_in_button"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp"
-            android:background="@color/colorAccent"
+            android:background="@drawable/rounded_layout_background"
             android:text="@string/app_register"
             tools:layout_constraintBottom_creator="1"
             tools:layout_constraintLeft_creator="1"

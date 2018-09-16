@@ -59,7 +59,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class LoginActivity extends AppCompatActivity {
-ViewPager mViewPager;
+    public static ViewPager mViewPager;
 
     private FirebaseAuth mAuth;
     // UI references.
@@ -73,16 +73,15 @@ ViewPager mViewPager;
     private DrawerLayout mDrawer;
     private Toolbar mToolbar;
     public static EmailLogin emailLogin;
+    NonSwipeableViewPager nonSwipeViewPage;
     ViewPagerAdapter viewPagerAdapter;
     Button signInButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (savedInstanceState == null) {
-//            getSupportFragmentManager().beginTransaction()
-//                    .add(R.id.container, new EmailLogin())
-//                    .commit();
-//        }
+
+
+
 
         FacebookSdk.setApplicationId("113991652589123");
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -382,4 +381,19 @@ ViewPager mViewPager;
 //}
 
 
-    }}
+    }
+    @Override
+    public void onBackPressed() {
+
+        if (mViewPager.getCurrentItem() != 0) {
+            mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1,true);
+        }else{
+            finish();
+        }
+
+    }
+
+
+
+
+}

@@ -3,15 +3,16 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:id="@+id/view_pager_container"
                 tools:context="com.opark.opark.login_auth.LoginActivity">
 
 
 
-        <android.support.v4.view.ViewPager
+        <com.opark.opark.login_auth.NonSwipeableViewPager
             android:id="@+id/m_view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        </android.support.v4.view.ViewPager>
+        </com.opark.opark.login_auth.NonSwipeableViewPager>
 
 </RelativeLayout>

@@ -25,7 +25,7 @@
     <string name="email_registration">Email</string>
     <string name="confirm_password_text">Confirm Password</string>
     <string name="name_registration">Name</string>
-    <string name="name_and_number_text">Name and Number</string>
+    <string name="name_and_number_text">You</string>
     <string name="your_car_text">Your Car</string>
     <string name="address_text">Your Address</string>
     <string name="first_name_string">First Name</string>

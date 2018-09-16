@@ -1,15 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical" android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:gravity="center_vertical"
-              android:background="#B4045F">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="PhoneAuth"
-        android:textSize="25sp"
-        android:textAlignment="center"
-        android:textColor="#ffffff"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:theme="@style/AppTheme">
 
-</LinearLayout>
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/verification_code_text_input_layout"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/phone_text_input_layout"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:layout_height="wrap_content">
+    <EditText
+        android:id="@+id/verification_code_entry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:digits="0123456789"
+        android:drawablePadding="10dp"
+        android:hint="Enter verification code"
+        android:inputType="phone"
+        android:maxLength="10" />
+
+
+    </android.support.design.widget.TextInputLayout>
+
+
+
+    <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
+        android:id="@+id/verify_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:visibility="gone"
+        android:background="@drawable/rounded_layout_background"
+        android:layout_centerHorizontal="true"
+        android:text="Verify"/>
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/verification_code_text_input_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:clickable="true"
+        android:fontFamily="sans-serif"
+        android:text="Resend Verification Code"
+        android:textSize="12sp"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/phone_text_input_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="269dp"
+        android:hint="Phone Number"
+        android:layout_centerHorizontal="true"
+
+        >
+
+
+        <EditText
+
+            android:id="@+id/phone_num_enter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="146dp"
+            android:digits="+0123456789"
+            android:ems="10"
+            android:inputType="phone"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
+        android:id="@+id/send_v_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:background="@drawable/rounded_layout_background"
+        app:spinning_bar_width="4dp"
+        app:spinning_bar_color="#FFF"
+        app:spinning_bar_padding="6dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:layout_centerHorizontal="true"
+        android:text="Send Code"/>
+
+
+</RelativeLayout>
