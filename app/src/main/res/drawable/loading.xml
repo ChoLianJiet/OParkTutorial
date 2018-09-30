@@ -4,7 +4,7 @@
         <shape
             android:shape="ring"
             android:useLevel="false">
-            <solid android:color="#EF9A9A"/>
+            <solid android:color="@color/brightPeach"/>
         </shape>
     </item>
     <item android:id="@android:id/progress">
@@ -15,7 +15,7 @@
             android:useLevel="false">
             <gradient android:color="@android:color/transparent"
                 android:angle="0"
-                android:startColor="#D50000"
+                android:startColor="@color/colorPrimaryDark"
                 android:type="sweep"
                 android:useLevel="false"/>
             </shape>

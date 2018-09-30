@@ -135,7 +135,7 @@ public class RegisterActivity extends AppCompatActivity {
                     showErrorDialog("Registration attempt failed");
 
                 } else {
-                    Intent intent = new Intent (RegisterActivity.this, LoginActivity.class);
+                    Intent intent = new Intent (RegisterActivity.this, UserProfileSetup.class);
                     finish();
                     startActivity(intent);
                 }

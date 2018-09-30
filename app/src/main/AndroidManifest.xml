@@ -34,11 +34,13 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts"/>
 
-        <activity android:name=".login_auth.LoginActivity"
-                  android:theme="@style/AppTheme">
+        <activity
+            android:name=".login_auth.LoginActivity"
+            android:theme="@style/AppTheme">
         </activity>
-        <activity android:name=".card_swipe.MainActivityCardSwipe"
-                  android:theme="@style/AppTheme">
+        <activity
+            android:name=".card_swipe.MainActivityCardSwipe"
+            android:theme="@style/AppTheme">
         </activity>
         <activity android:name=".motion_vehicle_tracker.Map">
         </activity>
@@ -74,8 +76,6 @@
 
                 <data android:scheme="@string/fb_login_protocol_scheme"/>
             </intent-filter>
-
-
         </activity>
         <activity
             android:name=".share_parking.MapsMainActivity"
@@ -99,17 +99,18 @@
         </activity>
         <activity android:name=".ProfileEdit">
         </activity>
-
-
         <activity android:name=".splash_screen.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity android:name=".login_auth.PhoneAuth">
         </activity>
         <activity android:name=".login_auth.EmailLogin">
+        </activity>
+        <activity android:name=".RewardsFragment">
         </activity>
     </application>
 

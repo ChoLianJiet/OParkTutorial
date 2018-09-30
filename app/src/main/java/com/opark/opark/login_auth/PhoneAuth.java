@@ -100,7 +100,6 @@ public class PhoneAuth extends Fragment {
 //                              sendCodeButton.startAnimation();
                               sendVerificationCode(userPhoneNumber);
                               sendCodeButton.setVisibility(View.GONE);
-                              verifyButton.setVisibility(View.VISIBLE);
                               Log.d(TAG, "Phone Number Entered");
                           }
                       }
@@ -172,6 +171,8 @@ public class PhoneAuth extends Fragment {
                 // by combining the code with a verification ID.
 //                super.onCodeSent(mVerificationId, token);
                 Log.d(TAG, "onCodeSent:" + verificationId);
+                verifyButton.setVisibility(View.VISIBLE);
+
 
                 // Save verification ID and resending token so we can use them later
                 mVerificationId = verificationId;

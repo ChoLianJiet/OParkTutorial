@@ -3,6 +3,9 @@
     <array name="preloaded_fonts" translatable="false">
         <item>@font/baloo</item>
         <item>@font/khula</item>
+        <item>@font/nova_mono</item>
+        <item>@font/open_sans_light</item>
         <item>@font/passion_one_bold</item>
+        <item>@font/roboto_thin</item>
     </array>
 </resources>

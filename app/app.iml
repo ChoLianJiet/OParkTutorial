@@ -106,11 +106,9 @@
     <orderEntry type="jdk" jdkName="Android API 27 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: com.android.support:support-v4-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.stfalcon:chatkit-0.2.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test.espresso:espresso-idling-resource-2.2.2" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-core-16.0.3" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-basement-15.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:cardview-v7-27.0.2" level="project" />
     <orderEntry type="library" name="Gradle: com.github.renaudcerrato:static-maps-api:1.0.4@jar" level="project" />
     <orderEntry type="library" name="Gradle: net.cachapa.expandablelayout:expandablelayout-2.9.2" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-measurement-base-16.0.2" level="project" />
@@ -129,7 +127,6 @@
     <orderEntry type="library" name="Gradle: com.github.johnkil.android-appmsg:appmsg-1.2.0" level="project" />
     <orderEntry type="library" name="Gradle: com.facebook.android:facebook-core-4.34.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android:flexbox-0.2.5" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support.constraint:constraint-layout-solver:2.0.0-alpha2@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.code.findbugs:jsr305:3.0.1@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: javax.inject:javax.inject:1@jar" level="project" />
@@ -155,6 +152,7 @@
     <orderEntry type="library" name="Gradle: com.facebook.android:facebook-login-4.34.0" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-annotations:27.1.1@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-auth-16.0.3" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support:cardview-v7-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.parse.bolts:bolts-android:1.4.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:animated-vector-drawable-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-compat-27.1.1" level="project" />
@@ -171,7 +169,7 @@
     <orderEntry type="library" name="Gradle: com.airbnb.android:lottie-2.5.5" level="project" />
     <orderEntry type="library" name="Gradle: com.facebook.android:facebook-common-4.34.0" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.flipkart-incubator:circular-image-1.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.xdty.preference:color-picker-0.0.5" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-ads-identifier-15.0.1" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.core:common:1.1.1@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-database-16.0.2" level="project" />
@@ -185,7 +183,6 @@
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-iid-interop-16.0.0" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support.constraint:constraint-layout-2.0.0-alpha2" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-maps-15.0.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.squareup.picasso:picasso:2.5.2@jar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:livedata-core-1.1.0" level="project" />
     <orderEntry type="library" name="Gradle: com.facebook.android:facebook-android-sdk-4.34.0" level="project" />
     <orderEntry type="library" name="Gradle: com.facebook.android:facebook-share-4.34.0" level="project" />

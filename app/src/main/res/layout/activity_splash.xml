@@ -7,14 +7,10 @@
 
     <ImageView
         android:id="@+id/splashscreen"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_centerInParent="true"
-        android:src="@drawable/splashscreen_background"/>
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Hello World, splash"/>
+        android:layout_width="220dp"
+        android:layout_height="151dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="200dp"
+        android:src="@mipmap/squareboilogohdpi"/>
 
 </RelativeLayout>

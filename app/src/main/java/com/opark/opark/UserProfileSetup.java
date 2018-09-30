@@ -3,10 +3,12 @@ package com.opark.opark;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,17 +26,23 @@ import com.opark.opark.model.User;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
+import org.w3c.dom.Text;
+import org.xdty.preference.colorpicker.ColorPickerDialog;
+import org.xdty.preference.colorpicker.ColorPickerSwatch;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
 public class UserProfileSetup extends AppCompatActivity {
 
+    private static final String TAG = "UserProfileSetup" ;
     private ExpandableLayout expandableFirstName;
     private ExpandableLayout expandableNRIC;
     private ExpandableLayout expandableLastName;
     private ExpandableLayout expandablePhoneNum;
     private ExpandableLayout expandableCarColour;
+    private TextInputLayout carColourTextInputLayout;
     private ExpandableLayout expandableCarBrand;
     private ExpandableLayout expandableCarModel;
     private ExpandableLayout expandableCarPlate;
@@ -68,7 +76,7 @@ public class UserProfileSetup extends AppCompatActivity {
     private EditText [] nameNumEditText = new EditText[4];
 //    private String [] addressString = new String [5];
 //    private EditText[] addressEditText = new EditText[5];
-
+    private int mSelectedColor;
     private int userPoints = 0;
     private EditText icNumber;
 
@@ -89,6 +97,11 @@ public class UserProfileSetup extends AppCompatActivity {
 
         //Provided by Library but haven't test if useful or not
         expandableListener();
+
+
+
+
+
 
         /**EXPANDING LAYOUT**/
         //Expand Name and Num layout
@@ -125,6 +138,37 @@ public class UserProfileSetup extends AppCompatActivity {
         buttonExpandCarLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                carColourTextInputLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        int[] mColors = getResources().getIntArray(R.array.default_rainbow);
+
+                        ColorPickerDialog dialog = ColorPickerDialog.newInstance(R.string.color_picker_default_title,
+                                mColors,
+                                mSelectedColor,
+                                5, // Number of columns
+                                ColorPickerDialog.SIZE_SMALL,
+                                true // True or False to enable or disable the serpentine effect
+                                //0, // stroke width
+                                //Color.BLACK // stroke color
+                        );
+                        dialog.setOnColorSelectedListener(new ColorPickerSwatch.OnColorSelectedListener() {
+
+                            @Override
+                            public void onColorSelected(int color) {
+                                mSelectedColor = color;
+
+                            }
+
+                        });
+                        Log.d(TAG, "onClick: Dialog setup");
+
+                        dialog.show(getFragmentManager(), "color_dialog_test");
+                    }
+
+                });
+
 
                 if (expandableCarBrand.isExpanded()&&expandableCarColour.isExpanded()&&expandableCarPlate.isExpanded()&&expandableCarModel.isExpanded())
                 {
@@ -132,12 +176,19 @@ public class UserProfileSetup extends AppCompatActivity {
                     expandableCarColour.collapse();
                     expandableCarPlate.collapse();
                     expandableCarModel.collapse();
+
+
                 }
+
+
+
                 else
                carExpand();
 
             }
         });
+
+
 
         //TODO Signout code
 //        buttonSignOut.setOnClickListener(new View.OnClickListener() {
@@ -287,6 +338,7 @@ public class UserProfileSetup extends AppCompatActivity {
         expandableCarBrand = (ExpandableLayout) findViewById(R.id.expand_car_brand);
         expandableCarModel = (ExpandableLayout) findViewById(R.id.expand_car_model);
         expandableCarPlate = (ExpandableLayout) findViewById(R.id.expand_car_plate);
+        carColourTextInputLayout = (TextInputLayout) findViewById(R.id.car_color_text_input_layout);
 
        /* expandableFirstLineAddress = (ExpandableLayout) findViewById(R.id.expand_firstline_address);
         expandableSecondLineAddress = (ExpandableLayout) findViewById(R.id.expand_secondline_address);

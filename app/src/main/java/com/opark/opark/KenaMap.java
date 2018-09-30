@@ -301,4 +301,6 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback {
     public void onBackPressed() {
         // do nothing
     }
+
+
 }

@@ -234,7 +234,7 @@ public class DrawerActivityMain extends AppCompatActivity
         //initializing the fragment object which is selected
         switch (itemId) {
             case R.id.nav_first_fragment:
-                fragment = new ProfileNavFragment();
+//                fragment = new ProfileNavFragment();
                 break;
 //            case R.id.nav_second_fragment:
 //                fragment = new Menu2();

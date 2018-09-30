@@ -2,9 +2,9 @@ package com.opark.opark;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -67,6 +67,8 @@ public class UserPopUpFragment extends Fragment {
     Button declineButton;
     FloatingActionButton xButton;
     UserPopUpFragment userPopUpFragment;
+
+
 
     public static UserPopUpFragment newInstance(){
         return new UserPopUpFragment();
@@ -179,10 +181,10 @@ public class UserPopUpFragment extends Fragment {
     private void acceptUser(){
 
         matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM2);
-        togetherRef.child(foundUser).setValue(MapsMainActivity.currentUserID);
+        togetherRef.child(foundUser).child("peter").setValue(MapsMainActivity.currentUserID);
         Intent intent = new Intent(getActivity(),PeterMap.class);
         startActivity(intent);
-        getActivity().finish();
+//        getActivity().finish();
     }
 
     private void declineUser(){
