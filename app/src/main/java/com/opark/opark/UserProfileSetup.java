@@ -2,6 +2,8 @@ package com.opark.opark;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -26,13 +29,15 @@ import com.opark.opark.model.User;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
-import org.w3c.dom.Text;
-import org.xdty.preference.colorpicker.ColorPickerDialog;
-import org.xdty.preference.colorpicker.ColorPickerSwatch;
+//
+//import org.xdty.preference.colorpicker.ColorPickerDialog;
+//import org.xdty.preference.colorpicker.ColorPickerSwatch;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+
+import petrov.kristiyan.colorpicker.ColorPicker;
 
 public class UserProfileSetup extends AppCompatActivity {
 
@@ -54,10 +59,11 @@ public class UserProfileSetup extends AppCompatActivity {
     private EditText lastName ;
     private EditText firstName ;
     private EditText phoneNum ;
-    private EditText carColour ;
+    private TextView carColour ;
     private EditText carBrand ;
     private EditText carModel ;
     private EditText carPlate ;
+
 //    private EditText firstLine ;
 //    private EditText secondLine ;
 //    private EditText city ;
@@ -71,7 +77,7 @@ public class UserProfileSetup extends AppCompatActivity {
     public static FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String [] carString = new String[4];
-    private EditText [] carEditText =new EditText[4] ;
+    private EditText [] carEditText =new EditText[3] ;
     private String [] nameNumString = new String[4];
     private EditText [] nameNumEditText = new EditText[4];
 //    private String [] addressString = new String [5];
@@ -91,6 +97,8 @@ public class UserProfileSetup extends AppCompatActivity {
         // Retrieve FirebaseUser object via intent string extra
         // String is converted into FirebaseUser object via Gson
         firebaseUserUID = getIntent().getStringExtra("firebaseUser");
+
+
 
         // LINKING VARIABLES TO RESPECTIVE IDs
         bindViews();
@@ -138,35 +146,61 @@ public class UserProfileSetup extends AppCompatActivity {
         buttonExpandCarLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                carColourTextInputLayout.setOnClickListener(new View.OnClickListener() {
+
+                carColour.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                          final ColorPicker colorPicker = new ColorPicker(UserProfileSetup.this);
+                            colorPicker
+                                    .setColors(R.array.rainbow)
+                                    .disableDefaultButtons(true)
+                                    .setRoundColorButton(true)
+                                    .setColumns(5)
+                                    .setOnFastChooseColorListener(new ColorPicker.OnFastChooseColorListener() {
+                           
 
-                        int[] mColors = getResources().getIntArray(R.array.default_rainbow);
+                                        @Override
+                                        public void setOnFastChooseColorListener(int position, int color) {
+                                            Log.d(TAG, "setOnFastChooseColorListener: Fast chosen");
+//                                            getColor(color);
 
-                        ColorPickerDialog dialog = ColorPickerDialog.newInstance(R.string.color_picker_default_title,
-                                mColors,
-                                mSelectedColor,
-                                5, // Number of columns
-                                ColorPickerDialog.SIZE_SMALL,
-                                true // True or False to enable or disable the serpentine effect
-                                //0, // stroke width
-                                //Color.BLACK // stroke color
-                        );
-                        dialog.setOnColorSelectedListener(new ColorPickerSwatch.OnColorSelectedListener() {
+                                            Log.d(TAG, "setOnFastChooseColorListener: "+ String.valueOf(color) + "position" + String.valueOf(position));
+                                            String[] colorName= getResources().getStringArray(R.array.colorname);
+                                            carColour.setVisibility(View.VISIBLE);
+                                            carColour.setText(colorName[position]);
+                                            Log.d(TAG, "setOnFastChooseColorListener: " + carColour.getText().toString());
 
-                            @Override
-                            public void onColorSelected(int color) {
-                                mSelectedColor = color;
 
-                            }
+                                        }
 
-                        });
-                        Log.d(TAG, "onClick: Dialog setup");
 
-                        dialog.show(getFragmentManager(), "color_dialog_test");
+
+
+                                        @Override
+                                public void onCancel(){
+
+                                    Log.d(TAG, "onCancel: ");
+                                    // put code
+                                }
+                            })
+
+                                             .addListenerButton("newButton", new ColorPicker.OnButtonListener() {
+                                             	@Override
+                                             	public void onClick(View v, int position, int color) {
+                                             	    // put code
+                                             	}
+                                             })
+                                    .show()     ;
+
+
+
+
+                            //
+
+                            //
+
                     }
-
+//
                 });
 
 
@@ -231,10 +265,10 @@ public class UserProfileSetup extends AppCompatActivity {
 
 
     private void collectCar(){
-        carEditText[0]=carColour;
-        carEditText[1]=carBrand ;
-        carEditText[2]=carModel ;
-        carEditText[3]=carPlate ;
+
+        carEditText[0]=carBrand ;
+        carEditText[1]=carModel ;
+        carEditText[2]=carPlate ;
 
 
         carString[0]= user.userCar.carColour = carColour.getText().toString();
@@ -271,6 +305,7 @@ public class UserProfileSetup extends AppCompatActivity {
     // On Back Pressed
     @Override
     public void onBackPressed() {
+        //TODO signout
         finish();
         Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
         startActivity(intent);
@@ -303,6 +338,7 @@ public class UserProfileSetup extends AppCompatActivity {
     private void showErrorDialog(String message) {
         new AlertDialog.Builder(this)
                 .setTitle("Oops")
+
                 .setMessage(message)
                 .setPositiveButton(android.R.string.ok,null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -316,7 +352,7 @@ public class UserProfileSetup extends AppCompatActivity {
         phoneNum = (EditText) findViewById(R.id.edittext_phone_num);
         icNumber = (EditText) findViewById(R.id.edittext_user_nric);
 
-        carColour = (EditText) findViewById(R.id.edittext_car_colour);
+        carColour = (TextView) findViewById(R.id.edittext_car_colour);
         carBrand = (EditText) findViewById(R.id.edittext_car_brand);
         carModel = (EditText) findViewById(R.id.edittext_car_model);
         carPlate = (EditText) findViewById(R.id.edittext_car_plate);
@@ -338,7 +374,7 @@ public class UserProfileSetup extends AppCompatActivity {
         expandableCarBrand = (ExpandableLayout) findViewById(R.id.expand_car_brand);
         expandableCarModel = (ExpandableLayout) findViewById(R.id.expand_car_model);
         expandableCarPlate = (ExpandableLayout) findViewById(R.id.expand_car_plate);
-        carColourTextInputLayout = (TextInputLayout) findViewById(R.id.car_color_text_input_layout);
+//        carColourTextInputLayout = (TextInputLayout) findViewById(R.id.car_color_text_input_layout);
 
        /* expandableFirstLineAddress = (ExpandableLayout) findViewById(R.id.expand_firstline_address);
         expandableSecondLineAddress = (ExpandableLayout) findViewById(R.id.expand_secondline_address);
@@ -517,7 +553,7 @@ public class UserProfileSetup extends AppCompatActivity {
         collectCar();
 //        collectAddress();
 
-       checkCar= emptyCheck(carString,carEditText, 4);
+       checkCar= emptyCheck(carString,carEditText, 3);
 //       checkAddress= emptyCheck(addressString,addressEditText, 5);
         checkNameNum = emptyCheck(nameNumString,nameNumEditText,4);
 
@@ -552,12 +588,17 @@ else {
        View focusView =null;
 
         for (int i = 0; i < size; i++){
-            if (string[i].isEmpty()) {
+            if ((string[i].isEmpty())) {
                 editTexts[i].setError(getString(R.string.error_field_required));
                 focusView = editTexts[i];
                 cancel = true;
-            }
+                if(carColour==null){
+                    carColour.setError(getString(R.string.error_field_required));
+                    focusView=carColour;
+                    cancel=true;
+                }
 
+            }
 
 
             if (cancel) {

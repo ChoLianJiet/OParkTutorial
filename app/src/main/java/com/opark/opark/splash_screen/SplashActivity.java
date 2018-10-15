@@ -16,17 +16,27 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.opark.opark.MerchActivity;
+import com.opark.opark.MerchProfileSetup;
 import com.opark.opark.UserProfileSetup;
 import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.R;
+import com.opark.opark.login_auth.MerchWaitingApproval;
 import com.opark.opark.share_parking.MapsMainActivity;
+
+import static com.opark.opark.RegisterActivity.isMerchant;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private final int SPLASH_DISPLAY_LENGTH = 1000;
+    private static final String TAG = "SplashActivity";
+    private final int SPLASH_DISPLAY_LENGTH = 10;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-
+    public static boolean hasMerchantProfile;
+    public static boolean isMerchantApproved;
+    public static boolean isMerchantWhileSplash;
+    private  FirebaseUser oParkMerchantFirebase;
+    private String currentMerchantEmail;
 
     /** Called when the activity is first created. */
     @Override
@@ -52,8 +62,10 @@ public class SplashActivity extends AppCompatActivity {
             }
         };
 
-
-
+try {
+    oParkMerchantFirebase = mAuth.getCurrentUser();
+    currentMerchantEmail = oParkMerchantFirebase.getEmail();
+}catch  (NullPointerException e ){}
         /* New Handler to start the Menu-Activity
          * and close this Splash-Screen after some seconds.*/
 
@@ -61,11 +73,10 @@ public class SplashActivity extends AppCompatActivity {
            new Handler().postDelayed(new Runnable() {
                @Override
                public void run() {
+
+
                    updateUI(currentUser);
-                   /* Create an Intent that will start the Menu-Activity. */
-//                   Intent mainIntent = new Intent(SplashActivity.this, MapsMainActivity.class);
-//                   SplashActivity.this.startActivity(mainIntent);
-//                   SplashActivity.this.finish();
+
                }
            }, SPLASH_DISPLAY_LENGTH);
        }
@@ -78,17 +89,110 @@ public class SplashActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
-
     private void updateUI(FirebaseUser currentUser) {
         try {
             if (currentUser != null) {
 
                 final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
+                Log.d(TAG, "updateUI: currentUserID" + currentUserID);
+
+                checkIsMerchantOrUser(currentUserID);
+
+
+        }else {
+                // No user is signed in
+                Log.d(TAG, "updateUI: NoUser");
+                return;
+            } }catch (NullPointerException e) {
+
+            Log.d("Login Null", "login null caught");
+        }
+    }
+
+
+
+    /**below are methods to check if logged in is a User or Merchant**/
+
+    private void checkIsMerchantOrUser(final String userID){
+
+        StorageReference merchRef = FirebaseStorage.getInstance().getReference().child("merchants/" +"merchantlist/"+ currentMerchantEmail + "/isMerchant.txt");
+        merchRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // file exists
+                Log.d(TAG, "is Merchant");
+                Log.d(TAG, "uri: " + uri.toString());
+
+                isMerchantWhileSplash =true;
+                checkHasMerchProfile(userID);
+
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                //file not found
+                Log.d(TAG, "not Merchant");
+                isMerchantWhileSplash=false;
+                checkIsUser(userID);
+            }
+        });
+    }
+
+    private void checkHasMerchProfile(final String userID){
+
+        final StorageReference hasMerchProf = FirebaseStorage.getInstance().getReference().child("merchants/" + "merchantlist/" + currentMerchantEmail + "/merchProf.txt");
+        hasMerchProf.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+
+                hasMerchantProfile = true;
+                Log.d(TAG, "Merchant has profile ");
+                checkIsMerchApproved(userID);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "Merchant has no profile");
+                hasMerchantProfile = false;
+                //MERCH PROFILE SETUP
+                Intent merchProfSetupIntent = new Intent(SplashActivity.this, MerchProfileSetup.class);
+                finish();
+                SplashActivity.this.startActivity(merchProfSetupIntent);
+            }
+        });
+
+}
+
+    private void checkIsMerchApproved(String userID){
+        final StorageReference isApproved = FirebaseStorage.getInstance().getReference().child("merchants/" + "merchantlist/" + currentMerchantEmail + "/isApproved.txt");
+        isApproved.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Log.d(TAG, "onSuccess: approved merchant");
+                isMerchantApproved = true;
+                //TODO intent to MerchActivity
+                Intent merchActIntent = new Intent(SplashActivity.this, MerchActivity.class);
+                finish();
+                startActivity(merchActIntent);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "onFailure: not approved");
+                isMerchantApproved = false;
+                //TODO intent to merchwaiting approval
+                Intent merchApprovIntent = new Intent(SplashActivity.this, MerchWaitingApproval.class);
+                finish();
+                startActivity(merchApprovIntent);
+
+            }
+        });
+    }
+
+   private void checkIsUser(final String userID){
+
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("users/" + userID + "/profile.txt");
                 storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
@@ -96,13 +200,10 @@ public class SplashActivity extends AppCompatActivity {
                         Log.d("login", "user logged in");
                         Log.d("urlget", "uri: " + uri.toString());
 
-
-
                         Intent intent = new Intent(SplashActivity.this, MapsMainActivity.class);
-                        intent.putExtra("firebaseUser", currentUserID);
+                        intent.putExtra("firebaseUser", userID);
                         finish();
                         startActivity(intent);
-
 
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -117,16 +218,8 @@ public class SplashActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
-            } else {
-                // No user is signed in
-                Log.d("login", "no user");
-                return;
             }
-        } catch (NullPointerException e) {
-
-            Log.d("Login Null", "login null caught");
-
-
         }
-    }
-}
+
+
+

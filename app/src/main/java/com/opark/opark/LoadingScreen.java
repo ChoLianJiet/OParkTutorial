@@ -172,8 +172,8 @@ public class LoadingScreen extends AppCompatActivity {
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(getApplicationContext(), "Profile update successful!", Toast.LENGTH_LONG).show();
-                Log.i("Hello", "Profile update successful!");
+                Toast.makeText(getApplicationContext(), "You've Earned Points!", Toast.LENGTH_LONG).show();
+                Log.i(TAG, "Profile update successful!");
                 // Use analytics to calculate the success rate
             }
         });

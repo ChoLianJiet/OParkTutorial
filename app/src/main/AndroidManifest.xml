@@ -112,6 +112,14 @@
         </activity>
         <activity android:name=".RewardsFragment">
         </activity>
+        <activity android:name="merchant_all.merchant_prof.MerchantProfileSetup">
+        </activity>
+        <activity android:name=".MerchProfileSetup">
+        </activity>
+        <activity android:name=".login_auth.MerchWaitingApproval">
+        </activity>
+        <activity android:name=".MerchActivity">
+        </activity>
     </application>
 
 </manifest>

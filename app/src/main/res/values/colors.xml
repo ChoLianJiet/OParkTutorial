@@ -8,6 +8,7 @@
     <color name="buttonWhite">#f0e9ec</color>
     <color name="buttonSkinBeige">#ffdebf</color>
     <color name="brightPeach">#ffece6 </color>
+    <color name="backdropBrightPeach">#edd9d3</color>
     <color name="peach">#fccdc0</color>
     <color name="font_Brown">#605552</color>
 </resources>

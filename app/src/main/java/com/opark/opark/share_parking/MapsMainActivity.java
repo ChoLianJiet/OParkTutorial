@@ -152,7 +152,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     public static UserPopUpFragment userPopUpFragment;
     private PopupWindow popUpWindow;
     private LayoutInflater layoutInflater;
-
+    private int backStackCount;
 
 
     //NavDrawer variables
@@ -191,10 +191,9 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         //INVISIBLE PARKINGBUTTON
         shareParkingButton.setVisibility(View.INVISIBLE);
         findParkingButton.setVisibility(View.INVISIBLE);
-
         //Toolbar
         // Set a Toolbar to replace the ActionBar.
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_in_maps_main);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Map");
 
@@ -366,10 +365,19 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                             return false;
                         }
                         else {
+//                           backStackCount= navFragmentManager.getBackStackEntryCount();
+//                            Log.d(TAG, "onNavigationItemSelected: backstack count is " +backStackCount);
                             Log.d(TAG,"menuitem is not displayed");
 //                            Log.d("navmenuitem","menu item isnotchecked and setChecked(false) and return true");
                             try{
-                                navFragmentManager.popBackStack();} catch (NullPointerException e ){Log.d(TAG,"first selected pop");}
+                                backStackCount= navFragmentManager.getBackStackEntryCount();
+                                Log.d(TAG, "onNavigationItemSelected: backstack count is " +backStackCount);
+                                if( backStackCount !=0){
+                                navFragmentManager.popBackStack();
+                               }
+
+
+                                } catch (NullPointerException e ){Log.d(TAG,"first selected pop");}
 
                                 selectDrawerItem(menuItem);
 
@@ -1084,6 +1092,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
             navFragmentManager.popBackStack();
 
             mapContainer.setVisibility(View.VISIBLE);
+            toolbar.setTitle("Map");
                             // Update your UI here.
 //                            ft.remove(userProfilePage);
 //                            ft.replace(R.id.map_page_container,null);

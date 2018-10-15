@@ -10,12 +10,28 @@
     tools:openDrawer="start">
 
 
+
+
+    <RelativeLayout
+        android:id="@+id/nav_view_selection_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar_in_maps_main"
+        >
+
+
+    </RelativeLayout>
+
+
     <!--<FrameLayout-->
         <!--android:id="@+id/item_content"-->
         <!--android:layout_width="wrap_content"-->
         <!--android:layout_height="match_parent"-->
         <!--android:background="@color/brightPeach"-->
         <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"/>-->
+
+
+
 
     <RelativeLayout
         android:id="@+id/map_page_container"
@@ -55,6 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
+
             android:layout_alignParentTop="true"
             tools:context=".share_parking.MapsMainActivity"/>
 
@@ -96,7 +113,9 @@
 
             android:id="@+id/popupuser"
             android:layout_width="match_parent"
-            android:layout_height="270dp"/>
+            android:layout_height="270dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"/>
 
         <ProgressBar
             android:id="@+id/progress_bar"
@@ -123,33 +142,27 @@
             app:srcCompat="@mipmap/ic_launcher_foreground"/>
 
         <include
+            android:id="@+id/toolbar_in_maps_main"
             layout="@layout/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-    </RelativeLayout>
-
-
-    <RelativeLayout
-        android:id="@+id/nav_view_selection_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
     </RelativeLayout>
 
 
 
 
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nvView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@color/brightPeach"
-        app:headerLayout="@layout/nav_header_drawer_activity_main"
-        app:menu="@menu/drawer_view">
 
-    </android.support.design.widget.NavigationView>
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nvView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="@color/brightPeach"
 
+            app:headerLayout="@layout/nav_header_drawer_activity_main"
+            app:menu="@menu/drawer_view">
 
+        </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>

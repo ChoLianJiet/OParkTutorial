@@ -176,7 +176,7 @@ public class ProfileEdit extends AppCompatActivity {
     // On Back Pressed
     @Override
     public void onBackPressed() {
-        finish();
+        this.finish();
 //        Intent intent = new Intent(ProfileEdit.this, MapsMainActivity.class);
 //
 //        startActivity(intent);

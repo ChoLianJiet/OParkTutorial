@@ -87,9 +87,8 @@ android {
 
         implementation 'br.com.simplepass:loading-button-android:1.14.0'
 
-        //COLOR SELECTION TOOL BY XDTIANYU BASED ON ORIGINAL GOOGLE COLORPICKER
-        implementation 'org.xdty.preference:color-picker:0.0.5'
-
+//        implementation 'org.xdty.preference:color-picker:0.0.5'
+        implementation 'petrov.kristiyan:colorpicker-library:1.1.8'
         //CHATHEAD
 /*
         implementation 'com.github.flipkart-incubator:circular-image:1.0'

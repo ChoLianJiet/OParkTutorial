@@ -203,10 +203,10 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-    }
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        callbackManager.onActivityResult(requestCode, resultCode, data);
+//    }
 
 
     @Override
@@ -382,6 +382,20 @@ public class LoginActivity extends AppCompatActivity {
 
 
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    try{
+        for(Fragment fragment: getSupportFragmentManager().getFragments()){
+            fragment.onActivityResult(requestCode,resultCode,data);
+        }
+    } catch (Exception e){
+
+    }
+//        Fragment fragment = getFragmentManager().findFragmentById(R.id.);
+
+    }
+
     @Override
     public void onBackPressed() {
 

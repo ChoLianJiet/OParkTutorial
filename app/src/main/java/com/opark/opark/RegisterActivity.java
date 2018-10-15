@@ -12,13 +12,25 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 import com.opark.opark.login_auth.LoginActivity;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -26,6 +38,8 @@ public class RegisterActivity extends AppCompatActivity {
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private EditText mConfirmPasswordView;
+    private Switch merchantSwitch;
+    public static boolean isMerchant ;
 
     // Firebase instance variables
     private FirebaseAuth mAuth;
@@ -36,7 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
+        merchantSwitch = (Switch) findViewById(R.id.merchant_switch);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.register_email);
         mPasswordView = (EditText) findViewById(R.id.register_password);
         mConfirmPasswordView = (EditText) findViewById(R.id.register_confirm_password);
@@ -71,6 +85,9 @@ public class RegisterActivity extends AppCompatActivity {
         // Reset errors displayed in the form.
         mEmailView.setError(null);
         mPasswordView.setError(null);
+
+
+
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
@@ -135,9 +152,29 @@ public class RegisterActivity extends AppCompatActivity {
                     showErrorDialog("Registration attempt failed");
 
                 } else {
+                    isMerchant=checkIsMerchant();
+
+                    if (isMerchant ){
+
+
+                        //Create merchant temp file for checking
+                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                        StorageReference storageRef = storage.getReference();
+                        final String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                        StorageReference merchFolder = storageRef.child("merchants/" + "merchantlist/" + currentUserEmail  + "/isMerchant.txt");
+                        objToByteStreamUpload(isMerchant, merchFolder);
+
+
+                        //TODO transfer to merchant setup page
+                        Intent merchantIntent = new Intent(RegisterActivity.this,LoginActivity.class);
+                        finish();
+                        startActivity(merchantIntent);
+
+
+                    }else {
                     Intent intent = new Intent (RegisterActivity.this, UserProfileSetup.class);
                     finish();
-                    startActivity(intent);
+                    startActivity(intent);}
                 }
             }
         });
@@ -153,6 +190,15 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
+
+    private boolean checkIsMerchant(){
+        if (merchantSwitch.isChecked()){
+            return  true;
+        }else  return false;
+
+
+    }
+
 // Error Dialog
 
     private void showErrorDialog(String message) {
@@ -162,6 +208,31 @@ public class RegisterActivity extends AppCompatActivity {
                 .setPositiveButton(android.R.string.ok,null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+
+
+    private void objToByteStreamUpload(Object obj, StorageReference destination){
+
+        String objStr = new Gson().toJson(obj);
+        InputStream in = new ByteArrayInputStream(objStr.getBytes(Charset.forName("UTF-8")));
+        UploadTask uploadTask = destination.putStream(in);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                showErrorDialog("Failed to update your profile. Try again maybe? ");
+                // Use analytics to find out why is the error
+                // then only implement the best corresponding measures
+
+
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(getApplicationContext(), "Profile update successful!", Toast.LENGTH_LONG).show();
+                Log.i("Hello", "Profile update successful!");
+                // Use analytics to calculate the success rate
+            }
+        });
     }
 
 }

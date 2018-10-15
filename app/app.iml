@@ -139,6 +139,7 @@
     <orderEntry type="library" name="Gradle: com.facebook.android:facebook-places-4.34.0" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:C.\Users\Yz\Documents\ANRDOID_PROJECTS\OParkTutorial\app\libs\signalr-client-sdk-android.jar:unspecified@jar" level="project" />
+    <orderEntry type="library" name="Gradle: petrov.kristiyan:colorpicker-library-1.1.8" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test:exposed-instrumentation-api-publish-0.5" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-database-collection-15.0.1" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-tasks-15.0.1" level="project" />
@@ -169,7 +170,6 @@
     <orderEntry type="library" name="Gradle: com.airbnb.android:lottie-2.5.5" level="project" />
     <orderEntry type="library" name="Gradle: com.facebook.android:facebook-common-4.34.0" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.xdty.preference:color-picker-0.0.5" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-ads-identifier-15.0.1" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.core:common:1.1.1@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-database-16.0.2" level="project" />

@@ -25,4 +25,17 @@
         <item>@color/violet</item>
         <item>@color/magenta</item>
     </array>
+
+    <string-array name="colorname">
+        <item>Bright Pink</item>
+        <item>Red</item>
+        <item>Orange</item>
+        <item>Yellow</item>
+        <item>Green</item>
+        <item>Cyan</item>
+        <item>Azure</item>
+        <item>Blue</item>
+        <item>Violet</item>
+        <item>Magenta</item>
+    </string-array>
 </resources>
