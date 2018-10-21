@@ -1,5 +1,6 @@
 package com.opark.opark.model.merchant_offer;
 
+import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 import com.opark.opark.R;
@@ -9,11 +10,11 @@ import java.util.List;
 
 public class MerchantOffer {
     private String merchantOfferTitle, merchantName, merchantAddress, merchantContact, offerCost;
-    private int offerImage;
+    private String offerImage;
     public MerchantOffer() {
     }
 
-    public MerchantOffer(String merchantOfferTitle, String merchantName, String merchantAddress, String merchantContact, String offerCost, int offerImage) {
+    public MerchantOffer(String merchantOfferTitle, String merchantName, String merchantAddress, String merchantContact, String offerCost, String offerImage) {
         this.merchantOfferTitle = merchantOfferTitle;
         this.merchantName = merchantName;
         this.merchantAddress = merchantAddress;
@@ -22,11 +23,11 @@ public class MerchantOffer {
         this.offerImage = offerImage;
     }
 
-    public int getOfferImage() {
+    public String getOfferImage() {
         return offerImage;
     }
 
-    public void setOfferImage(int offerImage) {
+    public void setOfferImage(String offerImage) {
         this.offerImage = offerImage;
     }
 

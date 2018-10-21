@@ -6,6 +6,9 @@
     <!-- Uses permission -->
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission
         android:name="android.permission.LOCATION_HARDWARE"
         tools:ignore="ProtectedPermissions"/>
@@ -119,6 +122,8 @@
         <activity android:name=".login_auth.MerchWaitingApproval">
         </activity>
         <activity android:name=".MerchActivity">
+        </activity>
+        <activity android:name=".merchant_side.MerchUploadOfferActivity">
         </activity>
     </application>
 

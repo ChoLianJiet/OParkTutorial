@@ -19,6 +19,13 @@ public class Merchant {
         this.merchCoAddress = merchCoAddress;
     }
 
+    public Merchant(String merchCoName , String merchContact,  String merchEmail, String merchCoAddress){
+        this.merchCoName = merchCoName;
+        this.merchContact = merchContact;
+        this.merchEmail = merchEmail;
+        this.merchCoAddress = merchCoAddress;
+    }
+
     public String getMerchSignUpPerson() {
         return merchSignUpPerson;
     }
@@ -35,13 +42,6 @@ public class Merchant {
         this.merchCoRegNumber = merchCoNumber;
     }
 
-    public String getMerchBusiness() {
-        return merchCoName;
-    }
-
-    public void setMerchBusiness(String merchCoName) {
-        this.merchCoName = merchCoName;
-    }
 
     public String getMerchContact() {
         return merchContact;
@@ -57,5 +57,30 @@ public class Merchant {
 
     public void setMerchEmail(String merchEmail) {
         this.merchEmail = merchEmail;
+    }
+
+
+    public String getMerchCoRegNumber() {
+        return merchCoRegNumber;
+    }
+
+    public void setMerchCoRegNumber(String merchCoRegNumber) {
+        this.merchCoRegNumber = merchCoRegNumber;
+    }
+
+    public String getMerchCoName() {
+        return merchCoName;
+    }
+
+    public void setMerchCoName(String merchCoName) {
+        this.merchCoName = merchCoName;
+    }
+
+    public String getMerchCoAddress() {
+        return merchCoAddress;
+    }
+
+    public void setMerchCoAddress(String merchCoAddress) {
+        this.merchCoAddress = merchCoAddress;
     }
 }
