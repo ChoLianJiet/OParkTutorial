@@ -193,12 +193,6 @@ public class UserProfileSetup extends AppCompatActivity {
                                     .show()     ;
 
 
-
-
-                            //
-
-                            //
-
                     }
 //
                 });

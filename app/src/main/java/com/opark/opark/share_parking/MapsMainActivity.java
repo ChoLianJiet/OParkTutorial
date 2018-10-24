@@ -120,7 +120,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
+    public static Location mLastLocation;
     private GoogleMap mMap;
     private Button shareParkingButton;
     private Button findParkingButton;

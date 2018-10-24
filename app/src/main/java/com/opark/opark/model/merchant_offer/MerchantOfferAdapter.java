@@ -47,7 +47,7 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
         MerchantOffer merchantOffer;
 
 
-       MerchantOfferAdapterViewHolder(View itemView) {
+        MerchantOfferAdapterViewHolder(View itemView) {
             super(itemView);
 
             merchantCardView = (CardView) itemView.findViewById(R.id.merchant_offer_card_view);
@@ -110,21 +110,21 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
     public void onBindViewHolder(@NonNull MerchantOfferAdapterViewHolder holder,final int i) {
 
 
-            holder.merchantOfferTitle.setText(merchantOfferList.get(i).getMerchantOfferTitle());
-            holder.merchantName.setText(merchantOfferList.get(i).getMerchantName());
-            holder.merchantAddress.setText(merchantOfferList.get(i).getMerchantAddress());
-            holder.merchantNumber.setText(merchantOfferList.get(i).getMerchantContact());
-            holder.merchantOfferImage.setImageBitmap(StringToBitMap(merchantOfferList.get(i).getOfferImage()));
-            holder.redeemButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    RewardsFragment.merchantOfferTitle = merchantOfferList.get(i).getMerchantOfferTitle();
-                    mButtonClicked.onButtonClicked(v, i);
+        holder.merchantOfferTitle.setText(merchantOfferList.get(i).getMerchantOfferTitle());
+        holder.merchantName.setText(merchantOfferList.get(i).getMerchantName());
+        holder.merchantAddress.setText(merchantOfferList.get(i).getMerchantAddress());
+        holder.merchantNumber.setText(merchantOfferList.get(i).getMerchantContact());
+        holder.merchantOfferImage.setImageBitmap(StringToBitMap(merchantOfferList.get(i).getOfferImage()));
+        holder.redeemButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RewardsFragment.merchantOfferTitle = merchantOfferList.get(i).getMerchantOfferTitle();
+                mButtonClicked.onButtonClicked(v, i);
 
-                    Log.d("redeem", "onClick: " + RewardsFragment.merchantOfferTitle);
-                    Log.d("redeem", "MerchantOfferAdapter button : " + mButtonClicked);
-                }
-            });
+                Log.d("redeem", "onClick: " + RewardsFragment.merchantOfferTitle);
+                Log.d("redeem", "MerchantOfferAdapter button : " + mButtonClicked);
+            }
+        });
 
 //
 

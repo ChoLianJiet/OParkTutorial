@@ -5,15 +5,18 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,12 +26,17 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
+import com.opark.opark.model.MatchmakingRecord;
+import com.opark.opark.share_parking.MapsMainActivity;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class LoadingScreen extends AppCompatActivity {
 
@@ -38,9 +46,16 @@ public class LoadingScreen extends AppCompatActivity {
 
     private DatabaseReference matchmakingRef;
     private FirebaseStorage storage;
+    private FirebaseUser currentUser;
+    private FirebaseAuth mAuth;
+    private String CurrentUserID;
     private StorageReference storageRef;
+    private StorageReference matchMakingRecordStoRef;
     private StorageReference userRewardsFolder;
     private String currentUserID;
+    private double kenaLat;
+    private double kenaLng;
+    private LatLng kenaLatLng;
     private Button cancelButton;
     private int userPoints;
     double startTime;
@@ -95,6 +110,7 @@ public class LoadingScreen extends AppCompatActivity {
             public void onClick(View v) {
                 matchmakingRef.child(currentUserID).child("adatem").setValue("Not Available");
                 finish();
+                recordMatchMaking();
                 CalculatePoints();
                 GetPointsStorage();
             }
@@ -184,4 +200,31 @@ public class LoadingScreen extends AppCompatActivity {
         matchmakingRef.child(currentUserID).child("adatem").setValue("Not Available");
         finish();
     }
+
+    public void recordMatchMaking(){
+
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        currentUserID = currentUser.getUid();
+
+        kenaLat = MapsMainActivity.mLastLocation.getLatitude();
+        kenaLng = MapsMainActivity.mLastLocation.getLongitude();
+        kenaLatLng = new LatLng(kenaLat,kenaLng);
+        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        Long tsLong = System.currentTimeMillis()/1000;
+
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        cal.setTimeInMillis(tsLong* 1000L);
+        String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
+
+        MatchmakingRecord thisMatchmakingRecord = new MatchmakingRecord("none",date,currentUserID,"none",null,kenaLatLng,elapsedTime);
+        matchMakingRecordStoRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/matchmakingrecord/" + "sharingRecord/" + date);
+        objToByteStreamUpload(thisMatchmakingRecord,matchMakingRecordStoRef);
+
+
+
+
+    }
+
+
 }

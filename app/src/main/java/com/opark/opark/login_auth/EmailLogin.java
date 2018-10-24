@@ -178,12 +178,12 @@ public class EmailLogin extends Fragment {
         }
 
 
-                                          // FACEBOOK CALLBACK MANAGER
+        // FACEBOOK CALLBACK MANAGER
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
-                        @Override
-                        public void onSuccess(LoginResult loginResult) {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
                         Toast.makeText(getActivity(), loginResult.toString(), Toast.LENGTH_LONG).show();
                         Log.d("facebook login", "facebook:onSuccess:" + loginResult);
 
@@ -376,9 +376,3 @@ public class EmailLogin extends Fragment {
 
 
 }
-
-
-
-
-
-

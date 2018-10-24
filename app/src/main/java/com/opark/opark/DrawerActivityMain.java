@@ -65,12 +65,12 @@ import java.util.HashSet;
 public class DrawerActivityMain extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-//    private BubblesManager bubblesManager;
+    //    private BubblesManager bubblesManager;
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className,
-                IBinder service) {
+                                       IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
 //            ChatHeadService.LocalBinder binder = (ChatHeadService.LocalBinder) service;
 //            chatHeadService = binder.getService();
@@ -85,7 +85,7 @@ public class DrawerActivityMain extends AppCompatActivity
             bound = false;
         }
     };
-//    private ChatHeadService chatHeadService ;
+    //    private ChatHeadService chatHeadService ;
     private boolean bound;
 
     //CONSTANT
@@ -432,4 +432,3 @@ public class DrawerActivityMain extends AppCompatActivity
 
 
 }
-

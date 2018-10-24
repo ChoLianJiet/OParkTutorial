@@ -34,6 +34,8 @@ import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
+import petrov.kristiyan.colorpicker.ColorPicker;
+
 import static android.R.id.list;
 import static android.R.string.cancel;
 import static android.view.View.GONE;
@@ -52,7 +54,7 @@ public class ProfileEdit extends AppCompatActivity {
     private EditText firstName ;
     private EditText lastName ;
     private EditText phoneNum ;
-    private EditText carColour ;
+    private TextView carColour ;
     private EditText carBrand ;
     private EditText carModel ;
     private EditText carPlate ;
@@ -112,19 +114,74 @@ public class ProfileEdit extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                carColour.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final ColorPicker colorPicker = new ColorPicker(ProfileEdit.this);
+                        colorPicker
+                                .setColors(R.array.rainbow)
+                                .disableDefaultButtons(true)
+                                .setRoundColorButton(true)
+                                .setColumns(5)
+                                .setOnFastChooseColorListener(new ColorPicker.OnFastChooseColorListener() {
+
+
+                                    @Override
+                                    public void setOnFastChooseColorListener(int position, int color) {
+                                        Log.d(TAG, "setOnFastChooseColorListener: Fast chosen");
+//                                            getColor(color);
+
+                                        Log.d(TAG, "setOnFastChooseColorListener: "+ String.valueOf(color) + "position" + String.valueOf(position));
+                                        String[] colorName= getResources().getStringArray(R.array.colorname);
+                                        carColour.setVisibility(View.VISIBLE);
+                                        carColour.setText(colorName[position]);
+                                        Log.d(TAG, "setOnFastChooseColorListener: " + carColour.getText().toString());
+
+
+                                    }
+
+
+
+
+                                    @Override
+                                    public void onCancel(){
+
+                                        Log.d(TAG, "onCancel: ");
+                                        // put code
+                                    }
+                                })
+
+                                .addListenerButton("newButton", new ColorPicker.OnButtonListener() {
+                                    @Override
+                                    public void onClick(View v, int position, int color) {
+                                        // put code
+                                    }
+                                })
+                                .show()     ;
+
+
+                    }
+//
+                });
+
+
                 if (expandableCarBrand.isExpanded()&&expandableCarColour.isExpanded()&&expandableCarPlate.isExpanded()&&expandableCarModel.isExpanded())
                 {
                     expandableCarBrand.collapse();
                     expandableCarColour.collapse();
                     expandableCarPlate.collapse();
                     expandableCarModel.collapse();
+
+
                 }
+
+
+
                 else
                     carExpand();
 
             }
         });
-
         profileSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,10 +212,10 @@ public class ProfileEdit extends AppCompatActivity {
 
     }
     private void collectCar(){
-        carEditText[0]=carColour;
-        carEditText[1]=carBrand ;
-        carEditText[2]=carModel ;
-        carEditText[3]=carPlate ;
+
+        carEditText[0]=carBrand ;
+        carEditText[1]=carModel ;
+        carEditText[2]=carPlate ;
 
 
         carString[0]= user.userCar.carColour = carColour.getText().toString();
@@ -222,7 +279,7 @@ public class ProfileEdit extends AppCompatActivity {
         phoneNum = (EditText) findViewById(R.id.edittext_phone_num);
         icNumber = (EditText) findViewById(R.id.edittext_user_nric);
 
-        carColour = (EditText) findViewById(R.id.edittext_car_colour);
+        carColour = (TextView) findViewById(R.id.edittext_car_colour);
         carBrand = (EditText) findViewById(R.id.edittext_car_brand);
         carModel = (EditText) findViewById(R.id.edittext_car_model);
         carPlate = (EditText) findViewById(R.id.edittext_car_plate);

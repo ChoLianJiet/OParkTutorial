@@ -59,46 +59,43 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class LoginActivity extends AppCompatActivity {
-    public static ViewPager mViewPager;
+  public static ViewPager mViewPager;
 
-    private FirebaseAuth mAuth;
-    // UI references.
+  private FirebaseAuth mAuth;
+  // UI references.
 
-    private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView;
-    private CallbackManager callbackManager;
-    LoginButton facebookloginButton;
-    private Button registerButton;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    private DrawerLayout mDrawer;
-    private Toolbar mToolbar;
-    public static EmailLogin emailLogin;
-    NonSwipeableViewPager nonSwipeViewPage;
-    ViewPagerAdapter viewPagerAdapter;
-    Button signInButton;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
+  private AutoCompleteTextView mEmailView;
+  private EditText mPasswordView;
+  private CallbackManager callbackManager;
+  LoginButton facebookloginButton;
+  private Button registerButton;
+  private FirebaseAuth.AuthStateListener mAuthListener;
+  private DrawerLayout mDrawer;
+  private Toolbar mToolbar;
+  public static EmailLogin emailLogin;
+  NonSwipeableViewPager nonSwipeViewPage;
+  ViewPagerAdapter viewPagerAdapter;
+  Button signInButton;
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
 
-        FacebookSdk.setApplicationId("113991652589123");
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        if (BuildConfig.DEBUG) {
-            FacebookSdk.setIsDebugEnabled(true);
-            FacebookSdk.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
-        }
-        setContentView(R.layout.login_viewpager);
+
+
+    FacebookSdk.setApplicationId("113991652589123");
+    FacebookSdk.sdkInitialize(getApplicationContext());
+    if (BuildConfig.DEBUG) {
+      FacebookSdk.setIsDebugEnabled(true);
+      FacebookSdk.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
+    }
+    setContentView(R.layout.login_viewpager);
 
 /*
-
         mAuth = FirebaseAuth.getInstance();
-
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     System.out.println("User logged in");
@@ -108,9 +105,9 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
 */
-        mViewPager = (ViewPager) findViewById(R.id.m_view_pager);
-       viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-       mViewPager.setAdapter(viewPagerAdapter);
+    mViewPager = (ViewPager) findViewById(R.id.m_view_pager);
+    viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+    mViewPager.setAdapter(viewPagerAdapter);
 
 
 
@@ -119,9 +116,6 @@ public class LoginActivity extends AppCompatActivity {
         mPasswordView = (EditText) findViewById(R.id.password_edit_text);
         registerButton = (Button) findViewById(R.id.register_button);
         signInButton = (Button) findViewById(R.id.sign_in_button);
-
-
-
 //         attempt login
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -133,28 +127,21 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 registerNewUser(v);
             }
         });
-
-
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signInRegisteredUser(v);
             }
         });
-
         //FACEBOOK LOGIN BUTTON
         facebookloginButton = (LoginButton) findViewById(R.id.facebook_login_button);
         facebookloginButton.setReadPermissions("email", "public_profile");
-
-
         //FACEBOOK HASH KEY Generating
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
@@ -166,12 +153,8 @@ public class LoginActivity extends AppCompatActivity {
                 Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
         } catch (PackageManager.NameNotFoundException e) {
-
         } catch (NoSuchAlgorithmException e) {
-
         }
-
-
         // FACEBOOK CALLBACK MANAGER
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(callbackManager,
@@ -180,50 +163,34 @@ public class LoginActivity extends AppCompatActivity {
                     public void onSuccess(LoginResult loginResult) {
                         Toast.makeText(getApplicationContext(), loginResult.toString(), Toast.LENGTH_LONG).show();
                         Log.d("facebook login", "facebook:onSuccess:" + loginResult);
-
                         handleFacebookAccessToken(loginResult.getAccessToken());
                         FirebaseUser user = mAuth.getCurrentUser();
                         updateUI(user);
                     }
-
-
                     @Override
                     public void onCancel() {
                         // App code
                     }
-
                     @Override
                     public void onError(FacebookException exception) {
                         Toast.makeText(LoginActivity.this, "Error in register callback : " + exception.toString(), Toast.LENGTH_LONG).show();
                     }
                 });
-
     }
-
-
-
-
 //    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
 //        callbackManager.onActivityResult(requestCode, resultCode, data);
 //    }
-
-
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         mAuth.addAuthStateListener(mAuthListener);
-
         updateUI(currentUser);
     }
-
-
     private void updateUI(FirebaseUser currentUser) {
-
         if (currentUser != null) {
-
             final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
             StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
             storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -234,13 +201,11 @@ public class LoginActivity extends AppCompatActivity {
                     Log.d("urlget", "uri: " + uri.toString());
                     Toast.makeText(LoginActivity.this, "Log in Successful! :D ",
                             Toast.LENGTH_SHORT).show();
-
                     //TODO Add Intent to Drawer Activity onSuccess
                     Intent intent = new Intent(LoginActivity.this, MapsMainActivity.class);
                     intent.putExtra("firebaseUser", currentUserID);
                     finish();
                     startActivity(intent);
-
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -260,11 +225,8 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
     }
-
-
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d("facebook token", "handleFacebookAccessToken:" + token);
-
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -282,61 +244,42 @@ public class LoginActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
-
-
                     }
                 });
     }
-
     // Executed when Sign in button pressed
     public void signInRegisteredUser(View v) {
         attemptLogin();
-
     }
-
-
     // Executed when Register button pressed
     public void registerNewUser(View v) {
         Intent intent = new Intent(this, com.opark.opark.RegisterActivity.class);
         finish();
         startActivity(intent);
     }
-
-
     // Attempt Login Method
     private void attemptLogin() {
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
-
         if (email.equals("") || password.equals("")) {
             return;
         }
-
         Toast.makeText(this, "Login you to Opark !", Toast.LENGTH_SHORT).show();
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 Log.d("OparkLogin", "Log in successfull ? " + task.isSuccessful());
-
                 if (!task.isSuccessful()) {
                     Log.d("OparkLogin", "Problem signing in : " + task.getException());
                     showErrorDialog("Problem signing you in. Try again maybe ? ");
                 } else {
                     FirebaseUser currentUser = mAuth.getCurrentUser();
-
                     updateUI(currentUser);
-
                 }
             }
         });
-
-
     }
-
-
 // AlertDialog
-
-
     private void showErrorDialog(String message) {
         new AlertDialog.Builder(this)
                 .setTitle("Oops")
@@ -345,8 +288,6 @@ public class LoginActivity extends AppCompatActivity {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-
-
     }*/
 
 
@@ -381,31 +322,31 @@ public class LoginActivity extends AppCompatActivity {
 //}
 
 
-    }
+  }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
     try{
-        for(Fragment fragment: getSupportFragmentManager().getFragments()){
-            fragment.onActivityResult(requestCode,resultCode,data);
-        }
+      for(Fragment fragment: getSupportFragmentManager().getFragments()){
+        fragment.onActivityResult(requestCode,resultCode,data);
+      }
     } catch (Exception e){
 
     }
 //        Fragment fragment = getFragmentManager().findFragmentById(R.id.);
 
+  }
+
+  @Override
+  public void onBackPressed() {
+
+    if (mViewPager.getCurrentItem() != 0) {
+      mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1,true);
+    }else{
+      finish();
     }
 
-    @Override
-    public void onBackPressed() {
-
-        if (mViewPager.getCurrentItem() != 0) {
-            mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1,true);
-        }else{
-            finish();
-        }
-
-    }
+  }
 
 
 

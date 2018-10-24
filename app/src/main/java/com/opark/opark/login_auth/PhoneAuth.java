@@ -47,18 +47,18 @@ import br.com.simplepass.loading_button_lib.customViews.CircularProgressButton;
 /** * Created by Supriya on 9/11/2016. */
 public class PhoneAuth extends Fragment {
 
-   private FirebaseAuth mAuth;
-   private EditText phoneEntry;
-   private PhoneAuthProvider.OnVerificationStateChangedCallbacks phoneAuthCallback;
-   private String userPhoneNumber;
-   private EditText verificationCodeEntry;
-   private String mVerificationId;
-   private Button verifyButton;
-   private boolean mVerificationInProgress;
-   private PhoneAuthProvider.ForceResendingToken mResendToken;
-   private Button sendCodeButton;
-   private String vCode;
-   private FirebaseUser user;
+    private FirebaseAuth mAuth;
+    private EditText phoneEntry;
+    private PhoneAuthProvider.OnVerificationStateChangedCallbacks phoneAuthCallback;
+    private String userPhoneNumber;
+    private EditText verificationCodeEntry;
+    private String mVerificationId;
+    private Button verifyButton;
+    private boolean mVerificationInProgress;
+    private PhoneAuthProvider.ForceResendingToken mResendToken;
+    private Button sendCodeButton;
+    private String vCode;
+    private FirebaseUser user;
 
     private static final String KEY_VERIFY_IN_PROGRESS = "key_verify_in_progress";
     private static final String TAG = "PhoneAuth";
@@ -73,49 +73,49 @@ public class PhoneAuth extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v=inflater.inflate(R.layout.phoneauth_page,null);
 
-    verificationCodeEntry = (EditText) v.findViewById(R.id.verification_code_entry);
-    phoneEntry = (EditText) v.findViewById(R.id.phone_num_enter);
-    verifyButton = (CircularProgressButton) v.findViewById(R.id.verify_button);
-    sendCodeButton = (CircularProgressButton) v.findViewById(R.id.send_v_code);
+        verificationCodeEntry = (EditText) v.findViewById(R.id.verification_code_entry);
+        phoneEntry = (EditText) v.findViewById(R.id.phone_num_enter);
+        verifyButton = (CircularProgressButton) v.findViewById(R.id.verify_button);
+        sendCodeButton = (CircularProgressButton) v.findViewById(R.id.send_v_code);
 
 
         mAuth = FirebaseAuth.getInstance();
 
 
 
-    sendCodeButton.setOnClickListener(new View.OnClickListener() {
-                      @Override
-                      public void onClick(View v) {
+        sendCodeButton.setOnClickListener(new View.OnClickListener() {
+                                              @Override
+                                              public void onClick(View v) {
 
-                          userPhoneNumber = phoneEntry.getText().toString().trim();
+                                                  userPhoneNumber = phoneEntry.getText().toString().trim();
 
-                          if (userPhoneNumber.isEmpty() || (userPhoneNumber.length() < 8)) {
-                              Log.d(TAG, "Phone entry invalid");
-                              phoneEntry.setError("Enter a valid mobile");
-                              phoneEntry.requestFocus();
+                                                  if (userPhoneNumber.isEmpty() || (userPhoneNumber.length() < 8)) {
+                                                      Log.d(TAG, "Phone entry invalid");
+                                                      phoneEntry.setError("Enter a valid mobile");
+                                                      phoneEntry.requestFocus();
 
-                              return;
-                          }
-                          else {
+                                                      return;
+                                                  }
+                                                  else {
 //                              sendCodeButton.startAnimation();
-                              sendVerificationCode(userPhoneNumber);
-                              sendCodeButton.setVisibility(View.GONE);
-                              Log.d(TAG, "Phone Number Entered");
-                          }
-                      }
-                  }
+                                                      sendVerificationCode(userPhoneNumber);
+                                                      sendCodeButton.setVisibility(View.GONE);
+                                                      Log.d(TAG, "Phone Number Entered");
+                                                  }
+                                              }
+                                          }
         );
 
-    verifyButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
+        verifyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-            vCode = verificationCodeEntry.getText().toString().trim();
-            verifyVerificationCode(vCode);
+                vCode = verificationCodeEntry.getText().toString().trim();
+                verifyVerificationCode(vCode);
 
 
-        }
-    });
+            }
+        });
 
 
         phoneAuthCallback = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -203,16 +203,12 @@ public class PhoneAuth extends Fragment {
 
 /*
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         // TODO Auto-generated method stub
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-
             LoginActivity.mViewPager.setCurrentItem(LoginActivity.mViewPager.getCurrentItem() - 1);
             return true;
         }
-
         return super.onKeyDown(keyCode, event);
-
     }*/
 
 
@@ -244,7 +240,7 @@ public class PhoneAuth extends Fragment {
 
 
 
-//Sign in User
+    //Sign in User
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
@@ -252,9 +248,9 @@ public class PhoneAuth extends Fragment {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             //verification successful we will start the profile activity
-                               Log.d(TAG, "sign in phone auth credential successful");
-                                user = mAuth.getCurrentUser();
-                                updateUI(user);
+                            Log.d(TAG, "sign in phone auth credential successful");
+                            user = mAuth.getCurrentUser();
+                            updateUI(user);
 //                            Intent intent = new Intent(getActivity(), MapsMainActivity.class);
 //                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                            getActivity().finish();

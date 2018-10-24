@@ -11,6 +11,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -39,7 +40,9 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mPasswordView;
     private EditText mConfirmPasswordView;
     private Switch merchantSwitch;
+    private Switch userSwitch;
     public static boolean isMerchant ;
+    public static boolean isUser;
 
     // Firebase instance variables
     private FirebaseAuth mAuth;
@@ -51,6 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         merchantSwitch = (Switch) findViewById(R.id.merchant_switch);
+        userSwitch = findViewById(R.id.user_switch);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.register_email);
         mPasswordView = (EditText) findViewById(R.id.register_password);
         mConfirmPasswordView = (EditText) findViewById(R.id.register_confirm_password);
@@ -66,6 +70,7 @@ public class RegisterActivity extends AppCompatActivity {
                 return false;
             }
         });
+
 
 
         mAuth = FirebaseAuth.getInstance();
@@ -154,7 +159,7 @@ public class RegisterActivity extends AppCompatActivity {
                 } else {
                     isMerchant=checkIsMerchant();
 
-                    if (isMerchant ){
+                    if ((isMerchant )&& (!isUser)){
 
 
                         //Create merchant temp file for checking
@@ -172,9 +177,24 @@ public class RegisterActivity extends AppCompatActivity {
 
 
                     }else {
+                        isUser= checkIsUser();
+
+                        if ((isUser)&&(!isMerchant)){
+
                     Intent intent = new Intent (RegisterActivity.this, UserProfileSetup.class);
                     finish();
-                    startActivity(intent);}
+                    startActivity(intent);} else if(((isMerchant)&&(isUser))||((!isMerchant)&&(!isUser))) {
+
+                            Log.d("error", "onComplete: Please select either merchant or user");
+
+
+                        }
+
+
+                    }
+
+
+
                 }
             }
         });
@@ -193,6 +213,16 @@ public class RegisterActivity extends AppCompatActivity {
 
     private boolean checkIsMerchant(){
         if (merchantSwitch.isChecked()){
+            userSwitch.setChecked(false);
+            return  true;
+        }else  return false;
+
+
+    }
+
+    private boolean checkIsUser(){
+        if (userSwitch.isChecked()){
+            merchantSwitch.setChecked(false);
             return  true;
         }else  return false;
 

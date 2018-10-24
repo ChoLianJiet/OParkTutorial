@@ -15,8 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 
+import com.google.android.gms.auth.api.signin.internal.Storage;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -25,10 +29,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 import com.opark.opark.model.merchant_class.Merchant;
 import com.opark.opark.model.merchant_offer.MerchantOffer;
 import com.opark.opark.model.merchant_offer.MerchantOfferAdapter;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,10 +50,17 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
     private List<MerchantOffer> merchantOffer = new ArrayList<>();
     MerchantOffer thisMerchantOffer = new MerchantOffer();
     private DatabaseReference offerlistDatabaseRef;
+    private StorageReference userPointsStorageRef;
     private FirebaseAuth mAuth;
     private FirebaseUser thisUser;
     private String redeemUid;
     public static String merchantOfferTitle;
+    final long ONE_MEGABYTE = 1024 * 1024;
+    private int userPoints;
+    private int pointsAfterRedemption;
+    public static int redeemCost;
+
+
 
     @Nullable
     @Override
@@ -57,69 +76,11 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
     mAuth = FirebaseAuth.getInstance();
     thisUser = mAuth.getCurrentUser();
     redeemUid = thisUser.getUid();
+    userPointsStorageRef = FirebaseStorage.getInstance().getReference().child("users/" + redeemUid + "/points.txt");
 
 
 
     initializeData(merchantRecView);
-//    Log.d(TAG, "onCreateView: merchantOffer = " + merchantOffer);
-//    MerchantOfferAdapter merchantOfferAdapter = new MerchantOfferAdapter(merchantOffer, new MerchantOfferAdapter.ButtonClicked() {
-//        @Override
-//        public void onButtonClicked(View v, int position) {
-//            Log.d(TAG, "Rewards Fragment Button Clicked");
-//        }
-//    });
-//
-//    merchantRecView.setAdapter(merchantOfferAdapter);
-
-
-
-
-
-//
-//} catch (NullPointerException e ){
-//    Log.d(TAG, "onCreateView: Null" + e);
-//}
-//
-//
-
-
-
-//                offerlistDatabaseRef.child("redeemCount").addChildEventListener(new ChildEventListener() {
-//                    @Override
-//                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                        Log.d("redeem", "redeem count " +dataSnapshot.getValue());
-////                       int redeemCount =  Integer.parseInt(dataSnapshot.getValue());
-//                        redeemButton.setOnClickListener(new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View v) {
-//
-//                            }});
-//
-//                    }
-//
-//                    @Override
-//                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                        Log.d("redeem", "redeem count " +dataSnapshot);
-//
-//                    }
-//
-//                    @Override
-//                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                    }
-//                });
-
-
 
         return view;
     }
@@ -149,8 +110,7 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
                     @Override
                     public void onButtonClicked(View v, int position) {
 
-
-                        offerlistDatabaseRef.child(merchantOfferTitle).child("redeemedUsers").push().setValue(redeemUid);
+                        deductPointsForRedemption();
 
                         Log.d(TAG, "Rewards Fragment Button Clicked " + position);
                     }
@@ -191,26 +151,7 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
     }
 
 
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//        if (context instanceof MerchantOfferAdapter.ButtonClicked){
-//            mButtonClicked=(MerchantOfferAdapter.ButtonClicked) context;
-//
-//        } else {
-//            throw new RuntimeException(context.toString());
-//        }
-//    }
-//
-//
-//
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        mButtonClicked=null;
-//    }
 
-    public static int position =0;
 
     @Override
     public void onButtonClicked(View v, int position) {
@@ -218,6 +159,70 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
         Log.d(TAG, "onButtonClicked:  Button is clicked");
 
 
+    }
+
+
+    private void deductPointsForRedemption(){
+
+
+        userPointsStorageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+
+                try {
+                    userPoints = (new Gson().fromJson(new String(bytes, "UTF-8"), Integer.class));
+                    Log.d(TAG, "Gsonfrom json success, Points is " + userPoints);
+
+                } catch (UnsupportedEncodingException e){
+                    e.printStackTrace();
+                }
+                if (userPoints>redeemCost){
+                pointsAfterRedemption = (int) (Math.ceil(userPoints) - redeemCost );
+                objToByteStreamUpload(pointsAfterRedemption,userPointsStorageRef);
+                offerlistDatabaseRef.child(merchantOfferTitle).child("redeemedUsers").push().setValue(redeemUid);
+
+                Log.d("redeem","Points uploaded from Redeem is " + pointsAfterRedemption);}
+
+                else {
+                    Log.d("redeem","Points insufficient " + userPoints);
+                    InsufficientPointsDialog insufficientPointsDialog = new InsufficientPointsDialog(getContext());
+                    insufficientPointsDialog.show();
+                return;
+                }
+            }
+
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.d(TAG,"fragment is not created, exception: " + exception);
+            }
+        });
+
+    }
+
+
+    public void objToByteStreamUpload(Object obj, StorageReference destination){
+
+        String objStr = new Gson().toJson(obj);
+        InputStream in = new ByteArrayInputStream(objStr.getBytes(Charset.forName("UTF-8")));
+        UploadTask uploadTask = destination.putStream(in);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.d(TAG, "onFailure: Failure to upload in storage ");
+                // Use analytics to find out why is the error
+                // then only implement the best corresponding measures
+
+
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(getContext(), "You've Earned Points!", Toast.LENGTH_LONG).show();
+                Log.i(TAG, "Profile update successful!");
+                // Use analytics to calculate the success rate
+            }
+        });
     }
 
 
