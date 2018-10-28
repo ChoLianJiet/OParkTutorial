@@ -6,12 +6,19 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.widget.Chronometer;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -31,9 +38,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.opark.opark.chat.ChatAdapter;
+import com.opark.opark.chat.ChatMessage;
 import com.opark.opark.share_parking.MapsMainActivity;
 
-public class PeterMap extends FragmentActivity implements OnMapReadyCallback {
+public class PeterMap extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnCameraMoveStartedListener {
 
     final String TAG = "PeterMap";
 
@@ -41,6 +50,16 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback {
     private float DEFAULT_ZOOM = 17f;
 
     GoogleMap mMap;
+
+    Chronometer mChronometer;
+
+    private BottomSheetBehavior mBottomSheetBehavior;
+    private TextView kenaParkerName;
+    private TextView kenaCarModel;
+    private TextView kenaCarPlateNumber;
+    private TextView kenaCarColor;
+
+    private FloatingActionButton recenterButton;
     private Location mLastLocation = new Location("");
     private String currentUserId;
     DatabaseReference geofireRef;
@@ -54,6 +73,14 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback {
     private LatLng foundUserLocation;
     private LatLng currentUserLocation;
     Marker peterMarker;
+    public static double pointsGainedFromPeterMap;
+
+    //Chat
+    private EditText chatEditText;
+    private FloatingActionButton fab;
+    private ChatAdapter mAdapter;
+    private ListView chatListView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +96,31 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback {
         mapFragment.getMapAsync(this);
         FirebaseApp.initializeApp(getApplicationContext());
 
+        View bottomSheet = findViewById(R.id.bottom_sheet_peter);
+        mBottomSheetBehavior= BottomSheetBehavior.from(bottomSheet);
+
+        mChronometer = (Chronometer) findViewById(R.id.chronometer);
+        mChronometer.start();
+
+        kenaParkerName = findViewById(R.id.kena_name);
+        kenaCarColor = findViewById(R.id.kena_car_color);
+        kenaCarModel = findViewById(R.id.kena_car_modal);
+        kenaCarPlateNumber = findViewById(R.id.kena_car_plate_number);
+
+
+        this.kenaParkerName.setText(UserPopUpFragment.kenaParkerName.getText().toString());
+        this.kenaCarModel.setText(UserPopUpFragment.carModel.getText().toString());
+        this.kenaCarPlateNumber.setText(UserPopUpFragment.carPlateNumber.getText().toString());
+        this.kenaCarColor.setText(UserPopUpFragment.carColor.getText().toString());
+
+        //Chat
+        chatListView = (ListView) findViewById(R.id.list_view);
+        chatEditText = (EditText) findViewById(R.id.input_text) ;
+        fab = (FloatingActionButton) findViewById(R.id.fab) ;
+
+        recenterButton = (FloatingActionButton) findViewById(R.id.recenter_button);
+        recenterButton.setVisibility(View.INVISIBLE);
+
         geofireRef = FirebaseDatabase.getInstance().getReference().child("geofire");
         matchmakingRef = FirebaseDatabase.getInstance().getReference().child("matchmaking");
         togetherRef = FirebaseDatabase.getInstance().getReference().child("together");
@@ -78,12 +130,78 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback {
         getCurrentUserLocation();
         getFoundUserLocation();
 
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = chatEditText.getText().toString();
+                if(!text.equals("")){
+                    ChatMessage chat = new ChatMessage(text,FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                    FirebaseDatabase.getInstance().getReference().child("together").child(MapsMainActivity.foundUser).child("messages").push().setValue(chat);
+                    chatEditText.setText("");
+                }
+
+            }
+        });
+
+        recenterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Recentered Button is Pressed");
+                markerInMiddle = true;
+                LatLng latlong = new LatLng(currentUserLatitude,currentUserLongitude);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlong,DEFAULT_ZOOM));
+                Log.d(TAG,"markerInMiddle is " + markerInMiddle);
+                setRecenterButton();
+            }
+        });
+
+        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        setRecenterButton();
+                        break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        recenterButton.setVisibility(View.INVISIBLE);
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        recenterButton.setVisibility(View.INVISIBLE);
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        recenterButton.setVisibility(View.INVISIBLE);
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnCameraMoveStartedListener(this);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAdapter = new ChatAdapter(this,FirebaseDatabase.getInstance().getReference().child("together").child(foundUser),UserPopUpFragment.kenaParkerName.getText().toString());
+        chatListView.setAdapter(mAdapter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mAdapter.cleanup();
+    }
+
     private void getCurrentUserLocation(){
         geofireRef.child(currentUserId).child("l").addValueEventListener(new ValueEventListener() {
             @Override
@@ -92,18 +210,18 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback {
 
                     if (subscriptionDataSnapshot.getKey().equals("0")) {
                         currentUserLatitude = Double.parseDouble(subscriptionDataSnapshot.getValue().toString());
-                        System.out.print("currentUserLatitude is: " + currentUserLatitude);
+                        System.out.println("currentUserLatitude is: " + currentUserLatitude);
                     }
 
                     if (subscriptionDataSnapshot.getKey().equals("1")) {
                         currentUserLongitude = Double.parseDouble(subscriptionDataSnapshot.getValue().toString());
-                        System.out.print("currentUserLongitude is: " + currentUserLongitude);
+                        System.out.println("currentUserLongitude is: " + currentUserLongitude);
                     }
 
-                    currentUserLocation = new LatLng(currentUserLatitude,currentUserLongitude);
 
-                    addMarker(mMap,currentUserLatitude,currentUserLongitude);
                 }
+                currentUserLocation = new LatLng(currentUserLatitude,currentUserLongitude);
+                addMarker(mMap,currentUserLatitude,currentUserLongitude);
             }
 
             @Override
@@ -137,9 +255,9 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback {
                     foundUserLocation = new LatLng(foundUserLatitude, foundUserLongitude);
                     Log.d(TAG, "foundUserLocation is: " + foundUserLocation);
 
-                    setKenaMarker(foundUserLocation);
-
                 }
+
+                setKenaMarker(foundUserLocation);
             }
 
             @Override
@@ -167,23 +285,32 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback {
 //        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(thisLocation,17f,DEFAULT_TILT,0)));
     }
 
+    private void setRecenterButton(){
+        if(markerInMiddle == true){
+            recenterButton.setVisibility(View.INVISIBLE);
+        } else {
+            recenterButton.setVisibility(View.VISIBLE);
+        }
+    }
+
 
     int markerCount = 0;
     private Marker mk = null;
+    boolean markerInMiddle = false;
     // Add A Map Pointer To The Map
     public void addMarker(GoogleMap googleMap, double lat, double lon) {
-
+        Log.d(TAG,"markerCount is " + markerCount);
         LatLng latlong = new LatLng(lat, lon);
 
         mLastLocation.setLatitude(currentUserLocation.latitude);
         mLastLocation.setLongitude(currentUserLocation.longitude);
 
-        if(markerCount==1){
+        if(markerCount==1 && markerInMiddle == true){
             animateMarker(mLastLocation,mk);
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latlong));
-        }
-
-        else if (markerCount==0){
+        } else if (markerCount == 1 && markerInMiddle == false) {
+            animateMarker(mLastLocation, mk);
+        } else if (markerCount==0){
             //Set Custom BitMap for Pointer
             int height = 80;
             int width = 45;
@@ -192,18 +319,19 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback {
             Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
             mMap = googleMap;
 
-
-            mk= mMap.addMarker(new MarkerOptions().position(latlong)
-                    .position(currentUserLocation)
+            mk = mMap.addMarker(new MarkerOptions().position(latlong)
                     .icon(BitmapDescriptorFactory.fromBitmap((smallMarker))));
-            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(currentUserLocation,DEFAULT_ZOOM,DEFAULT_TILT,0)));
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latlong, DEFAULT_ZOOM, DEFAULT_TILT, 0)));
             //Set Marker Count to 1 after first marker is created
-            markerCount=1;
+            markerCount = 1;
+            markerInMiddle = true;
+            Log.d(TAG,"markerCount is " + markerCount);
 
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 return;
             }
+            setRecenterButton();
         }
     }
 
@@ -252,6 +380,15 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback {
         return (result + 360) % 360;
     }
 
+    @Override
+    public void onCameraMoveStarted(int reason) {
+        if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE){
+            markerInMiddle = false;
+            Log.d(TAG,"markerInMiddle is " + markerInMiddle);
+            setRecenterButton();
+        }
+    }
+
     private interface LatLngInterpolator {
         LatLng interpolate(float fraction, LatLng a, LatLng b);
 
@@ -270,8 +407,14 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
+    public void expandWhenBottomSheetIsClicked(View v){
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+    }
+
     @Override
     public void onBackPressed() {
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         // do nothing
     }
+
 }
