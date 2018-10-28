@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:gravity="center"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@color/buttonWhite"
+    android:orientation="vertical">
+
+<LinearLayout
+              android:layout_width="wrap_content"
+              android:padding="20dp"
               android:layout_height="150dp"
               android:paddingBottom="@dimen/activity_vertical_margin"
               android:background="@color/buttonWhite"
@@ -12,9 +22,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="10dp"
-        android:text="You have Insufficient points to redeem"
+        android:text="Insufficient points"
         android:textColor="@color/font_Brown"
-        android:textSize="15dp"
+        android:textSize="20dp"
         android:textStyle="bold"/>
 
 
@@ -23,7 +33,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@color/buttonWhite"
-        android:paddingBottom="@dimen/activity_vertical_margin"
 
         android:orientation="vertical" >
 
@@ -44,4 +53,5 @@
             android:textStyle="bold"/>
     </LinearLayout>
 
+</LinearLayout>
 </LinearLayout>

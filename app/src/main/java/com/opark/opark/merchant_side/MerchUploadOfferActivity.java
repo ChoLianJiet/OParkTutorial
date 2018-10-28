@@ -1,27 +1,24 @@
 package com.opark.opark.merchant_side;
 
-import android.app.ProgressDialog;
+import com.google.firebase.storage.UploadTask;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.transition.Slide;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Gallery;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,24 +30,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+import com.google.firebase.storage.StorageTask;
 import com.google.gson.Gson;
 import com.opark.opark.R;
-import com.opark.opark.model.User;
-import com.opark.opark.model.merchant_class.Merchant;
-import com.opark.opark.model.merchant_offer.MerchantOffer;
-import com.opark.opark.share_parking.MapsMainActivity;
-import com.opark.opark.share_parking.Matchmaking;
+import com.opark.opark.merchant_side.merchant_class.Merchant;
+import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.UUID;
-
-import static android.media.MediaRecorder.VideoSource.CAMERA;
 
 public class MerchUploadOfferActivity extends AppCompatActivity {
   private static final int GALLERY = 55;
@@ -66,10 +55,14 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   private EditText offerRedemptionCost;
   private FirebaseStorage merchantOfferStorage;
   private StorageReference merchantOfferStorageReference;
+  private StorageReference merchantOfferImageRefFromSto;
   private DatabaseReference offerlistDatabaseRef;
   private FirebaseAuth mAuth;
   public static ArrayList<Merchant> merchObjList = new ArrayList<>();
   private FirebaseUser currentMerchantFirebaseUser;
+  private StorageTask mUploadTask;
+  private ProgressBar mProgressBar;
+
 
 
   private String merchantCoName;
@@ -95,8 +88,13 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     merchantOfferStorageReference = merchantOfferStorage.getReference();
     bindViews();
 
+
+
     Merchant thisMerchant = new Merchant(merchantCoName , merchantCoPhone,  currentMerchantEmail, merchantCoAddress);
     Log.d(TAG, "onCreate: Merch Name" + thisMerchant.merchCoName);
+
+
+
 
     offerPicture.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -105,10 +103,16 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
       }
     });
 
+
+
+
+
     uploadButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        setFolderInDatabase();
+        uploadFile();
+
+//        setFolderInDatabase();
 //                uploadImage();
       }
     });
@@ -117,6 +121,8 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   }
 
   private void bindViews() {
+
+    mProgressBar = findViewById(R.id.progress_bar);
     offerPicture = findViewById(R.id.offer_picture);
     offerTitleEntry=findViewById(R.id.offer_title);
     offerRedemptionCost=findViewById(R.id.points_cost);
@@ -168,15 +174,18 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
             && data != null && data.getData() != null )
     {
       filePath = data.getData();
-      try {
-        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-        offerPicture.setImageBitmap(bitmap);
-        offerImageForUpload = bitmap;
-      }
-      catch (IOException e)
-      {
-        e.printStackTrace();
-      }
+
+
+//      try {
+        Picasso.get().load(filePath).into(offerPicture);
+//        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+//        offerPicture.setImageBitmap(bitmap);
+//        offerImageForUpload = bitmap;
+//      }
+//      catch (IOException e)
+//      {
+//        e.printStackTrace();
+//      }
 
     } else if (requestCode == CAMERAOPEN) {
       Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
@@ -186,6 +195,13 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
       Toast.makeText(MerchUploadOfferActivity.this, "Image Saved!", Toast.LENGTH_SHORT).show();
     }
   }
+
+  private String getFileExtension(Uri uri) {
+    ContentResolver cR = getContentResolver();
+    MimeTypeMap mime = MimeTypeMap.getSingleton();
+    return mime.getExtensionFromMimeType(cR.getType(uri));
+  }
+
 
   private void uploadImage() {
 
@@ -244,12 +260,16 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     merchantOfferData.setMerchantAddress(merchantCoAddress);
     merchantOfferData.setMerchantContact(merchantCoPhone);
     merchantOfferData.setOfferCost(offerRedemptionCost.getText().toString());
-    merchantOfferData.setOfferImage(BitMapToString(offerImageForUpload));
+//    merchantOfferData.setOfferImage(BitMapToString(offerImageForUpload));
     Log.d(TAG, "setFolderInDatabase: offer image" + offerImageForUpload);
 
     offerlistDatabaseRef.child(offerTitle).setValue(merchantOfferData);
     offerlistDatabaseRef.child(offerTitle).child("redeemCount").setValue(0);
   }
+
+
+
+
 
 
   private void getMerchantDetails(String email ){
@@ -298,4 +318,93 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     return temp;
   }
 
+
+
+
+
+
+  private void uploadFile() {
+
+    offerTitle = offerTitleEntry.getText().toString();
+    if (filePath != null) {
+       final StorageReference fileReference = merchantOfferStorageReference.child("merchants/offerlist/"+offerTitle).child("offerImage"
+              + "." + getFileExtension(filePath));
+
+       merchantOfferImageRefFromSto = fileReference;
+
+      mUploadTask = fileReference.putFile(filePath)
+              .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                  Handler handler = new Handler();
+                  handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                      mProgressBar.setProgress(0);
+                    }
+                  }, 500);
+
+
+                  Toast.makeText(MerchUploadOfferActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
+////
+                  fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+
+                      Log.d("URI", "onSuccess: " + uri.toString());
+                      setUpMerchantOffer(uri);
+
+
+                    }
+                  });
+
+
+                }
+              })
+
+
+              .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                  Toast.makeText(MerchUploadOfferActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+              })
+
+
+              .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                  double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                  mProgressBar.setProgress((int) progress);
+                }
+              });
+    } else {
+      Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+    }
+  }
+
+
+  public void setUpMerchantOffer(Uri uri){
+
+    MerchantOffer merchantOfferData = new MerchantOffer();
+                  merchantOfferData.setMerchantName(merchantCoName);
+                  merchantOfferData.setMerchantOfferTitle(offerTitle);
+                  merchantOfferData.setMerchantAddress(merchantCoAddress);
+                  merchantOfferData.setMerchantContact(merchantCoPhone);
+                  merchantOfferData.setOfferCost(offerRedemptionCost.getText().toString());
+                  merchantOfferData.setOfferImage(uri.toString());
+                  Log.d(TAG, "setFolderInDatabase: offer image" + offerImageForUpload);
+//
+                  offerlistDatabaseRef.child(offerTitle).setValue(merchantOfferData);
+                  offerlistDatabaseRef.child(offerTitle).child("redeemCount").setValue(0);
+
+
+  }
+
+
 }
+
+
+
+
+

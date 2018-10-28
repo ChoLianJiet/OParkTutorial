@@ -1,24 +1,20 @@
 package com.opark.opark;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 
-import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,21 +24,23 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
-import com.opark.opark.model.merchant_class.Merchant;
-import com.opark.opark.model.merchant_offer.MerchantOffer;
-import com.opark.opark.model.merchant_offer.MerchantOfferAdapter;
+import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
+import com.opark.opark.merchant_side.merchant_offer.MerchantOfferAdapter;
+import com.opark.opark.model.RewardsRecord;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class RewardsFragment extends Fragment implements MerchantOfferAdapter.ButtonClicked {
     private Button redeemButton;
@@ -50,15 +48,24 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
     private List<MerchantOffer> merchantOffer = new ArrayList<>();
     MerchantOffer thisMerchantOffer = new MerchantOffer();
     private DatabaseReference offerlistDatabaseRef;
+    private DatabaseReference rewardsDatabaseRef;
+
+
     private StorageReference userPointsStorageRef;
+    private StorageReference rewardsRedemptionRecord;
+
+
     private FirebaseAuth mAuth;
     private FirebaseUser thisUser;
     private String redeemUid;
     public static String merchantOfferTitle;
     final long ONE_MEGABYTE = 1024 * 1024;
     private int userPoints;
+    private int userPointsBefRed;
     private int pointsAfterRedemption;
     public static int redeemCost;
+    public static String rewardsMerchant;
+
 
 
 
@@ -71,6 +78,7 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
         offerlistDatabaseRef = FirebaseDatabase.getInstance().getReference().child("offerlist");
     RecyclerView merchantRecView = (RecyclerView) view.findViewById(R.id.merchant_offer_recview);
     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+    merchantRecView.setHasFixedSize(true);
     merchantRecView.setLayoutManager(linearLayoutManager);
 
     mAuth = FirebaseAuth.getInstance();
@@ -89,6 +97,9 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
 
     private void initializeData(final RecyclerView merchantRecView){
 
+        Log.d("INITDATA", "initializeData: initialising data");
+
+
 //        merchantOffer = new ArrayList<>();
         offerlistDatabaseRef.addChildEventListener(new ChildEventListener() {
             @Override
@@ -97,13 +108,18 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
                 Log.d(TAG, "onChildAdded: datasnapshot children" + dataSnapshot.getChildren());
                 Log.d(TAG, "onChildAdded: datasnapshot " +  String.valueOf(dataSnapshot.child("offerCost").getValue()));
                 Log.d(TAG, "onChildAdded:  datasnapshot value " + dataSnapshot.getValue());
-//
-                Log.d(TAG, "redeem " + dataSnapshot.child("redeemCount").getValue());
 
 
 
 //                merchantOffer.add(new MerchantOffer(String.valueOf(dataSnapshot.child("merchantOfferTitle").getValue()) ,String.valueOf(dataSnapshot.child("merchantName").getValue()),String.valueOf(dataSnapshot.child("merchantAddress").getValue()),String.valueOf(dataSnapshot.child("merchantContact").getValue()),String.valueOf(dataSnapshot.child("offerCost").getValue()),"asdsadas"));
                 merchantOffer.add(dataSnapshot.getValue(MerchantOffer.class));
+
+                Log.d("INITDATA", "Data added as class");
+
+
+
+
+
 //                Log.d(TAG, "onChildAdded: merchant offer " + merchantOffer.get(1));
 
                 final MerchantOfferAdapter merchantOfferAdapter = new MerchantOfferAdapter(merchantOffer, new MerchantOfferAdapter.ButtonClicked() {
@@ -162,6 +178,35 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
     }
 
 
+
+
+
+    private void recordRewardsRedemption(){
+
+
+
+
+        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        Long tsLong = System.currentTimeMillis()/1000;
+
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        cal.setTimeInMillis(tsLong* 1000L);
+        String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
+
+        RewardsRecord thisMatchmakingRecord = new RewardsRecord(merchantOfferTitle,rewardsMerchant,date,redeemCost,userPointsBefRed, userPoints);
+        rewardsRedemptionRecord = FirebaseStorage.getInstance().getReference().child("users/" + redeemUid + "/rewardsrecord/" + date);
+
+
+
+        objToByteStreamUpload(thisMatchmakingRecord,rewardsRedemptionRecord);
+
+
+
+
+
+    }
+
+
     private void deductPointsForRedemption(){
 
 
@@ -171,12 +216,14 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
 
                 try {
                     userPoints = (new Gson().fromJson(new String(bytes, "UTF-8"), Integer.class));
+                    userPointsBefRed = userPoints;
                     Log.d(TAG, "Gsonfrom json success, Points is " + userPoints);
 
                 } catch (UnsupportedEncodingException e){
                     e.printStackTrace();
                 }
                 if (userPoints>redeemCost){
+                    Log.d("redeem", "redeem cost " + redeemCost);
                 pointsAfterRedemption = (int) (Math.ceil(userPoints) - redeemCost );
                 objToByteStreamUpload(pointsAfterRedemption,userPointsStorageRef);
                 offerlistDatabaseRef.child(merchantOfferTitle).child("redeemedUsers").push().setValue(redeemUid);
@@ -184,6 +231,8 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
                 Log.d("redeem","Points uploaded from Redeem is " + pointsAfterRedemption);}
 
                 else {
+                    Log.d("redeem", "redeem cost " + redeemCost);
+
                     Log.d("redeem","Points insufficient " + userPoints);
                     InsufficientPointsDialog insufficientPointsDialog = new InsufficientPointsDialog(getContext());
                     insufficientPointsDialog.show();
@@ -218,12 +267,16 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(getContext(), "You've Earned Points!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Your Rewards have been Redeemed", Toast.LENGTH_LONG).show();
                 Log.i(TAG, "Profile update successful!");
                 // Use analytics to calculate the success rate
             }
         });
     }
+
+
+
+
 
 
 

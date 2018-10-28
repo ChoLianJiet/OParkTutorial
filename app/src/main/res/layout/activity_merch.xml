@@ -11,9 +11,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:paddingBottom="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MerchActivity"
+    tools:context=".merchant_side.MerchActivity"
     android:orientation="vertical">
 
     <TextView
@@ -26,10 +27,10 @@
         android:textSize="20sp"/>
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/amount_redeemed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="1000"
+        android:text="null"
         android:layout_marginStart="100dp"
         android:textSize="100sp"/>
 

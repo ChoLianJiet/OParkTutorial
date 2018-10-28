@@ -1,4 +1,4 @@
-package com.opark.opark.model.merchant_class;
+package com.opark.opark.merchant_side.merchant_class;
 
 public class Merchant {
    //TODO add merchant objects

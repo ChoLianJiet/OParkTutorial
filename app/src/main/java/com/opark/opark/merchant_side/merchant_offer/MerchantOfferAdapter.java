@@ -1,4 +1,4 @@
-package com.opark.opark.model.merchant_offer;
+package com.opark.opark.merchant_side.merchant_offer;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,11 +15,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.airbnb.lottie.L;
 import com.opark.opark.R;
 import com.opark.opark.RewardsFragment;
-
-import org.w3c.dom.Text;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -90,11 +88,6 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
     }
 
 
-
-
-
-
-
     @NonNull
     @Override
     public MerchantOfferAdapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -107,22 +100,43 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
 
 
     @Override
-    public void onBindViewHolder(@NonNull MerchantOfferAdapterViewHolder holder,final int i) {
+    public void onBindViewHolder(@NonNull final MerchantOfferAdapterViewHolder holder, final int i) {
 
 
         holder.merchantOfferTitle.setText(merchantOfferList.get(i).getMerchantOfferTitle());
         holder.merchantName.setText(merchantOfferList.get(i).getMerchantName());
         holder.merchantAddress.setText(merchantOfferList.get(i).getMerchantAddress());
+
+        holder.redeemCost.setText(merchantOfferList.get(i).getOfferCost());
+
         holder.merchantNumber.setText(merchantOfferList.get(i).getMerchantContact());
-        holder.merchantOfferImage.setImageBitmap(StringToBitMap(merchantOfferList.get(i).getOfferImage()));
+
+//
+        Picasso.get()
+                .load(merchantOfferList.get(i).getOfferImage())
+                .fit()
+                .centerCrop()
+                .into(holder.merchantOfferImage);
+
+
+        Log.d("INITDATA", " onBINDview Complete  ");
+
+//        holder.merchantOfferImage.setImageURI(merchantOfferList.get(i).getOfferImage());
+//        holder.merchantOfferImage.setImageBitmap(StringToBitMap(merchantOfferList.get(i).getOfferImage()));
+
         holder.redeemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                RewardsFragment.redeemCost = Integer.valueOf( merchantOfferList.get(i).getOfferCost());
                 RewardsFragment.merchantOfferTitle = merchantOfferList.get(i).getMerchantOfferTitle();
+                RewardsFragment.rewardsMerchant = merchantOfferList.get(i).getMerchantName();
                 mButtonClicked.onButtonClicked(v, i);
 
                 Log.d("redeem", "onClick: " + RewardsFragment.merchantOfferTitle);
                 Log.d("redeem", "MerchantOfferAdapter button : " + mButtonClicked);
+                Log.d("redeem", "offercost in adaapter : " + RewardsFragment.redeemCost);
+
+
             }
         });
 

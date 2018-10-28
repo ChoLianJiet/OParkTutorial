@@ -10,10 +10,21 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:paddingTop="80dp"
+            android:layout_height="0dp"
+
             android:orientation="vertical"
+
             >
+
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="65dp"
+                android:layout_marginBottom="10dp"
+                android:text="Please Select an Image" />
 
             <ImageButton
                 android:id="@+id/offer_picture"
@@ -28,7 +39,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
                 android:paddingBottom="50dp"
@@ -48,20 +59,37 @@
                     android:ems="15"
                     android:hint="Redemption amount (enter 500-2000)"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <Button
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="50dp"
+                >
+
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="20dp"
+
+                    />
+
+                <Button
                     android:id="@+id/upload_offer_button"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="60dp"
+                    android:layout_height="0dp"
+                    android:layout_margin="16dp"
                     android:layout_weight="1"
                     android:background="@color/colorPrimary"
                     android:text="Upload"
                     android:theme="@style/AppTheme"/>
-                </LinearLayout>
-
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

@@ -117,11 +117,11 @@
         </activity>
         <activity android:name="merchant_all.merchant_prof.MerchantProfileSetup">
         </activity>
-        <activity android:name=".MerchProfileSetup">
+        <activity android:name=".merchant_side.MerchProfileSetup">
         </activity>
         <activity android:name=".login_auth.MerchWaitingApproval">
         </activity>
-        <activity android:name=".MerchActivity">
+        <activity android:name=".merchant_side.MerchActivity">
         </activity>
         <activity android:name=".merchant_side.MerchUploadOfferActivity">
         </activity>

@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,10 +47,13 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class ProfileNavFragment extends Fragment {
     private Button profileEditButton;
-    private TextView firstName, lastName, phoneNum;
+    private TextView firstName, lastName, phoneNum, userEmail;
     private TextView carColour, carBrand, carModel, carPlate;
     private TextView firstLine, secondLine, city, postcode, countryState;
-    String firebaseUserUID;
+    String userEmailAddress;
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
+    private Toolbar toolbar;
    private ProgressBar loadingCircle;
     private LinearLayout nameNumLayout1, nameNumlayout2 , carLayout;
     private ArrayList<User> userObjList = new ArrayList<>();
@@ -59,9 +63,13 @@ public class ProfileNavFragment extends Fragment {
         // Defines the xml file for the fragment
         View view=  inflater.inflate(R.layout.profile_nav_fragment, parent, false);
 
-        FirebaseUser currentUser;
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        userEmailAddress = currentUser.getEmail();
          final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         bindViews(view);
+//        toolbar.setTitle("Profile");
+
         Log.d("View","Viewbinding success");
 
 //        StorageReference userRef = FirebaseStorage.getInstance().getReference().child("users/" + firebaseUserUID + "/profile.txt");
@@ -100,6 +108,7 @@ public class ProfileNavFragment extends Fragment {
 ////                            Log.i("Hello","heyhey" + MapsMainActivity.userObjList.get(i).getUserName().getFirstName());
 ////                            firstName.setText(userObjList.get(i).getUserName().getFirstName());
                             lastName.setText(MapsMainActivity.lastName);
+                            userEmail.setText(userEmailAddress);
                             phoneNum.setText(MapsMainActivity.phoneNum);
                             carColour.setText(MapsMainActivity.carColour);
                             carBrand.setText(MapsMainActivity.carBrand);
@@ -152,7 +161,10 @@ public class ProfileNavFragment extends Fragment {
 //        nameNumlayout2=(LinearLayout) view.findViewById(R.id.name_num_2);
 //        carLayout= (LinearLayout) view.findViewById(R.id.car_1);
 //        firstName = (TextView) view.findViewById(R.id.first_name_edit);
+        toolbar = (Toolbar) view.findViewById(R.id.toolbar_in_maps_main);
+
         lastName = (TextView) view.findViewById(R.id.last_name_edit);
+        userEmail = view.findViewById(R.id.email_text);
         phoneNum = (TextView) view.findViewById(R.id.phone_num_edit);
         carColour = (TextView) view.findViewById(R.id.car_colour_edit);
         carBrand = (TextView) view.findViewById(R.id.car_brand_edit);

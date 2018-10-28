@@ -50,6 +50,7 @@ public class LoadingScreen extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private String CurrentUserID;
     private StorageReference storageRef;
+    private StorageReference latestMatchmakingRecord;
     private StorageReference matchMakingRecordStoRef;
     private StorageReference userRewardsFolder;
     private String currentUserID;
@@ -218,8 +219,10 @@ public class LoadingScreen extends AppCompatActivity {
         String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
 
         MatchmakingRecord thisMatchmakingRecord = new MatchmakingRecord("none",date,currentUserID,"none",null,kenaLatLng,elapsedTime);
-        matchMakingRecordStoRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/matchmakingrecord/" + "sharingRecord/" + date);
+        matchMakingRecordStoRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/matchmakingrecord/" + "sharingrecord/" + date);
+        latestMatchmakingRecord = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/matchmakingrecord/"+  "latestrecord.txt");
         objToByteStreamUpload(thisMatchmakingRecord,matchMakingRecordStoRef);
+        objToByteStreamUpload(thisMatchmakingRecord,latestMatchmakingRecord);
 
 
 

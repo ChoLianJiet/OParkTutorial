@@ -1,20 +1,12 @@
-package com.opark.opark.model.merchant_offer;
-
-import android.graphics.Bitmap;
-import android.widget.ImageView;
-
-import com.opark.opark.R;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.opark.opark.merchant_side.merchant_offer;
 
 public class MerchantOffer {
   private String merchantOfferTitle, merchantName, merchantAddress, merchantContact, offerCost;
-  private String offerImage;
+  private String  offerImage;
   public MerchantOffer() {
   }
 
-  public MerchantOffer(String merchantOfferTitle, String merchantName, String merchantAddress, String merchantContact, String offerCost, String offerImage) {
+  public MerchantOffer(String merchantOfferTitle, String merchantName, String merchantAddress, String merchantContact, String offerCost ) {
     this.merchantOfferTitle = merchantOfferTitle;
     this.merchantName = merchantName;
     this.merchantAddress = merchantAddress;
@@ -23,11 +15,11 @@ public class MerchantOffer {
     this.offerImage = offerImage;
   }
 
-  public String getOfferImage() {
+  public String  getOfferImage() {
     return offerImage;
   }
 
-  public void setOfferImage(String offerImage) {
+  public void setOfferImage(String  offerImage) {
     this.offerImage = offerImage;
   }
 

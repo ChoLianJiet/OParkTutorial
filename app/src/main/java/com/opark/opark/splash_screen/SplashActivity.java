@@ -16,15 +16,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.opark.opark.MerchActivity;
-import com.opark.opark.MerchProfileSetup;
+import com.opark.opark.merchant_side.MerchActivity;
+import com.opark.opark.merchant_side.MerchProfileSetup;
 import com.opark.opark.UserProfileSetup;
 import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.R;
 import com.opark.opark.login_auth.MerchWaitingApproval;
 import com.opark.opark.share_parking.MapsMainActivity;
-
-import static com.opark.opark.RegisterActivity.isMerchant;
 
 public class SplashActivity extends AppCompatActivity {
 

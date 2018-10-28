@@ -9,6 +9,11 @@
     tools:layout_editor_absoluteX="0dp"
     android:background="@color/brightPeach"
     tools:layout_editor_absoluteY="25dp">
+    <include
+        android:id="@+id/toolbar_in_maps_main"
+        layout="@layout/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <ImageView
         android:id="@+id/imageView2"
@@ -32,14 +37,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/you_text_bold"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="30dp"
-            android:layout_weight="1"
-            android:text="YOU"
-            android:textSize="50sp"/>
+
+            <TextView
+                android:id="@+id/you_text_bold"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="30dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/mosk_ultra_bold_900"
+                android:text="YOU"
+                android:textSize="50sp" />
         </LinearLayout>
         <LinearLayout
 
@@ -74,7 +81,7 @@
                 android:textSize="20sp"/>
 
             <TextView
-                android:id="@+id/email_edit"
+                android:id="@+id/email_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -100,6 +107,7 @@
             android:layout_width="match_parent"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_height="wrap_content"
+            android:paddingTop="10dp"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:orientation="vertical"
             android:background="@color/brightPeach"
@@ -111,8 +119,9 @@
                 android:layout_height="0dp"
                 android:layout_marginStart="30dp"
                 android:layout_weight="1"
+                android:fontFamily="@font/mosk_ultra_bold_900"
                 android:text="CAR"
-                android:textSize="50sp"/>
+                android:textSize="50sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
