@@ -2,25 +2,27 @@ package com.opark.opark.share_parking;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+
+
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
@@ -35,6 +37,9 @@ import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -47,6 +52,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -60,7 +67,6 @@ import com.opark.opark.LoadingScreen;
 import com.opark.opark.LoginActivity;
 import com.opark.opark.NoUserPopUp;
 import com.opark.opark.R;
-import com.opark.opark.UserPopUp;
 import com.opark.opark.UserPopUpFragment;
 import com.opark.opark.UserProfileSetup;
 
@@ -68,17 +74,14 @@ import com.opark.opark.UserProfileSetup;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import javax.security.auth.Subject;
-
 public class MapsMainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnInfoWindowClickListener,
-        LocationListener, GoogleMap.OnCameraMoveStartedListener {
+        LocationListener, GoogleMap.OnCameraMoveStartedListener, UserPopUpFragment.OnUserPopUpFragmentListener {
 
     //CONSTANT
     private static final String TAG = "MapsMainActivity";
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int MY_PERMISSION_REQUEST_CODE = 123;
     private static final int PLAY_SERVICES_REQUEST_CODE = 124;
     private static int UPDATE_INTERVAL = 5000;
@@ -86,6 +89,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     private static int DISTANCE = 10;
     private float DEFAULT_ZOOM = 18f;
     private float DEFAULT_TILT = 45f;
+    private String GEOFENCE_ID = "myGeofenceID";
 
     public static String ADATEM0 = "0";
     public static String ADATEM1 = "1";
@@ -95,16 +99,19 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
 
     //MEMBER VARIALBLE
 
+    private BottomSheetBehavior mBottomSheetBehavior;
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
     private Button shareParkingButton;
     private Button findParkingButton;
     private Button signOutButton;
     private FloatingActionButton recenterButton;
     private GeoFire geoFire;
     private GeoQuery geoQuery;
+    private GeoFire geofencingGeoFire;
+    private GeoQuery geofencingGeoQuery;
     private double longitude;
     private double latitude;
     private double kenaLatitude;
@@ -127,6 +134,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     private ProgressBar loadingCircle;
     private String adatemValue;
     public static UserPopUpFragment userPopUpFragment;
+    public static UserPopUpFragment userPopUpFragment1;
     private PopupWindow popUpWindow;
     private LayoutInflater layoutInflater;
 
@@ -143,11 +151,13 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
 
         shareParkingButton = (Button) findViewById(R.id.share_parking_button);
         findParkingButton = (Button) findViewById(R.id.find_parking_button);
-        shareParkingButton.setVisibility(View.INVISIBLE);
-        findParkingButton.setVisibility(View.INVISIBLE);
+//        shareParkingButton.setVisibility(View.INVISIBLE);
+//        findParkingButton.setVisibility(View.INVISIBLE);
         recenterButton = (FloatingActionButton) findViewById(R.id.recenter_button);
         recenterButton.setVisibility(View.INVISIBLE);
         loadingCircle = (ProgressBar) findViewById(R.id.progress_bar);
+        View bottomSheet = findViewById(R.id.bottom_sheet_sorry);
+        mBottomSheetBehavior= BottomSheetBehavior.from(bottomSheet);
         showLoading();
         FirebaseApp.initializeApp(getApplicationContext());
         currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -159,7 +169,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
         storageRef = firebaseStorage.getReference();
         signOutButton = (Button) findViewById(R.id.sign_out_button);
 
-
+//        setArtificialGeofence();
 
         shareParkingButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -181,8 +191,9 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             public void onClick(View v) {
                 Log.d(TAG, "Recentered Button is Pressed");
                 markerInMiddle = true;
-                addMarker(mMap, peterParkerLocation.latitude, peterParkerLocation.longitude);
-                Log.d(TAG,"markerInMiddle is " + markerInMiddle);
+                LatLng latlong = new LatLng(peterParkerLocation.latitude, peterParkerLocation.longitude);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlong, DEFAULT_ZOOM));
+                Log.d(TAG, "markerInMiddle is " + markerInMiddle);
                 setRecenterButton();
             }
         });
@@ -193,7 +204,6 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
                 signOut();
             }
         });
-
     }
 
     /**
@@ -214,10 +224,10 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
 
     private void getLocationPermission() {
         Log.d(TAG, "getLocationPermission: getting location permission");
-        if (ActivityCompat.checkSelfPermission(this, FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{
-                            FINE_LOCATION, COARSE_LOCATION}, MY_PERMISSION_REQUEST_CODE);
+                            FINE_LOCATION}, MY_PERMISSION_REQUEST_CODE);
         } else {
             if (checkPlayServices()) {
                 buildGoogleApiClient();
@@ -244,7 +254,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     }
 
     private void displayLocation() {
-        if (ActivityCompat.checkSelfPermission(this, FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -261,8 +271,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
                     } else {
                         System.out.println("Location saved on server successfully as lat[" + latitude + "], lon[" + longitude + "]!");
                         loadLocationForThisUser();
-                        shareParkingButton.setVisibility(View.VISIBLE);
-                        findParkingButton.setVisibility(View.VISIBLE);
+
                         dismissLoading();
                     }
                 }
@@ -309,7 +318,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     }
 
     private void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, (com.google.android.gms.location.LocationListener) this);
@@ -340,6 +349,11 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
     protected void onStop() {
 
         if (mGoogleApiClient != null) {
@@ -347,7 +361,6 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
         }
         super.onStop();
     }
-
 
     @Override
     protected void onResume() {
@@ -367,12 +380,70 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
         super.onDestroy();
     }
 
-    private void setRecenterButton(){
-        if(markerInMiddle == true){
+    private void setRecenterButton() {
+        if (markerInMiddle == true) {
             recenterButton.setVisibility(View.INVISIBLE);
         } else {
             recenterButton.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void setArtificialGeofence(){
+        geofencingGeoFire = new GeoFire(geofireRef);
+        geofencingGeoQuery = geoFire.queryAtLocation(new GeoLocation(3.032307, 101.722998), 10.0);
+        geofencingGeoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                if (mLastLocation != null) {
+                    latitude = mLastLocation.getLatitude();
+                    longitude = mLastLocation.getLongitude();
+
+                    //Update to firebase
+                    geoFire.setLocation(currentUserID, new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
+                        @Override
+                        public void onComplete(String key, DatabaseError error) {
+                            if (error != null) {
+                                System.err.println("There was an error saving the location to GeoFire: " + error);
+                            } else {
+                                System.out.println("Location saved on server successfully as lat[" + latitude + "], lon[" + longitude + "]!");
+                                loadLocationForThisUser();
+                                shareParkingButton.setVisibility(View.VISIBLE);
+                                findParkingButton.setVisibility(View.VISIBLE);
+                                mBottomSheetBehavior.setHideable(true);
+                                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                            }
+                        }
+                    });
+                } else {
+                    Log.d("Test", "Couldn't load location");
+                }
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+                shareParkingButton.setVisibility(View.INVISIBLE);
+                findParkingButton.setVisibility(View.INVISIBLE);
+                mBottomSheetBehavior.setHideable(false);
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+
+
     }
 
     //Retrieve location for peterParker
@@ -418,7 +489,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
 
     //FIND OTHER USERS LOCATION
     private void findOtherUsersLocation() {
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), 50.0);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), 100.0);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(final String key, GeoLocation location) {
@@ -428,39 +499,43 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            adatemValue = dataSnapshot.getValue().toString();
+                            try {
+                                adatemValue = dataSnapshot.getValue().toString();
 
-                            if (oldArrayList.contains(key)) {
-                                //do nothing
-                                if (!adatemValue.equals(ADATEM0)) {
-                                    oldArrayList.remove(key);
-                                    Log.d(TAG, key + " has been removed due to becoming not 0, oldArrayList consist of " + oldArrayList);
+                                if (oldArrayList.contains(key)) {
+                                    //do nothing
+                                    if (!adatemValue.equals(ADATEM0)) {
+                                        oldArrayList.remove(key);
+                                        Log.d(TAG, key + " has been removed due to becoming not 0, oldArrayList consist of " + oldArrayList);
+                                    }
+                                } else if (adatemValue.equals(ADATEM0) && !oldArrayList.contains(key)) {
+
+                                    newArrayList.add(key);
+                                    newHashSet.addAll(newArrayList);
+                                    newArrayList.clear();
+                                    newArrayList.addAll(newHashSet);
+                                    newHashSet.clear();
+
+                                    Log.d(TAG, "newArrayList consist of " + newArrayList);
+
+                                } else if (!adatemValue.equals(ADATEM0)) {
+
+                                    Log.d(TAG, key + " adatem has become not 0, removed from newArrayList");
+
+                                    newArrayList.remove(key);
+                                    newHashSet.addAll(newArrayList);
+                                    newArrayList.clear();
+                                    newArrayList.addAll(newHashSet);
+                                    newHashSet.clear();
+
+                                    Log.d(TAG, "newArrayList consist of " + newArrayList);
+
+                                } else {
+                                    Log.d(TAG, "nothing is triggered, newArrayList is not used");
+                                    //do nothing
                                 }
-                            } else if (adatemValue.equals(ADATEM0) && !oldArrayList.contains(key)) {
-
-                                newArrayList.add(key);
-                                newHashSet.addAll(newArrayList);
-                                newArrayList.clear();
-                                newArrayList.addAll(newHashSet);
-                                newHashSet.clear();
-
-                                Log.d(TAG, "newArrayList consist of " + newArrayList);
-
-                            } else if (!adatemValue.equals(ADATEM0)) {
-
-                                Log.d(TAG, key + " adatem has become not 0, removed from newArrayList");
-
-                                newArrayList.remove(key);
-                                newHashSet.addAll(newArrayList);
-                                newArrayList.clear();
-                                newArrayList.addAll(newHashSet);
-                                newHashSet.clear();
-
-                                Log.d(TAG, "newArrayList consist of " + newArrayList);
-
-                            } else {
-                                Log.d(TAG, "nothing is triggered, newArrayList is not used");
-                                //do nothing
+                            } catch (NullPointerException e){
+                                System.out.println(e);
                             }
 
                         }
@@ -547,14 +622,28 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             });
             saveFoundUserId();
             dismissLoading();
-//            Intent intent = new Intent(MapsMainActivity.this, UserPopUp.class);
-//            startActivity(intent);
-            userPopUpFragment = new UserPopUpFragment();
-            FragmentManager manager = getFragmentManager();
-            FragmentTransaction transaction = manager.beginTransaction();
-            transaction.add(R.id.popupuser,userPopUpFragment,null);
-            transaction.addToBackStack(null);
-            transaction.commit();
+
+            if(position == 123) {
+                userPopUpFragment1 = new UserPopUpFragment();
+                FragmentManager manager = getSupportFragmentManager();
+                manager.popBackStack();
+                Log.d(TAG, "setMarkerForKenaOneByOne: "+ manager.getBackStackEntryCount());
+                manager.beginTransaction()
+                    .add(R.id.popupuser, userPopUpFragment1, null)
+                        .addToBackStack(null)
+                    .commit();
+                Log.d(TAG,"position is 123");
+            } else {
+                userPopUpFragment = new UserPopUpFragment();
+                FragmentManager manager = getSupportFragmentManager();
+                manager.beginTransaction()
+                        .add(R.id.popupuser, userPopUpFragment, null)
+                        .addToBackStack(null)
+                        .commit();
+                Log.d(TAG,"position is not 123");
+            }
+//            }
+
 //            UserPopUpFragment userPopUpFragment = new UserPopUpFragment();
 //            userPopUpFragment.show(getFragmentManager(),"userPopUpFragment");
 
@@ -577,6 +666,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
                 setMarkerForKenaOneByOne();
 
             } else if (oldArrayList.isEmpty()) {
+
                 dismissLoading();
                 Intent intent = new Intent(MapsMainActivity.this, NoUserPopUp.class);
                 startActivity(intent);
@@ -716,6 +806,22 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
         }
     }
 
+    public static int position = 0;
+
+    @Override
+    public void onArticleSelected(int position) {
+        this.position = position;
+        if (this.position == 123){
+            Log.d(TAG,"this position is really " + position);
+            setMarkerForKenaOneByOne();
+            this.position = 0;
+        } else {
+            // do nothing
+            Log.d(TAG,"this position is " + this.position);
+        }
+
+    }
+
     private interface LatLngInterpolator {
         LatLng interpolate(float fraction, LatLng a, LatLng b);
 
@@ -764,26 +870,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
-//    public void displayFragment(String string) {
-//
-//        UserPopUpFragment fragment;
-//
-//        if (string == null){
-//            fragment = new UserPopUpFragment();
-//            FragmentManager fm = getFragmentManager();
-//            FragmentTransaction ft = fm.beginTransaction();
-//            ft.add(R.id.popupuser,fragment);
-//            ft.hide(fragment);
-//        }
-//
-//        if (string == foundUser) {
-//
-//            fragment = new UserPopUpFragment();
-//            FragmentManager fm = getFragmentManager();
-//            FragmentTransaction ft = fm.beginTransaction();
-//            ft.add(R.id.popupuser,fragment);
-//            ft.commit();
-//        }
-//    }
+
+
 
 }

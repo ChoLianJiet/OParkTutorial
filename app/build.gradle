@@ -86,6 +86,9 @@ android {
         //STATIC MAP
         implementation 'com.github.renaudcerrato:static-maps-api:1.0.4'
 
+        //Chat Bubble View
+        implementation 'com.github.lguipeng:BubbleView:1.0.1'
+
     }
 
 

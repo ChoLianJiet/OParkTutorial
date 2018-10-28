@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        tools:context=".share_parking.MapsMainActivity"/>
+        tools:context=".KenaMap"/>
 
     <RelativeLayout
         android:layout_width="196dp"
@@ -44,4 +44,98 @@
 
         </RelativeLayout>
     </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/recenter_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="130dp"
+        android:layout_marginStart="20dp"
+        android:clickable="true"
+        app:backgroundTint="@color/cardview_light_background"
+        app:srcCompat="@mipmap/ic_launcher_foreground"/>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/bottom_sheet_kena"
+            android:background="@drawable/home01_bg_card"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+            app:behavior_peekHeight="150dp"
+            android:onClick="expandWhenBottomSheetIsClicked">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:orientation="horizontal">
+
+                <com.jackandphantom.circularimageview.CircleImage
+                    android:id="@+id/kenaProfilePicture"
+                    android:layout_width="250dp"
+                    android:layout_height="102dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_weight="1"
+                    android:background="@color/white"
+                    app:rounded_radius="50"
+                    app:shadow_radius="20"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/kena_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:textSize="15dp"
+                        android:text="abu"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/kena_car_color"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="red"
+                        android:layout_marginTop="5dp"
+                        android:textSize="20dp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/kena_car_modal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:textSize="20dp"
+                        android:textStyle="bold"
+                        android:text="Honda Civic"/>
+
+                    <TextView
+                        android:id="@+id/kena_car_plate_number"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:layout_marginTop="5dp"
+                        android:textSize="20dp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </RelativeLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
 </RelativeLayout>

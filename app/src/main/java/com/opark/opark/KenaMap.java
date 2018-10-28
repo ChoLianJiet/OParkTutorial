@@ -2,18 +2,34 @@ package com.opark.opark;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
+import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.os.SystemClock;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.Chronometer;
+import android.widget.TextView;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationServices;
@@ -37,8 +53,9 @@ import com.opark.opark.card_swipe.MainActivityCardSwipe;
 import com.opark.opark.share_parking.MapsMainActivity;
 
 import java.text.DecimalFormat;
+import java.util.Random;
 
-public class KenaMap extends FragmentActivity implements OnMapReadyCallback {
+public class KenaMap extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnCameraMoveStartedListener {
 
     final String TAG = "KenaMap";
 
@@ -48,9 +65,20 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback {
     private float DEFAULT_ZOOM = 18f;
     private float DEFAULT_TILT = 45f;
 
+
+
+
+
     GoogleMap mMap;
     Chronometer mChronometer;
+    private BottomSheetBehavior mBottomSheetBehavior;
+    private TextView kenaParkerName;
+    private TextView kenaCarModel;
+    private TextView kenaCarPlateNumber;
+    private TextView kenaCarColor;
+    double elapsedTime;
     private Location mLastLocation = new Location("");
+    private FloatingActionButton recenterButton;
     DatabaseReference geofireRef;
     DatabaseReference matchmakingRef;
     DatabaseReference togetherRef;
@@ -63,6 +91,9 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback {
     private LatLng foundUserLocation;
     private LatLng currentUserLocation;
     Marker kenaMarker;
+    private GeoFire geoFire;
+    private GeoQuery geoQuery;
+    public static double pointsGainedFromKenaMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,21 +112,73 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback {
         mChronometer = (Chronometer) findViewById(R.id.chronometer);
         mChronometer.start();
 
+        View bottomSheet = findViewById(R.id.bottom_sheet_kena);
+        mBottomSheetBehavior= BottomSheetBehavior.from(bottomSheet);
+
+        recenterButton = (FloatingActionButton) findViewById(R.id.recenter_button);
+        recenterButton.setVisibility(View.INVISIBLE);
+
 
         geofireRef = FirebaseDatabase.getInstance().getReference().child("geofire");
         matchmakingRef = FirebaseDatabase.getInstance().getReference().child("matchmaking");
         togetherRef = FirebaseDatabase.getInstance().getReference().child("together");
+        geoFire = new GeoFire(geofireRef);
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        recenterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Recentered Button is Pressed");
+                markerInMiddle = true;
+                LatLng latlong = new LatLng(currentUserLatitude,currentUserLongitude);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlong,DEFAULT_ZOOM));
+                Log.d(TAG,"markerInMiddle is " + markerInMiddle);
+                setRecenterButton();
+            }
+        });
+
         getCurrentUserLocation();
+
         getFoundUserLocation();
 
+        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        setRecenterButton();
+                        break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        recenterButton.setVisibility(View.INVISIBLE);
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        recenterButton.setVisibility(View.INVISIBLE);
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        recenterButton.setVisibility(View.INVISIBLE);
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+            }
+        });
+
+
     }
+
+    public void expandWhenBottomSheetIsClicked(View v){
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+    }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnCameraMoveStartedListener(this);
     }
 
     private void getCurrentUserLocation(){
@@ -114,10 +197,9 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback {
                         System.out.print("currentUserLongitude is: " + currentUserLongitude);
                     }
 
-                    currentUserLocation = new LatLng(currentUserLatitude,currentUserLongitude);
-
-                    setOwnMarker(currentUserLocation);
                 }
+                currentUserLocation = new LatLng(currentUserLatitude,currentUserLongitude);
+                setOwnMarker(currentUserLocation);
             }
 
             @Override
@@ -129,8 +211,17 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback {
 
     }
 
+    @Override
+    public void onCameraMoveStarted(int reason) {
+        if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE){
+            markerInMiddle = false;
+            Log.d(TAG,"markerInMiddle is " + markerInMiddle);
+            setRecenterButton();
+        }
+    }
+
     private void getFoundUserLocation(){
-        togetherRef.child(currentUserId).addValueEventListener(new ValueEventListener() {
+        togetherRef.child(currentUserId).child("peter").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 foundUser = dataSnapshot.getValue().toString();
@@ -156,9 +247,10 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback {
                             foundUserLocation = new LatLng(foundUserLatitude,foundUserLongitude);
                             Log.d(TAG,"foundUserLocation is: " + foundUserLocation);
 
-                            addMarker(mMap,foundUserLocation.latitude,foundUserLocation.longitude);
-
                         }
+                        addMarker(mMap,foundUserLocation.latitude,foundUserLocation.longitude);
+                        CheckFoundUserHaveEnteredGeoQueryArea();
+//                        CheckFoundUserHaveEnteredMiniGeoQueryArea();
                     }
 
                     @Override
@@ -188,29 +280,39 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback {
 
     private void setOwnMarker(LatLng thisLocation){
 
-        kenaMarker = mMap.addMarker(new MarkerOptions()
-                .position(thisLocation)
+        mk = mMap.addMarker(new MarkerOptions().position(thisLocation)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(thisLocation,17f,DEFAULT_TILT,0)));
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(thisLocation, DEFAULT_ZOOM, DEFAULT_TILT, 0)));
+        Log.d(TAG,"camera has been moved to middle");
+    }
+
+    private void setRecenterButton(){
+        if(markerInMiddle == true){
+            recenterButton.setVisibility(View.INVISIBLE);
+        } else {
+            recenterButton.setVisibility(View.VISIBLE);
+        }
     }
 
 
     int markerCount = 0;
     private Marker mk = null;
+    boolean markerInMiddle = false;
     // Add A Map Pointer To The Map
     public void addMarker(GoogleMap googleMap, double lat, double lon) {
+
 
         LatLng latlong = new LatLng(lat, lon);
 
         mLastLocation.setLatitude(foundUserLocation.latitude);
         mLastLocation.setLongitude(foundUserLocation.longitude);
 
-        if(markerCount==1){
+        if(markerCount==1 && markerInMiddle == true){
             animateMarker(mLastLocation,mk);
 //            mMap.animateCamera(CameraUpdateFactory.newLatLng(latlong));
-        }
-
-        else if (markerCount==0){
+        } else if (markerCount == 1 && markerInMiddle == false) {
+            animateMarker(mLastLocation, mk);
+        } else if (markerCount==0){
             //Set Custom BitMap for Pointer
             int height = 80;
             int width = 45;
@@ -219,18 +321,19 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback {
             Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
             mMap = googleMap;
 
-
-            mk= mMap.addMarker(new MarkerOptions().position(latlong)
-                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.pin3))
+            mk = mMap.addMarker(new MarkerOptions().position(latlong)
                     .icon(BitmapDescriptorFactory.fromBitmap((smallMarker))));
-//            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latlong,DEFAULT_ZOOM,DEFAULT_TILT,0)));
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latlong, DEFAULT_ZOOM, DEFAULT_TILT, 0)));
             //Set Marker Count to 1 after first marker is created
-            markerCount=1;
+            markerCount = 1;
+            markerInMiddle = true;
+
 
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 return;
             }
+            setRecenterButton();
         }
     }
 
@@ -297,8 +400,110 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
+    private void CheckFoundUserHaveEnteredGeoQueryArea(){
+        final double fixedGeoFireLatitude = currentUserLatitude;
+        final double fixedGeoFireLongitude = currentUserLongitude;
+        System.out.println("current user is " + currentUserLatitude + "," + currentUserLongitude);
+        Log.d(TAG,"fixed location for geofire is " + fixedGeoFireLatitude + "," + fixedGeoFireLongitude);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(currentUserLatitude, currentUserLongitude), 0.02);
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                if ( key.equals(foundUser)){
+                    PromptPeterNearby();
+                    Log.d(TAG,foundUser + " has entered the area");
+                } else {
+                    //do nothing
+                }
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+                Log.d(TAG,foundUser + " has exited the area");
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+        CheckFoundUserHaveEnteredMiniGeoQueryArea();
+    }
+
+    private void CheckFoundUserHaveEnteredMiniGeoQueryArea(){
+        final double fixedGeoFireLatitude = currentUserLatitude;
+        final double fixedGeoFireLongitude =currentUserLongitude;
+        System.out.println("current user is " + currentUserLatitude + "," + currentUserLongitude);
+        Log.d(TAG,"fixed location for geofire is " + fixedGeoFireLatitude + "," + fixedGeoFireLongitude);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(currentUserLatitude, currentUserLongitude), 0.005);
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+                if ( key.equals(foundUser)){
+                    EndSession();
+                    Log.d(TAG,foundUser + " has entered the area");
+                } else {
+                    //do nothing
+                }
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+                Log.d(TAG,foundUser + " has exited the area");
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void PromptPeterNearby(){
+        Log.d(TAG,"PromptPeterNearby() is called");
+        PromptKenaDialog promptKenaDialog = new PromptKenaDialog();
+        promptKenaDialog.show(getSupportFragmentManager(),"prompt dialog");
+    }
+
+    private void EndSession(){
+        mChronometer.stop();
+        Log.d(TAG,"PromptPeterNearbyMini() is called");
+        PromptEndSessionDialog promptEndSessionDialog = new PromptEndSessionDialog();
+        promptEndSessionDialog.show(getSupportFragmentManager(),"prompt dialog");
+        CalculatePoints();
+    }
+
+    private void CalculatePoints(){
+        int r = new Random().nextInt(10);
+        elapsedTime = (SystemClock.elapsedRealtime()-mChronometer.getBase())/1000;
+        Log.d(TAG,"Elapsed time is " + elapsedTime + " seconds");
+        pointsGainedFromKenaMap = (2 * elapsedTime) + r;
+        Log.d(TAG,"Points gained by Kena is " + pointsGainedFromKenaMap + ", the random r generated is " + r);
+    }
+
     @Override
     public void onBackPressed() {
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         // do nothing
     }
 }
