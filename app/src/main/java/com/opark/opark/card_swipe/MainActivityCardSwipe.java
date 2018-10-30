@@ -594,4 +594,9 @@ public class MainActivityCardSwipe extends AppCompatActivity implements com.opar
 //        geoFire.removeLocation("firebase-hq");
 //        geoQuery.removeAllListeners();
     }
+
+    @Override
+    public void onBackPressed() {
+        //do nothing
+    }
 }

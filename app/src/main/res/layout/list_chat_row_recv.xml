@@ -31,5 +31,15 @@
         app:arrowWidth="8dp"
         app:bubbleColor="#32CD32"/>
 
+    <!--<TextView-->
+    <!--android:padding="10dp"-->
+    <!--android:textColor="#FFF"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+
+    <!--android:layout_marginTop="5dp"-->
+    <!--android:textAppearance="@style/TextAppearance.AppCompat.Body1"-->
+    <!--android:textSize="18sp"-->
+    <!--android:id="@+id/message_text"/>-->
 
 </LinearLayout>
