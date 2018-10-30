@@ -1,232 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_user_profilexxhdpi"
     android:orientation="vertical"
     tools:layout_editor_absoluteX="0dp"
+    android:background="@color/brightPeach"
     tools:layout_editor_absoluteY="25dp">
-
-    <LinearLayout
-        android:id="@+id/name_num_1"
+    <include
+        android:id="@+id/toolbar_in_maps_main"
+        layout="@layout/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="156dp"
+        android:layout_height="150dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="142dp"
-        android:orientation="horizontal"
-        android:weightSum="1">
+        android:layout_marginStart="27dp"
+        android:layout_marginTop="26dp"
+        app:srcCompat="@drawable/maintenance_squareboi"/>
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout2"
+    <LinearLayout
+        android:id="@+id/you_text_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        android:paddingTop="20dp">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/linearLayout"
-            android:gravity="center">
+            android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/first_name_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="false"
-                android:layout_centerInParent="false"
-                android:text="First Name"
-                android:textColor="@color/black"/>
+                android:id="@+id/you_text_bold"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="30dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/mosk_ultra_bold_900"
+                android:text="YOU"
+                android:textSize="50sp" />
+        </LinearLayout>
+        <LinearLayout
+
+            android:id="@+id/name_num_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:layout_marginStart="30dp"
+            android:orientation="vertical"
+
+            android:weightSum="1">
 
             <TextView
                 android:id="@+id/last_name_edit"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerInParent="false"
-                android:layout_marginLeft="15dp"
-                android:layout_marginStart="15dp"
-                android:layout_toEndOf="@+id/first_name_edit"
-                android:layout_toRightOf="@+id/first_name_edit"
+                android:layout_marginStart="20dp"
+                android:fontFamily="sans-serif"
                 android:text="Last Name"
-                android:textAlignment="center"
-                android:textColor="@color/black"/>
-        </RelativeLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/name_num_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/name_num_1"
-        android:layout_centerHorizontal="true"
-        android:orientation="vertical"
-        android:weightSum="1">
-
-        <TextView
-            android:id="@+id/phone_num_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Phone Number"
-            android:textAlignment="center"
-            android:textColor="@color/black"/>
-
-        <TextView
-            android:id="@+id/email_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Email"
-            android:textAlignment="center"
-            android:textColor="@color/black"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/car_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/name_num_2"
-        android:layout_marginTop="28dp"
-        android:orientation="horizontal"
-        android:weightSum="1">
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/linearLayout"
-            android:gravity="center">
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                />
 
             <TextView
-                android:id="@+id/car_colour_edit"
-                android:layout_width="wrap_content"
+                android:id="@+id/phone_num_edit"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_centerInParent="false"
+                android:layout_marginStart="20dp"
+                android:text="Phone Number"
+                android:textColor="@color/black"
+                android:textSize="20sp"/>
 
-                android:text="Car Colour"
-                android:textColor="@color/black"/>
+            <TextView
+                android:id="@+id/email_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:text="Email"
+                android:textColor="@color/black"
+                android:textSize="20sp"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/car_text_holder_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/backdropBrightPeach"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingBottom="30dp"
+        android:paddingTop="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:orientation="vertical"
+            android:background="@color/brightPeach"
+            android:paddingBottom="30dp">
+
+            <TextView
+                android:id="@+id/car_text_bold"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="30dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/mosk_ultra_bold_900"
+                android:text="CAR"
+                android:textSize="50sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_marginStart="30dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <TextView
+                android:id="@+id/car_model_edit"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:text="Car Model"
+                android:textColor="@color/black"
+                android:textSize="20sp"/>
 
             <TextView
                 android:id="@+id/car_brand_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerInParent="false"
-                android:layout_marginLeft="15dp"
-                android:layout_marginStart="15dp"
-                android:layout_toEndOf="@+id/car_colour_edit"
-                android:layout_toRightOf="@+id/car_colour_edit"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
                 android:text="Car Brand"
-                android:textAlignment="center"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:textSize="20sp"/>
 
             <TextView
-                android:id="@+id/car_model_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_marginLeft="17dp"
-                android:layout_marginStart="17dp"
-                android:layout_toEndOf="@+id/car_brand_edit"
-                android:layout_toRightOf="@+id/car_brand_edit"
-                android:text="Car Model"
-                android:textColor="@color/black"/>
-        </RelativeLayout>
+                android:id="@+id/car_plate_edit"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:text="Car Plate"
+                android:textColor="@color/black"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/car_colour_edit"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:text="Car Colour"
+                android:textColor="@color/black"
+                android:textSize="20sp"/>
+
+        </LinearLayout>
+        </LinearLayout>
+        <Button
+            android:id="@+id/edit_profile_details"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="37dp"
+            android:background="@drawable/rounded_layout_background"
+
+            android:elevation="24dp"
+            android:text="@string/edit_profile_button"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/car_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/car_1"
-        android:layout_marginBottom="58dp"
 
-        android:orientation="vertical"
-        android:weightSum="1">
 
-        <TextView
-            android:id="@+id/car_plate_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Car Plate"
-            android:textAlignment="center"
-            android:textColor="@color/black"/>
+    <!--<ProgressBar-->
+        <!--android:id="@+id/progress_bar"-->
+        <!--style="?android:attr/progressBarStyleLarge"-->
+        <!--android:layout_width="110dp"-->
+        <!--android:layout_height="104dp"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_marginTop="215dp"-->
+        <!--android:background="@drawable/home01_bg_card"-->
+        <!--android:indeterminateDrawable="@drawable/loading"-->
+        <!--android:max="100"-->
+        <!--android:progress="20"/>-->
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/address_all"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/car_1"
-        android:layout_marginTop="50dp"
-        android:orientation="vertical"
-        android:weightSum="1">
-
-        <TextView
-            android:id="@+id/first_line_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="First Line"
-            android:textAlignment="center"
-            android:textColor="@color/black"/>
-
-        <TextView
-            android:id="@+id/second_line_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Second Line"
-            android:textAlignment="center"
-            android:textColor="@color/black"/>
-
-        <TextView
-            android:id="@+id/city_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="City"
-            android:textAlignment="center"
-            android:textColor="@color/black"/>
-
-        <TextView
-            android:id="@+id/post_code_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Postcode"
-            android:textAlignment="center"
-            android:textColor="@color/black"/>
-
-        <TextView
-            android:id="@+id/country_state_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Country State"
-            android:textAlignment="center"
-            android:textColor="@color/black"/>
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/edit_profile_details"
-        style="@style/Widget.AppCompat.Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/address_all"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="37dp"
-        android:background="@color/colorPrimaryDark"
-        android:elevation="24dp"
-        android:text="@string/edit_profile_button"/>
-
-</RelativeLayout>
+</LinearLayout>
 
 

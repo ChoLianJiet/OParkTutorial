@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#f79d7f</color>
-    <color name="colorBackground">#FFEADEDB</color>
-    <color name="colorPrimaryDark">#f26141</color>
+    <color name="colorPrimary">#ecc0b1</color>
+    <color name="colorPrimaryDark">#fcbba9</color>
     <color name="colorAccent">#f26141</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="buttonWhite">#f0e9ec</color>
+    <color name="buttonSkinBeige">#ffdebf</color>
+    <color name="brightPeach">#ffece6 </color>
+    <color name="backdropBrightPeach">#edd9d3</color>
+    <color name="peach">#fccdc0</color>
+    <color name="font_Brown">#605552</color>
+    <color name="font_red_accent">#ff6254</color>
 </resources>
+
+
+
+<!--<color name="colorBackground">#FFEADEDB</color>-->

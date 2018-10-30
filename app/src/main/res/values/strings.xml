@@ -25,7 +25,7 @@
     <string name="email_registration">Email</string>
     <string name="confirm_password_text">Confirm Password</string>
     <string name="name_registration">Name</string>
-    <string name="name_and_number_text">Name and Number</string>
+    <string name="name_and_number_text">You</string>
     <string name="your_car_text">Your Car</string>
     <string name="address_text">Your Address</string>
     <string name="first_name_string">First Name</string>
@@ -75,4 +75,11 @@
     <string name="share_parking">Share Parking</string>
     <string name="find_parking">Find Parking</string>
     <string name="title_activity_maps_main">Map</string>
+    <string name="title_activity_nav">NavActivity</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

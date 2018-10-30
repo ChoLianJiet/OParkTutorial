@@ -72,7 +72,7 @@ public class UserPopUpFragment extends Fragment {
     OnUserPopUpFragmentListener mCallback;
     List<String> words = new ArrayList<>();
 
-    public interface OnUserPopUpFragmentListener {
+    public static interface OnUserPopUpFragmentListener {
         void onArticleSelected(int position);
     }
 

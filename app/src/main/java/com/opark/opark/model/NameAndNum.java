@@ -9,6 +9,7 @@ public class NameAndNum {
         public String firstName;
         public String lastName;
         public String phoneNum;
+        public String icNumber;
 
 public NameAndNum(){
 
@@ -18,6 +19,7 @@ public NameAndNum(){
             this.firstName = firstName;
             this.lastName = lastName;
             this.phoneNum = phoneNum;
+            this.icNumber = icNumber;
         }
 
     public String getFirstName() {
@@ -43,7 +45,17 @@ public NameAndNum(){
     public void setPhoneNum(String phoneNum) {
         this.phoneNum = phoneNum;
     }
+
+    public String getIcNumber() {
+        return icNumber;
+    }
+
+    public void setIcNumber(String icNumber) {
+        this.icNumber = icNumber;
+    }
 }
+
+
 
 
 

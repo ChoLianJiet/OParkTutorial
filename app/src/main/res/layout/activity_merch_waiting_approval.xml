@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".login_auth.MerchWaitingApproval">
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/maintenance_squareboi"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="304dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imageView5"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+
+        android:text="Your application is currently being verified by our admin team. \n\nFor more information, please contact us via the email link below"
+        android:textSize="25sp"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textView"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:autoLink="email"
+        android:textSize="20sp"
+        android:text="oparktech@gmail.com"/>
+</RelativeLayout>

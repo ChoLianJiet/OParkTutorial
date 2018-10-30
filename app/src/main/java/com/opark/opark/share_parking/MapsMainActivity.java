@@ -2,32 +2,50 @@ package com.opark.opark.share_parking;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 
 
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
-
+import android.location.LocationManager;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+//import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+//import android.app.FragmentManager;
+
+
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -63,21 +81,30 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
 import com.opark.opark.LoadingScreen;
-import com.opark.opark.LoginActivity;
+import com.opark.opark.ProfileNavFragment;
+import com.opark.opark.RewardsFragment;
+import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.NoUserPopUp;
 import com.opark.opark.R;
 import com.opark.opark.UserPopUpFragment;
 import com.opark.opark.UserProfileSetup;
+import com.opark.opark.login_auth.PhoneAuth;
+import com.opark.opark.model.User;
 
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
-public class MapsMainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
+public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnInfoWindowClickListener,
-        LocationListener, GoogleMap.OnCameraMoveStartedListener, UserPopUpFragment.OnUserPopUpFragmentListener {
+        LocationListener, GoogleMap.OnCameraMoveStartedListener,UserPopUpFragment.OnUserPopUpFragmentListener {
 
     //CONSTANT
     private static final String TAG = "MapsMainActivity";
@@ -102,7 +129,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     private BottomSheetBehavior mBottomSheetBehavior;
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
+    public static Location mLastLocation;
     private static GoogleMap mMap;
     private Button shareParkingButton;
     private Button findParkingButton;
@@ -131,33 +158,85 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     private LatLng kenaParkerLocation;
     public static Location peterParker = new Location("");
     public static String foundUser;
-    private ProgressBar loadingCircle;
+    public ProgressBar loadingCircle;
     private String adatemValue;
     public static UserPopUpFragment userPopUpFragment;
     public static UserPopUpFragment userPopUpFragment1;
     private PopupWindow popUpWindow;
     private LayoutInflater layoutInflater;
+    private int backStackCount;
+
+
+    //NavDrawer variables
+    public static DrawerLayout mDrawer;
+    private Toolbar toolbar;
+    public static NavigationView nvDrawer;
+    private ActionBarDrawerToggle drawerToggle;
+    private MenuItem oldMenuItem;
+    public static FragmentManager navFragmentManager;
+    private RelativeLayout mapContainer;
+    private Fragment fragment = null;
+    private FragmentTransaction ft;
+    private ProfileNavFragment userProfilePage;
+    private RewardsFragment rewardsPageFrag;
+    private Fragment currentFragment = null;
+    private PhoneAuth phoneAuth;
+
+    //User Profile
+    public static ArrayList<User> userObjList = new ArrayList<>();
+    public static String lastName, phoneNum, carColour, carPlate, carBrand, carModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_main);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be uPosed.
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
+        getSupportFragmentManager();
         getLocationPermission();
 
         shareParkingButton = (Button) findViewById(R.id.share_parking_button);
         findParkingButton = (Button) findViewById(R.id.find_parking_button);
+        mapContainer = (RelativeLayout) findViewById(R.id.map_page_container);
+        //INVISIBLE PARKINGBUTTON
 //        shareParkingButton.setVisibility(View.INVISIBLE);
 //        findParkingButton.setVisibility(View.INVISIBLE);
+        //Toolbar
+        // Set a Toolbar to replace the ActionBar.
+        toolbar = (Toolbar) findViewById(R.id.toolbar_in_maps_main);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle("Map");
+
+
+// Inflate the header view at runtime
+
+
+        // mDrawer view
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerToggle = setupDrawerToggle();
+        mDrawer.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+
+
+        // Tie DrawerLayout events to the ActionBarToggle
+        mDrawer.addDrawerListener(drawerToggle);
+
+        nvDrawer = (NavigationView) findViewById(R.id.nvView);
+        // Setup mDrawer view
+        setupDrawerContent(nvDrawer);
+//        View headerLayout = nvDrawer.inflateHeaderView(R.layout.nav_header_drawer_activity_main);
+
+
+
+
+
         recenterButton = (FloatingActionButton) findViewById(R.id.recenter_button);
         recenterButton.setVisibility(View.INVISIBLE);
         loadingCircle = (ProgressBar) findViewById(R.id.progress_bar);
-        View bottomSheet = findViewById(R.id.bottom_sheet_sorry);
-        mBottomSheetBehavior= BottomSheetBehavior.from(bottomSheet);
+//        View bottomSheet = findViewById(R.id.bottom_sheet_sorry);
+//        mBottomSheetBehavior= BottomSheetBehavior.from(bottomSheet);
         showLoading();
         FirebaseApp.initializeApp(getApplicationContext());
         currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -204,7 +283,208 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
                 signOut();
             }
         });
+
+
+
+
+
     }
+
+
+
+
+
+   private void acquireUserProfileAndStoreLocal(){
+
+       StorageReference userRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
+
+       final long ONE_MEGABYTE = 1024 * 1024;
+       userRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+           @Override
+           public void onSuccess(byte[] bytes) {
+               Log.d("Byte","getByte success");
+
+
+               try {
+                   userObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
+                   Log.d("Gson","Gsonfrom json success");
+
+
+                   for (int i = 0; i < MapsMainActivity.userObjList.size(); i++) {
+                       Log.d("I", "Iteration success");
+                       Log.i("Hello", "heyhey" + MapsMainActivity.userObjList.get(i).getUserName().getFirstName());
+//                            firstName.setText(userObjList.get(i).getUserName().getFirstName());
+                       lastName = (MapsMainActivity.userObjList.get(i).getUserName().getLastName());
+                       phoneNum = (MapsMainActivity.userObjList.get(i).getUserName().getPhoneNum());
+                       carColour =(MapsMainActivity.userObjList.get(i).getUserCar().getCarColour());
+                       carBrand = (MapsMainActivity.userObjList.get(i).getUserCar().getCarBrand());
+                       carModel = (MapsMainActivity.userObjList.get(i).getUserCar().getCarModel());
+                       carPlate= (MapsMainActivity.userObjList.get(i).getUserCar().getCarPlate());
+                       Log.d(TAG,"lastName variable is " + lastName);
+                   }
+               } catch (UnsupportedEncodingException e) {
+                   e.printStackTrace();
+               }
+           }
+       }).addOnFailureListener(new OnFailureListener() {
+           @Override
+           public void onFailure(@NonNull Exception exception) {
+               // Handle any errors
+           }
+       });
+
+
+
+
+
+   }
+
+
+
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // The action bar home/up action should open or close the mDrawer.
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                mDrawer.openDrawer(GravityCompat.START);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+
+//                        try{
+//                        navFragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+//                            @Override
+//                            public void onBackStackChanged() {
+//                                navFragmentManager.popBackStack();
+//                            }
+//                        });} catch (NullPointerException e ){Log.d(TAG, "OnBackStackChangedListener null execption catch");}
+
+                        if (menuItem == oldMenuItem){
+                            Log.d(TAG,"menuitem is displayed already");
+//                            Log.d("navmenuitem","menu item ischecked and return false");
+                            return false;
+                        }
+                        else {
+//                           backStackCount= navFragmentManager.getBackStackEntryCount();
+//                            Log.d(TAG, "onNavigationItemSelected: backstack count is " +backStackCount);
+                            Log.d(TAG,"menuitem is not displayed");
+//                            Log.d("navmenuitem","menu item isnotchecked and setChecked(false) and return true");
+                            try{
+                                backStackCount= navFragmentManager.getBackStackEntryCount();
+                                Log.d(TAG, "onNavigationItemSelected: backstack count is " +backStackCount);
+                                if( backStackCount !=0){
+                                navFragmentManager.popBackStack();
+                               }
+
+
+                                } catch (NullPointerException e ){Log.d(TAG,"first selected pop");}
+
+                                selectDrawerItem(menuItem);
+
+                            mDrawer.closeDrawer(GravityCompat.START);
+
+                            oldMenuItem =menuItem;
+                            return true;
+
+                        }
+
+                    }
+                });
+    }
+
+    public void selectDrawerItem(MenuItem menuItem) {
+        // Create a new fragment and specify the fragment to show based on nav item clicked
+
+        Class fragmentClass = null;
+        switch(menuItem.getItemId()) {
+            case R.id.nav_first_fragment:
+                userProfilePage = new ProfileNavFragment();
+                fragment = userProfilePage;
+                executeFragmentTransaction(fragment);
+                break;
+
+            case R.id.nav_second_fragment:
+                rewardsPageFrag = new RewardsFragment();
+                fragment = rewardsPageFrag;
+                executeFragmentTransaction(fragment);
+                    break;
+
+            case R.id.nav_third_fragment:
+//                fragmentClass = ThirdFragment.class;
+                break;
+            default:
+//                fragmentClass = FirstFragment.class;
+        }
+
+        //replacing the fragment
+
+
+//        try {
+//            fragment = (Fragment) fragmentClass.newInstance();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
+    }
+
+
+    private void executeFragmentTransaction(Fragment frag) {
+        if ((frag != null) ) {
+
+            navFragmentManager= getSupportFragmentManager();
+            navFragmentManager.beginTransaction()
+                        .replace(R.id.nav_view_selection_container, frag)
+                        .addToBackStack(null)
+                         .commit();
+            Log.d(TAG, "executing fragment transaction , added to backstack");
+            mapContainer.setVisibility(View.GONE);
+            currentFragment = frag;
+            Log.d(TAG, "executeFragmentTransaction: currentFragment is " + currentFragment);
+        }
+        else{
+            Log.d(TAG, "same fragment");
+            return;
+        }
+    }
+
+
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Pass any configuration change to the mDrawer toggles
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+
+    private ActionBarDrawerToggle setupDrawerToggle() {
+        // NOTE: Make sure you pass in a valid toolbar reference.  ActionBarDrawToggle() does not require it
+        // and will not render the hamburger icon without it.
+        return new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);
+    }
+
+
+
 
     /**
      * Manipulates the map once available.
@@ -254,7 +534,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     }
 
     private void displayLocation() {
-        if (ActivityCompat.checkSelfPermission(this, FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, FINE_LOCATION) != PackageManager.PERMISSION_GRANTED  ){
             return;
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
@@ -318,7 +598,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
     }
 
     private void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
             return;
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, (com.google.android.gms.location.LocationListener) this);
@@ -361,6 +641,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
         }
         super.onStop();
     }
+
 
     @Override
     protected void onResume() {
@@ -537,7 +818,6 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
                             } catch (NullPointerException e){
                                 System.out.println(e);
                             }
-
                         }
 
                         @Override
@@ -742,7 +1022,7 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
             markerCount = 1;
             markerInMiddle = true;
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
                 // TODO: Consider calling
                 return;
             }
@@ -869,6 +1149,66 @@ public class MapsMainActivity extends FragmentActivity implements OnMapReadyCall
         loadingCircle.setVisibility(View.INVISIBLE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
+//    public void displayFragment(String string) {
+//
+//        UserPopUpFragment fragment;
+//
+//        if (string == null){
+//            fragment = new UserPopUpFragment();
+//            FragmentManager fm = getFragmentManager();
+//            FragmentTransaction ft = fm.beginTransaction();
+//            ft.add(R.id.popupuser,fragment);
+//            ft.hide(fragment);
+//        }
+//
+//        if (string == foundUser) {
+//
+//            fragment = new UserPopUpFragment();
+//            FragmentManager fm = getFragmentManager();
+//            FragmentTransaction ft = fm.beginTransaction();
+//            ft.add(R.id.popupuser,fragment);
+//            ft.commit();
+//        }
+//    }
+
+
+
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+            mDrawer.closeDrawer(GravityCompat.START);
+        } else if (fragment != null ){
+
+
+            Log.d("backpress","Back Pressed when fragment is profnav");
+//            navFragmentManager = getFragmentManager();
+//            ft = navFragmentManager.beginTransaction();
+
+            navFragmentManager.popBackStack();
+
+            mapContainer.setVisibility(View.VISIBLE);
+            toolbar.setTitle("Map");
+                            // Update your UI here.
+//                            ft.remove(userProfilePage);
+//                            ft.replace(R.id.map_page_container,null);
+//                            ft.commit();
+                            fragment=null;
+            oldMenuItem = null;
+
+
+            mDrawer.closeDrawer(GravityCompat.START);
+
+        }
+
+
+            else
+
+            {
+            super.onBackPressed();
+        }
+}
 
 
 

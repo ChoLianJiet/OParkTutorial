@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -23,6 +24,7 @@ import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.google.zxing.common.StringUtils;
 import com.opark.opark.model.User;
+import com.opark.opark.share_parking.MapsMainActivity;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -32,11 +34,15 @@ import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
+import petrov.kristiyan.colorpicker.ColorPicker;
+
 import static android.R.id.list;
 import static android.R.string.cancel;
+import static android.view.View.GONE;
 
 public class ProfileEdit extends AppCompatActivity {
 
+    private static final String TAG = "ProfileEdit";
     private ExpandableLayout expandableFirstName;
     private ExpandableLayout expandableLastName;
     private ExpandableLayout expandablePhoneNum;
@@ -44,25 +50,16 @@ public class ProfileEdit extends AppCompatActivity {
     private ExpandableLayout expandableCarBrand;
     private ExpandableLayout expandableCarModel;
     private ExpandableLayout expandableCarPlate;
-    private ExpandableLayout expandableFirstLineAddress;
-    private ExpandableLayout expandableSecondLineAddress;
-    private ExpandableLayout expandableCity;
-    private ExpandableLayout expandablePostcode;
-    private ExpandableLayout expandableCountryState;
+    private ExpandableLayout expandableNRIC;
     private EditText firstName ;
     private EditText lastName ;
     private EditText phoneNum ;
-    private EditText carColour ;
+    private TextView carColour ;
     private EditText carBrand ;
     private EditText carModel ;
     private EditText carPlate ;
-    private EditText firstLine ;
-    private EditText secondLine ;
-    private EditText city ;
-    private EditText postcode ;
-    private EditText countryState;
-    private Button profileUpdate;
-    private Button buttonExpandAddressLayout;
+    private TextView buttonSignOut;
+    private Button profileSubmit;
     private Button buttonExpandNameNumLayout;
     private Button buttonExpandCarLayout;
 
@@ -70,18 +67,17 @@ public class ProfileEdit extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String [] carString = new String[4];
     private EditText [] carEditText =new EditText[4] ;
-    private String [] nameNumString = new String[3];
-    private EditText [] nameNumEditText = new EditText[3];
-    private String [] addressString = new String [5];
-    private EditText[] addressEditText = new EditText[5];
+    private String [] nameNumString = new String[4];
+    private EditText [] nameNumEditText = new EditText[4];
 
+    private EditText icNumber;
     private User user = new User(); // Changed User from static to non static
     String firebaseUserUID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile_edit);
+        setContentView(R.layout.activity_user_profile_setup);
         // Retrieve FirebaseUser object via intent string extra
         // String is converted into FirebaseUser object via Gson
         firebaseUserUID = getIntent().getStringExtra("firebaseUser");
@@ -90,6 +86,7 @@ public class ProfileEdit extends AppCompatActivity {
         // LINKING VARIABLES TO RESPECTIVE IDs
         bindViews();
 
+        buttonSignOut.setVisibility(GONE);
         //Provided by Library but haven't test if useful or not
         expandableListener();
 
@@ -98,26 +95,94 @@ public class ProfileEdit extends AppCompatActivity {
         buttonExpandNameNumLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                nameNumExpand();
+                if (expandableFirstName.isExpanded()&&expandableLastName.isExpanded() && expandablePhoneNum.isExpanded()){
+
+                    expandableFirstName.collapse();
+                    expandableLastName.collapse();
+                    expandablePhoneNum.collapse();
+                    expandableNRIC.collapse();
+
+                }
+                else
+                    nameNumExpand();
+
             }
         });
-        // Expand Address Layout
-        buttonExpandAddressLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addressExpand();
-            }
-        });
+
         //Expand Car layout
         buttonExpandCarLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                carExpand();
+
+                carColour.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final ColorPicker colorPicker = new ColorPicker(ProfileEdit.this);
+                        colorPicker
+                                .setColors(R.array.rainbow)
+                                .disableDefaultButtons(true)
+                                .setRoundColorButton(true)
+                                .setColumns(5)
+                                .setOnFastChooseColorListener(new ColorPicker.OnFastChooseColorListener() {
+
+
+                                    @Override
+                                    public void setOnFastChooseColorListener(int position, int color) {
+                                        Log.d(TAG, "setOnFastChooseColorListener: Fast chosen");
+//                                            getColor(color);
+
+                                        Log.d(TAG, "setOnFastChooseColorListener: "+ String.valueOf(color) + "position" + String.valueOf(position));
+                                        String[] colorName= getResources().getStringArray(R.array.colorname);
+                                        carColour.setVisibility(View.VISIBLE);
+                                        carColour.setText(colorName[position]);
+                                        Log.d(TAG, "setOnFastChooseColorListener: " + carColour.getText().toString());
+
+
+                                    }
+
+
+
+
+                                    @Override
+                                    public void onCancel(){
+
+                                        Log.d(TAG, "onCancel: ");
+                                        // put code
+                                    }
+                                })
+
+                                .addListenerButton("newButton", new ColorPicker.OnButtonListener() {
+                                    @Override
+                                    public void onClick(View v, int position, int color) {
+                                        // put code
+                                    }
+                                })
+                                .show()     ;
+
+
+                    }
+//
+                });
+
+
+                if (expandableCarBrand.isExpanded()&&expandableCarColour.isExpanded()&&expandableCarPlate.isExpanded()&&expandableCarModel.isExpanded())
+                {
+                    expandableCarBrand.collapse();
+                    expandableCarColour.collapse();
+                    expandableCarPlate.collapse();
+                    expandableCarModel.collapse();
+
+
+                }
+
+
+
+                else
+                    carExpand();
+
             }
         });
-
-
-        profileUpdate.setOnClickListener(new View.OnClickListener() {
+        profileSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 attemptProfileUpdate();
@@ -133,10 +198,13 @@ public class ProfileEdit extends AppCompatActivity {
         nameNumEditText[0]= firstName;
         nameNumEditText[1]= lastName;
         nameNumEditText[2]= phoneNum;
+        nameNumEditText[3]= icNumber;
+
 
         nameNumString[0]=  user.userName.firstName = firstName.getText().toString();
         nameNumString[1]=  user.userName.lastName = lastName.getText().toString();
         nameNumString[2]=  user.userName.phoneNum = phoneNum.getText().toString();
+        nameNumString[3] = user.userName.icNumber=icNumber.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -144,10 +212,10 @@ public class ProfileEdit extends AppCompatActivity {
 
     }
     private void collectCar(){
-        carEditText[0]=carColour;
-        carEditText[1]=carBrand ;
-        carEditText[2]=carModel ;
-        carEditText[3]=carPlate ;
+
+        carEditText[0]=carBrand ;
+        carEditText[1]=carModel ;
+        carEditText[2]=carPlate ;
 
 
         carString[0]= user.userCar.carColour = carColour.getText().toString();
@@ -160,32 +228,16 @@ public class ProfileEdit extends AppCompatActivity {
 
 
     }
-    private void collectAddress(){
-        addressEditText[0]=firstLine ;
-        addressEditText[1]=secondLine ;
-        addressEditText[2]=city ;
-        addressEditText[3]=postcode ;
-        addressEditText[4]=countryState;
-
-        addressString[0]=  user.userAddress.firstline = firstLine.getText().toString();
-        addressString[1]=  user.userAddress.secondline = secondLine.getText().toString();
-        addressString[2]=  user.userAddress.city = city.getText().toString();
-        addressString[3]=  user.userAddress.postcode = postcode.getText().toString();
-        addressString[4]=  user.userAddress.countryState = countryState.getText().toString();
-
-        boolean cancel = false;
-        View focusView = null;
-
-
-    }
 
 
     // On Back Pressed
     @Override
     public void onBackPressed() {
-        finish();
-        Intent intent = new Intent(ProfileEdit.this, DrawerActivityMain.class);
-        startActivity(intent);
+        this.finish();
+//        Intent intent = new Intent(ProfileEdit.this, MapsMainActivity.class);
+//
+//        startActivity(intent);
+
     }
 
     public void objToByteStreamUpload(Object obj, StorageReference destination){
@@ -222,34 +274,42 @@ public class ProfileEdit extends AppCompatActivity {
 
     private void bindViews(){
 
-        firstName = (EditText) findViewById(R.id.edittext_first_name_update);
-        lastName = (EditText) findViewById(R.id.edittext_last_name_update);
-        phoneNum = (EditText) findViewById(R.id.edittext_phone_num_update);
-        carColour = (EditText) findViewById(R.id.edittext_car_colour_update);
-        carBrand = (EditText) findViewById(R.id.edittext_car_brand_update);
-        carModel = (EditText) findViewById(R.id.edittext_car_model_update);
-        carPlate = (EditText) findViewById(R.id.edittext_car_plate_update);
-        firstLine = (EditText) findViewById(R.id.edittext_first_line_update);
-        secondLine = (EditText) findViewById(R.id.edittext_second_line_update);
-        city = (EditText) findViewById(R.id.edittext_city_update);
-        postcode = (EditText) findViewById(R.id.edittext_postcode_update);
-        countryState = (EditText) findViewById(R.id.edittext_state_update);
-        buttonExpandAddressLayout = (Button) findViewById(R.id.expand_address_button_update);
-        buttonExpandNameNumLayout = (Button) findViewById(R.id.expand_name_button_update);
-        buttonExpandCarLayout = (Button) findViewById(R.id.expand_car_button_update);
-        expandableFirstName = (ExpandableLayout) findViewById(R.id.expand_first_name_update);
-        expandableLastName = (ExpandableLayout) findViewById(R.id.expand_last_name_update);
-        expandablePhoneNum = (ExpandableLayout) findViewById(R.id.expand_phone_number_update);
-        expandableCarColour =(ExpandableLayout) findViewById(R.id.expand_car_colour_update);
-        expandableCarBrand = (ExpandableLayout) findViewById(R.id.expand_car_brand_update);
-        expandableCarModel = (ExpandableLayout) findViewById(R.id.expand_car_model_update);
-        expandableCarPlate = (ExpandableLayout) findViewById(R.id.expand_car_plate_update);
-        expandableFirstLineAddress = (ExpandableLayout) findViewById(R.id.expand_firstline_address_update);
-        expandableSecondLineAddress = (ExpandableLayout) findViewById(R.id.expand_secondline_address_update);
-        expandableCity = (ExpandableLayout) findViewById(R.id.expand_city_address_update);
-        expandablePostcode = (ExpandableLayout) findViewById(R.id.expand_postcode_address_update);
-        expandableCountryState = (ExpandableLayout) findViewById(R.id.expand_countryState_address_update);
-        profileUpdate = (Button) findViewById(R.id.confirm_profile_update_button) ;
+        firstName = (EditText) findViewById(R.id.edittext_first_name);
+        lastName = (EditText) findViewById(R.id.edittext_last_name);
+        phoneNum = (EditText) findViewById(R.id.edittext_phone_num);
+        icNumber = (EditText) findViewById(R.id.edittext_user_nric);
+
+        carColour = (TextView) findViewById(R.id.edittext_car_colour);
+        carBrand = (EditText) findViewById(R.id.edittext_car_brand);
+        carModel = (EditText) findViewById(R.id.edittext_car_model);
+        carPlate = (EditText) findViewById(R.id.edittext_car_plate);
+
+      /*  firstLine = (EditText) findViewById(R.id.edittext_first_line);
+        secondLine = (EditText) findViewById(R.id.edittext_second_line);
+        city = (EditText) findViewById(R.id.edittext_city);
+        postcode = (EditText) findViewById(R.id.edittext_postcode);
+        countryState = (EditText) findViewById(R.id.edittext_state);
+         buttonExpandAddressLayout = (Button) findViewById(R.id.expand_address_button);*/
+
+        buttonExpandNameNumLayout = (Button) findViewById(R.id.expand_name_button);
+        buttonExpandCarLayout = (Button) findViewById(R.id.expand_car_button);
+        expandableFirstName = (ExpandableLayout) findViewById(R.id.expand_first_name);
+        expandableLastName = (ExpandableLayout) findViewById(R.id.expand_last_name);
+        expandablePhoneNum = (ExpandableLayout) findViewById(R.id.expand_phone_number);
+        expandableNRIC = (ExpandableLayout) findViewById(R.id.expand_nric) ;
+        expandableCarColour =(ExpandableLayout) findViewById(R.id.expand_car_colour);
+        expandableCarBrand = (ExpandableLayout) findViewById(R.id.expand_car_brand);
+        expandableCarModel = (ExpandableLayout) findViewById(R.id.expand_car_model);
+        expandableCarPlate = (ExpandableLayout) findViewById(R.id.expand_car_plate);
+
+       /* expandableFirstLineAddress = (ExpandableLayout) findViewById(R.id.expand_firstline_address);
+        expandableSecondLineAddress = (ExpandableLayout) findViewById(R.id.expand_secondline_address);
+        expandableCity = (ExpandableLayout) findViewById(R.id.expand_city_address);
+        expandablePostcode = (ExpandableLayout) findViewById(R.id.expand_postcode_address);
+        expandableCountryState = (ExpandableLayout) findViewById(R.id.expand_countryState_address);*/
+
+        profileSubmit = (Button) findViewById(R.id.profile_submit_button) ;
+        buttonSignOut = (TextView) findViewById(R.id.not_you_sign_out_button);
     }
 
     private void expandableListener(){
@@ -296,36 +356,13 @@ public class ProfileEdit extends AppCompatActivity {
 
             }
         });
-        expandableFirstLineAddress.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
+        expandableNRIC.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
             @Override
             public void onExpansionUpdate(float expansionFraction, int state) {
 
             }
         });
-        expandableSecondLineAddress.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
 
-            }
-        });
-        expandableCity.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandablePostcode.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
-        expandableCountryState.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
-            @Override
-            public void onExpansionUpdate(float expansionFraction, int state) {
-
-            }
-        });
 
     }
 
@@ -333,70 +370,71 @@ public class ProfileEdit extends AppCompatActivity {
         expandableFirstName.expand();
         expandableLastName.expand();
         expandablePhoneNum.expand();
+        expandableNRIC.expand();
 
         expandableCarColour.collapse();
         expandableCarBrand.collapse();
         expandableCarPlate.collapse();
         expandableCarModel.collapse();
 
-        expandableFirstLineAddress.collapse();
-        expandableSecondLineAddress.collapse();
-        expandableCity.collapse();
-        expandablePostcode.collapse();
-        expandableCountryState.collapse();
+//        expandableFirstLineAddress.collapse();
+//        expandableSecondLineAddress.collapse();
+//        expandableCity.collapse();
+//        expandablePostcode.collapse();
+//        expandableCountryState.collapse();
     }
 
-    private void addressExpand(){
-        expandableFirstName.collapse();
-        expandableLastName.collapse();
-        expandablePhoneNum.collapse();
-
-        expandableCarColour.collapse();
-        expandableCarBrand.collapse();
-        expandableCarPlate.collapse();
-        expandableCarModel.collapse();
-
-        expandableFirstLineAddress.expand();
-        expandableSecondLineAddress.expand();
-        expandableCity.expand();
-        expandablePostcode.expand();
-        expandableCountryState.expand();
-
-    }
+//    private void addressExpand(){
+//        expandableFirstName.collapse();
+//        expandableLastName.collapse();
+//        expandablePhoneNum.collapse();
+//
+//        expandableCarColour.collapse();
+//        expandableCarBrand.collapse();
+//        expandableCarPlate.collapse();
+//        expandableCarModel.collapse();
+//
+////        expandableFirstLineAddress.expand();
+////        expandableSecondLineAddress.expand();
+////        expandableCity.expand();
+////        expandablePostcode.expand();
+////        expandableCountryState.expand();
+//
+//    }
 
     private void carExpand(){
         expandableFirstName.collapse();
         expandableLastName.collapse();
         expandablePhoneNum.collapse();
+        expandableNRIC.collapse();
 
         expandableCarColour.expand();
         expandableCarBrand.expand();
         expandableCarPlate.expand();
         expandableCarModel.expand();
 
-        expandableFirstLineAddress.collapse();
-        expandableSecondLineAddress.collapse();
-        expandableCity.collapse();
-        expandablePostcode.collapse();
-        expandableCountryState.collapse();
+//        expandableFirstLineAddress.collapse();
+//        expandableSecondLineAddress.collapse();
+//        expandableCity.collapse();
+//        expandablePostcode.collapse();
+//        expandableCountryState.collapse();
     }
 
     private void attemptProfileUpdate() {
 
         boolean checkNameNum = false;
-        boolean checkAddress = false;
+//        boolean checkAddress = false;
         boolean checkCar = false;
 
         collectUserName();
         collectCar();
-        collectAddress();
 
         checkCar= emptyCheck(carString,carEditText, 4);
-        checkAddress= emptyCheck(addressString,addressEditText, 5);
-        checkNameNum = emptyCheck(nameNumString,nameNumEditText,3);
+//        checkAddress= emptyCheck(addressString,addressEditText, 5);
+        checkNameNum = emptyCheck(nameNumString,nameNumEditText,4);
 
 // do empty check if returns true, break operation
-        if((checkCar) || (checkAddress) || (checkNameNum)) {
+        if((checkCar)  || (checkNameNum)) {
             Log.d("emptyCheck","is Empty");
             return;
         }
@@ -407,7 +445,7 @@ public class ProfileEdit extends AppCompatActivity {
             StorageReference storageRef = storage.getReference();
 
             StorageReference userFolder = storageRef.child("users/" + firebaseUserUID + "/profile.txt");
-
+            Log.d(TAG, "attemptProfileUpdate: userFolder is "+ userFolder);
 
             userFolder.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override

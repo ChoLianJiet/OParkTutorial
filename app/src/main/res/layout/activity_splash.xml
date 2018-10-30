@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:theme="@style/AppTheme"
+                android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/splashscreen"
+        android:layout_width="220dp"
+        android:layout_height="151dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="200dp"
+        android:src="@mipmap/squareboilogohdpi"/>
+
+</RelativeLayout>

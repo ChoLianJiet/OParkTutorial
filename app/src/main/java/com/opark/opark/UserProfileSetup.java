@@ -2,79 +2,89 @@ package com.opark.opark;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.support.v4.content.res.TypedArrayUtils;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
-import com.google.zxing.common.StringUtils;
+import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.model.User;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
+//
+//import org.xdty.preference.colorpicker.ColorPickerDialog;
+//import org.xdty.preference.colorpicker.ColorPickerSwatch;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 
-import static android.R.id.list;
-import static android.R.string.cancel;
+import petrov.kristiyan.colorpicker.ColorPicker;
 
 public class UserProfileSetup extends AppCompatActivity {
 
+    private static final String TAG = "UserProfileSetup" ;
     private ExpandableLayout expandableFirstName;
+    private ExpandableLayout expandableNRIC;
     private ExpandableLayout expandableLastName;
     private ExpandableLayout expandablePhoneNum;
     private ExpandableLayout expandableCarColour;
+    private TextInputLayout carColourTextInputLayout;
     private ExpandableLayout expandableCarBrand;
     private ExpandableLayout expandableCarModel;
     private ExpandableLayout expandableCarPlate;
-    private ExpandableLayout expandableFirstLineAddress;
-    private ExpandableLayout expandableSecondLineAddress;
-    private ExpandableLayout expandableCity;
-    private ExpandableLayout expandablePostcode;
-    private ExpandableLayout expandableCountryState;
-    private EditText firstName ;
+//    private ExpandableLayout expandableFirstLineAddress;
+//    private ExpandableLayout expandableSecondLineAddress;
+//    private ExpandableLayout expandableCity;
+//    private ExpandableLayout expandablePostcode;
+//    private ExpandableLayout expandableCountryState;
     private EditText lastName ;
+    private EditText firstName ;
     private EditText phoneNum ;
-    private EditText carColour ;
+    private TextView carColour ;
     private EditText carBrand ;
     private EditText carModel ;
     private EditText carPlate ;
-    private EditText firstLine ;
-    private EditText secondLine ;
-    private EditText city ;
-    private EditText postcode ;
-    private EditText countryState;
+
+//    private EditText firstLine ;
+//    private EditText secondLine ;
+//    private EditText city ;
+//    private EditText postcode ;
+//    private EditText countryState;
     private Button profileSubmit;
-    private Button buttonExpandAddressLayout;
+//    private Button buttonExpandAddressLayout;
     private Button buttonExpandNameNumLayout;
     private Button buttonExpandCarLayout;
-    private Button buttonSignOut;
+    private TextView buttonSignOut;
     public static FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String [] carString = new String[4];
-    private EditText [] carEditText =new EditText[4] ;
-    private String [] nameNumString = new String[3];
-    private EditText [] nameNumEditText = new EditText[3];
-    private String [] addressString = new String [5];
-    private EditText[] addressEditText = new EditText[5];
-
+    private EditText [] carEditText =new EditText[3] ;
+    private String [] nameNumString = new String[4];
+    private EditText [] nameNumEditText = new EditText[4];
+//    private String [] addressString = new String [5];
+//    private EditText[] addressEditText = new EditText[5];
+    private int mSelectedColor;
+    private int userPoints = 0;
+    private EditText icNumber;
 
     private User user = new User(); // Changed User from static to non static
     String firebaseUserUID;
@@ -88,25 +98,40 @@ public class UserProfileSetup extends AppCompatActivity {
         // String is converted into FirebaseUser object via Gson
         firebaseUserUID = getIntent().getStringExtra("firebaseUser");
 
+
+
         // LINKING VARIABLES TO RESPECTIVE IDs
         bindViews();
 
         //Provided by Library but haven't test if useful or not
         expandableListener();
 
+
+
+
+
+
         /**EXPANDING LAYOUT**/
         //Expand Name and Num layout
         buttonExpandNameNumLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (expandableFirstName.isExpanded()&&expandableLastName.isExpanded() && expandablePhoneNum.isExpanded()){
 
+                    expandableFirstName.collapse();
+                    expandableLastName.collapse();
+                    expandablePhoneNum.collapse();
+                    expandableNRIC.collapse();
+
+                }
+            else
                 nameNumExpand();
 
             }
         });
 
 // Expand Address Layout
-        buttonExpandAddressLayout.setOnClickListener(new View.OnClickListener() {
+/*        buttonExpandAddressLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -115,16 +140,83 @@ public class UserProfileSetup extends AppCompatActivity {
 
             }
         });
+*/
 
  //Expand Car layout
         buttonExpandCarLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                carColour.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                          final ColorPicker colorPicker = new ColorPicker(UserProfileSetup.this);
+                            colorPicker
+                                    .setColors(R.array.rainbow)
+                                    .disableDefaultButtons(true)
+                                    .setRoundColorButton(true)
+                                    .setColumns(5)
+                                    .setOnFastChooseColorListener(new ColorPicker.OnFastChooseColorListener() {
+                           
+
+                                        @Override
+                                        public void setOnFastChooseColorListener(int position, int color) {
+                                            Log.d(TAG, "setOnFastChooseColorListener: Fast chosen");
+//                                            getColor(color);
+
+                                            Log.d(TAG, "setOnFastChooseColorListener: "+ String.valueOf(color) + "position" + String.valueOf(position));
+                                            String[] colorName= getResources().getStringArray(R.array.colorname);
+                                            carColour.setVisibility(View.VISIBLE);
+                                            carColour.setText(colorName[position]);
+                                            Log.d(TAG, "setOnFastChooseColorListener: " + carColour.getText().toString());
+
+
+                                        }
+
+
+
+
+                                        @Override
+                                public void onCancel(){
+
+                                    Log.d(TAG, "onCancel: ");
+                                    // put code
+                                }
+                            })
+
+                                             .addListenerButton("newButton", new ColorPicker.OnButtonListener() {
+                                             	@Override
+                                             	public void onClick(View v, int position, int color) {
+                                             	    // put code
+                                             	}
+                                             })
+                                    .show()     ;
+
+
+                    }
+//
+                });
+
+
+                if (expandableCarBrand.isExpanded()&&expandableCarColour.isExpanded()&&expandableCarPlate.isExpanded()&&expandableCarModel.isExpanded())
+                {
+                    expandableCarBrand.collapse();
+                    expandableCarColour.collapse();
+                    expandableCarPlate.collapse();
+                    expandableCarModel.collapse();
+
+
+                }
+
+
+
+                else
                carExpand();
 
             }
         });
+
+
 
         //TODO Signout code
 //        buttonSignOut.setOnClickListener(new View.OnClickListener() {
@@ -150,10 +242,13 @@ public class UserProfileSetup extends AppCompatActivity {
         nameNumEditText[0]= firstName;
         nameNumEditText[1]= lastName;
         nameNumEditText[2]= phoneNum;
+        nameNumEditText[3]= icNumber;
+
 
       nameNumString[0]=  user.userName.firstName = firstName.getText().toString();
       nameNumString[1]=  user.userName.lastName = lastName.getText().toString();
       nameNumString[2]=  user.userName.phoneNum = phoneNum.getText().toString();
+      nameNumString[3] = user.userName.icNumber=icNumber.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -164,10 +259,10 @@ public class UserProfileSetup extends AppCompatActivity {
 
 
     private void collectCar(){
-        carEditText[0]=carColour;
-        carEditText[1]=carBrand ;
-        carEditText[2]=carModel ;
-        carEditText[3]=carPlate ;
+
+        carEditText[0]=carBrand ;
+        carEditText[1]=carModel ;
+        carEditText[2]=carPlate ;
 
 
         carString[0]= user.userCar.carColour = carColour.getText().toString();
@@ -181,7 +276,7 @@ public class UserProfileSetup extends AppCompatActivity {
 
     }
 
-    private void collectAddress(){
+    /*private void collectAddress(){
         addressEditText[0]=firstLine ;
         addressEditText[1]=secondLine ;
         addressEditText[2]=city ;
@@ -199,11 +294,12 @@ public class UserProfileSetup extends AppCompatActivity {
 
 
     }
-
+*/
 
     // On Back Pressed
     @Override
     public void onBackPressed() {
+        //TODO signout
         finish();
         Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
         startActivity(intent);
@@ -236,6 +332,7 @@ public class UserProfileSetup extends AppCompatActivity {
     private void showErrorDialog(String message) {
         new AlertDialog.Builder(this)
                 .setTitle("Oops")
+
                 .setMessage(message)
                 .setPositiveButton(android.R.string.ok,null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -247,32 +344,40 @@ public class UserProfileSetup extends AppCompatActivity {
         firstName = (EditText) findViewById(R.id.edittext_first_name);
         lastName = (EditText) findViewById(R.id.edittext_last_name);
         phoneNum = (EditText) findViewById(R.id.edittext_phone_num);
-        carColour = (EditText) findViewById(R.id.edittext_car_colour);
+        icNumber = (EditText) findViewById(R.id.edittext_user_nric);
+
+        carColour = (TextView) findViewById(R.id.edittext_car_colour);
         carBrand = (EditText) findViewById(R.id.edittext_car_brand);
         carModel = (EditText) findViewById(R.id.edittext_car_model);
         carPlate = (EditText) findViewById(R.id.edittext_car_plate);
-        firstLine = (EditText) findViewById(R.id.edittext_first_line);
+
+      /*  firstLine = (EditText) findViewById(R.id.edittext_first_line);
         secondLine = (EditText) findViewById(R.id.edittext_second_line);
         city = (EditText) findViewById(R.id.edittext_city);
         postcode = (EditText) findViewById(R.id.edittext_postcode);
         countryState = (EditText) findViewById(R.id.edittext_state);
-         buttonExpandAddressLayout = (Button) findViewById(R.id.expand_address_button);
+         buttonExpandAddressLayout = (Button) findViewById(R.id.expand_address_button);*/
+
          buttonExpandNameNumLayout = (Button) findViewById(R.id.expand_name_button);
          buttonExpandCarLayout = (Button) findViewById(R.id.expand_car_button);
         expandableFirstName = (ExpandableLayout) findViewById(R.id.expand_first_name);
         expandableLastName = (ExpandableLayout) findViewById(R.id.expand_last_name);
         expandablePhoneNum = (ExpandableLayout) findViewById(R.id.expand_phone_number);
+        expandableNRIC = (ExpandableLayout) findViewById(R.id.expand_nric) ;
         expandableCarColour =(ExpandableLayout) findViewById(R.id.expand_car_colour);
         expandableCarBrand = (ExpandableLayout) findViewById(R.id.expand_car_brand);
         expandableCarModel = (ExpandableLayout) findViewById(R.id.expand_car_model);
         expandableCarPlate = (ExpandableLayout) findViewById(R.id.expand_car_plate);
-        expandableFirstLineAddress = (ExpandableLayout) findViewById(R.id.expand_firstline_address);
+//        carColourTextInputLayout = (TextInputLayout) findViewById(R.id.car_color_text_input_layout);
+
+       /* expandableFirstLineAddress = (ExpandableLayout) findViewById(R.id.expand_firstline_address);
         expandableSecondLineAddress = (ExpandableLayout) findViewById(R.id.expand_secondline_address);
         expandableCity = (ExpandableLayout) findViewById(R.id.expand_city_address);
         expandablePostcode = (ExpandableLayout) findViewById(R.id.expand_postcode_address);
-        expandableCountryState = (ExpandableLayout) findViewById(R.id.expand_countryState_address);
+        expandableCountryState = (ExpandableLayout) findViewById(R.id.expand_countryState_address);*/
+
         profileSubmit = (Button) findViewById(R.id.profile_submit_button) ;
-        buttonSignOut = (Button) findViewById(R.id.not_you_sign_out_button);
+        buttonSignOut = (TextView) findViewById(R.id.not_you_sign_out_button);
     }
 
     private void expandableListener(){
@@ -319,6 +424,8 @@ public class UserProfileSetup extends AppCompatActivity {
 
             }
         });
+
+/*
         expandableFirstLineAddress.setOnExpansionUpdateListener(new ExpandableLayout.OnExpansionUpdateListener() {
             @Override
             public void onExpansionUpdate(float expansionFraction, int state) {
@@ -349,6 +456,7 @@ public class UserProfileSetup extends AppCompatActivity {
 
             }
         });
+*/
 
     }
 
@@ -356,34 +464,36 @@ public class UserProfileSetup extends AppCompatActivity {
         expandableFirstName.expand();
         expandableLastName.expand();
         expandablePhoneNum.expand();
+        expandableNRIC.expand();
 
         expandableCarColour.collapse();
         expandableCarBrand.collapse();
         expandableCarPlate.collapse();
         expandableCarModel.collapse();
 
-        expandableFirstLineAddress.collapse();
+    /*    expandableFirstLineAddress.collapse();
         expandableSecondLineAddress.collapse();
         expandableCity.collapse();
         expandablePostcode.collapse();
-        expandableCountryState.collapse();
+        expandableCountryState.collapse();*/
     }
 
     private void addressExpand(){
         expandableFirstName.collapse();
         expandableLastName.collapse();
         expandablePhoneNum.collapse();
+        expandableNRIC.collapse();
 
         expandableCarColour.collapse();
         expandableCarBrand.collapse();
         expandableCarPlate.collapse();
         expandableCarModel.collapse();
 
-        expandableFirstLineAddress.expand();
+  /*      expandableFirstLineAddress.expand();
         expandableSecondLineAddress.expand();
         expandableCity.expand();
         expandablePostcode.expand();
-        expandableCountryState.expand();
+        expandableCountryState.expand();*/
 
     }
 
@@ -391,17 +501,19 @@ public class UserProfileSetup extends AppCompatActivity {
         expandableFirstName.collapse();
         expandableLastName.collapse();
         expandablePhoneNum.collapse();
+        expandableNRIC.collapse();
 
         expandableCarColour.expand();
         expandableCarBrand.expand();
         expandableCarPlate.expand();
         expandableCarModel.expand();
 
+/*
         expandableFirstLineAddress.collapse();
         expandableSecondLineAddress.collapse();
         expandableCity.collapse();
         expandablePostcode.collapse();
-        expandableCountryState.collapse();
+        expandableCountryState.collapse();*/
     }
 
     public void profileSubmit(View v) {
@@ -433,11 +545,11 @@ public class UserProfileSetup extends AppCompatActivity {
 
         collectUserName();
         collectCar();
-        collectAddress();
+//        collectAddress();
 
-       checkCar= emptyCheck(carString,carEditText, 4);
-       checkAddress= emptyCheck(addressString,addressEditText, 5);
-        checkNameNum = emptyCheck(nameNumString,nameNumEditText,3);
+       checkCar= emptyCheck(carString,carEditText, 3);
+//       checkAddress= emptyCheck(addressString,addressEditText, 5);
+        checkNameNum = emptyCheck(nameNumString,nameNumEditText,4);
 
 // do empty check if returns true, break operation
         if((checkCar) || (checkAddress) || (checkNameNum)) {
@@ -451,6 +563,10 @@ else {
 
         StorageReference userFolder = storageRef.child("users/" + firebaseUserUID + "/profile.txt");
         objToByteStreamUpload(user, userFolder);
+
+
+        StorageReference userRewardsFolder = storageRef.child("users/" +firebaseUserUID + "/points.txt");
+        objToByteStreamUpload(userPoints,userRewardsFolder);
 
         //TODO intent to card swipe or other page ? maybe upload prof pic ?
         Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
@@ -466,12 +582,17 @@ else {
        View focusView =null;
 
         for (int i = 0; i < size; i++){
-            if (string[i].isEmpty()) {
+            if ((string[i].isEmpty())) {
                 editTexts[i].setError(getString(R.string.error_field_required));
                 focusView = editTexts[i];
                 cancel = true;
-            }
+                if(carColour==null){
+                    carColour.setError(getString(R.string.error_field_required));
+                    focusView=carColour;
+                    cancel=true;
+                }
 
+            }
 
 
             if (cancel) {

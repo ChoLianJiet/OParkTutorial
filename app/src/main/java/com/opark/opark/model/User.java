@@ -12,6 +12,7 @@ public class User {
 
 
 
+
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
@@ -20,6 +21,7 @@ public class User {
         this.userName = userName;
         this.userAddress = userAddress;
         this.userCar = userCar;
+
 
     }
 
