@@ -551,6 +551,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                     } else {
                         System.out.println("Location saved on server successfully as lat[" + latitude + "], lon[" + longitude + "]!");
                         loadLocationForThisUser();
+                        acquireUserProfileAndStoreLocal();
 
                         dismissLoading();
                     }

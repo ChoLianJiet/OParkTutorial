@@ -2,10 +2,12 @@ package com.opark.opark;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
@@ -16,9 +18,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -39,8 +40,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.opark.opark.chat.ChatAdapter;
-import com.opark.opark.chat.ChatMessage;
 import com.opark.opark.share_parking.MapsMainActivity;
 
 public class PeterMap extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnCameraMoveStartedListener {
@@ -61,6 +60,7 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
     private TextView kenaCarColor;
 
     private FloatingActionButton recenterButton;
+    private Button intentToGoogleMapButton;
     private Location mLastLocation = new Location("");
     private String currentUserId;
     DatabaseReference geofireRef;
@@ -73,14 +73,8 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
     double foundUserLongitude;
     private LatLng foundUserLocation;
     private LatLng currentUserLocation;
-    Marker peterMarker;
+    Marker kenaMarker;
     public static double pointsGainedFromPeterMap;
-
-    //Chat
-    private EditText chatEditText;
-    private FloatingActionButton fab;
-    private ChatAdapter mAdapter;
-    private ListView chatListView;
 
 
     @Override
@@ -114,10 +108,7 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
         this.kenaCarPlateNumber.setText(UserPopUpFragment.carPlateNumber.getText().toString());
         this.kenaCarColor.setText(UserPopUpFragment.carColor.getText().toString());
 
-        //Chat
-        chatListView = (ListView) findViewById(R.id.list_view);
-        chatEditText = (EditText) findViewById(R.id.input_text) ;
-        fab = (FloatingActionButton) findViewById(R.id.fab) ;
+        intentToGoogleMapButton = (Button) findViewById(R.id.intent_to_google_map);
 
         recenterButton = (FloatingActionButton) findViewById(R.id.recenter_button);
         recenterButton.setVisibility(View.INVISIBLE);
@@ -131,15 +122,22 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
         getCurrentUserLocation();
         getFoundUserLocation();
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        intentToGoogleMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = chatEditText.getText().toString();
-                if(!text.equals("")){
-                    ChatMessage chat = new ChatMessage(text,FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-                    FirebaseDatabase.getInstance().getReference().child("together").child(MapsMainActivity.foundUser).child("messages").push().setValue(chat);
-                    chatEditText.setText("");
-                }
+
+                double lat = kenaMarker.getPosition().latitude;
+
+                double lng = kenaMarker.getPosition().longitude;
+//
+                String format = "google.navigation:q=" + lat + "," + lng;
+//                String format = "waze://?ll="+ lat +"," + lng +"&navigate=yes";
+                Uri uri = Uri.parse(format);
+
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
 
             }
         });
@@ -162,16 +160,20 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
                 switch (newState) {
                     case BottomSheetBehavior.STATE_COLLAPSED:
                         setRecenterButton();
+                        intentToGoogleMapButton.setVisibility(View.VISIBLE);
                         break;
                     case BottomSheetBehavior.STATE_DRAGGING:
 //                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                         recenterButton.setVisibility(View.INVISIBLE);
+                        intentToGoogleMapButton.setVisibility(View.INVISIBLE);
                         break;
                     case BottomSheetBehavior.STATE_EXPANDED:
                         recenterButton.setVisibility(View.INVISIBLE);
+                        intentToGoogleMapButton.setVisibility(View.INVISIBLE);
                         break;
                     case BottomSheetBehavior.STATE_SETTLING:
                         recenterButton.setVisibility(View.INVISIBLE);
+                        intentToGoogleMapButton.setVisibility(View.INVISIBLE);
                         break;
                 }
             }
@@ -179,14 +181,6 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 
-            }
-        });
-
-        chatListView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                v.getParent().requestDisallowInterceptTouchEvent(true);
-                return false;
             }
         });
 
@@ -201,14 +195,11 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
     @Override
     protected void onStart() {
         super.onStart();
-        mAdapter = new ChatAdapter(this,FirebaseDatabase.getInstance().getReference().child("together").child(foundUser),UserPopUpFragment.kenaParkerName.getText().toString());
-        chatListView.setAdapter(mAdapter);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mAdapter.cleanup();
     }
 
     private void getCurrentUserLocation(){
@@ -288,7 +279,7 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
     }
     private void setKenaMarker(LatLng thisLocation){
 
-        peterMarker = mMap.addMarker(new MarkerOptions()
+        kenaMarker = mMap.addMarker(new MarkerOptions()
                 .position(thisLocation)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 //        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(thisLocation,17f,DEFAULT_TILT,0)));

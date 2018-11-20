@@ -180,5 +180,10 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/intent_to_google_map"/>
+
 
 </RelativeLayout>
