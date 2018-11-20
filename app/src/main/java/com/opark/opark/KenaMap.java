@@ -2,10 +2,7 @@ package com.opark.opark;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
-import android.app.AlertDialog;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -13,29 +10,24 @@ import android.location.Location;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.Chronometer;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -45,6 +37,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -52,12 +46,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.opark.opark.card_swipe.MainActivityCardSwipe;
-import com.opark.opark.chat.ChatAdapter;
-import com.opark.opark.chat.ChatMessage;
-import com.opark.opark.share_parking.MapsMainActivity;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
+import com.opark.opark.model.Car;
+import com.opark.opark.model.User;
 
-import java.text.DecimalFormat;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class KenaMap extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnCameraMoveStartedListener {
@@ -69,16 +69,18 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
 
     private float DEFAULT_ZOOM = 18f;
     private float DEFAULT_TILT = 45f;
+    final long ONE_MEGABYTE = 1024 * 1024;
 
 
-
-
+    ArrayList<User> userObjList = new ArrayList<>();
 
     GoogleMap mMap;
     Chronometer mChronometer;
     private BottomSheetBehavior mBottomSheetBehavior;
     private TextView kenaParkerName;
-    private TextView kenaCarModel;
+    private String kenaCarBrand;
+    private String kenaCarModel;
+    private TextView kenaCarModelText;
     private TextView kenaCarPlateNumber;
     private TextView kenaCarColor;
     double elapsedTime;
@@ -99,12 +101,10 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
     private GeoFire geoFire;
     private GeoQuery geoQuery;
     public static double pointsGainedFromKenaMap;
+    FirebaseStorage storage;
+    StorageReference storageRef;
+    User user = new User();
 
-    //Chat
-    private EditText chatEditText;
-    private FloatingActionButton fab;
-    private ChatAdapter mAdapter;
-    private ListView chatListView;
 
 
     @Override
@@ -130,16 +130,19 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
         recenterButton = (FloatingActionButton) findViewById(R.id.recenter_button);
         recenterButton.setVisibility(View.INVISIBLE);
 
-
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference();
         geofireRef = FirebaseDatabase.getInstance().getReference().child("geofire");
         matchmakingRef = FirebaseDatabase.getInstance().getReference().child("matchmaking");
         togetherRef = FirebaseDatabase.getInstance().getReference().child("together");
         geoFire = new GeoFire(geofireRef);
 
-        //Chat
-        chatListView = (ListView) findViewById(R.id.list_view);
-        chatEditText = (EditText) findViewById(R.id.input_text) ;
-        fab = (FloatingActionButton) findViewById(R.id.fab) ;
+        kenaParkerName = findViewById(R.id.kena_name);
+        kenaCarModelText = findViewById(R.id.kena_car_modal);
+        kenaCarPlateNumber = findViewById(R.id.kena_car_plate_number);
+        kenaCarColor = findViewById(R.id.kena_car_color);
+
+        setPeterDetailsOnBottomSheet();
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -152,19 +155,6 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlong,DEFAULT_ZOOM));
                 Log.d(TAG,"markerInMiddle is " + markerInMiddle);
                 setRecenterButton();
-            }
-        });
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String text = chatEditText.getText().toString();
-                if(!text.equals("")){
-                    ChatMessage chat = new ChatMessage(text,FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-                    FirebaseDatabase.getInstance().getReference().child("together").child(currentUserId).child("messages").push().setValue(chat);
-                    chatEditText.setText("");
-                }
-
             }
         });
 
@@ -197,14 +187,6 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
             }
         });
 
-        chatListView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                v.getParent().requestDisallowInterceptTouchEvent(true);
-                return false;
-            }
-        });
-
     }
 
 
@@ -217,14 +199,47 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
     @Override
     protected void onStart() {
         super.onStart();
-        mAdapter = new ChatAdapter(this,FirebaseDatabase.getInstance().getReference().child("together").child(currentUserId),UserPopUpFragment.kenaParkerName.getText().toString());
-        chatListView.setAdapter(mAdapter);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mAdapter.cleanup();
+    }
+
+    private void setPeterDetailsOnBottomSheet(){
+
+        Log.d(TAG,"displayKenaDetailsOnWindow is called");
+
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        StorageReference storageRef = firebaseStorage.getReference();
+
+        final StorageReference getKenaProfileRef = storageRef.child("users/" + foundUser + "/profile.txt");
+        getKenaProfileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+
+                try {
+                    userObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
+                    Log.d(TAG, "Gsonfrom json success");
+
+                    kenaParkerName.setText(userObjList.get(0).getUserName().getFirstName() + userObjList.get(0).getUserName().getLastName());
+                    kenaCarBrand = userObjList.get(0).getUserCar().getCarBrand();
+                    kenaCarModel = userObjList.get(0).getUserCar().getCarModel();
+                    kenaCarModelText.setText(kenaCarBrand + kenaCarModel);
+                    kenaCarPlateNumber.setText(userObjList.get(0).getUserCar().getCarPlate());
+                    kenaCarColor.setText(userObjList.get(0).getUserCar().getCarColour());
+
+
+                } catch (UnsupportedEncodingException e){
+                    e.printStackTrace();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.d(TAG,"fragment is not created, exception: " + exception);
+            }
+        });
     }
 
     private void getCurrentUserLocation(){
@@ -488,7 +503,7 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
 
     private void CheckFoundUserHaveEnteredMiniGeoQueryArea(){
         final double fixedGeoFireLatitude = currentUserLatitude;
-        final double fixedGeoFireLongitude =currentUserLongitude;
+        final double fixedGeoFireLongitude = currentUserLongitude;
         System.out.println("current user is " + currentUserLatitude + "," + currentUserLongitude);
         Log.d(TAG,"fixed location for geofire is " + fixedGeoFireLatitude + "," + fixedGeoFireLongitude);
         geoQuery = geoFire.queryAtLocation(new GeoLocation(currentUserLatitude, currentUserLongitude), 0.005);
@@ -496,8 +511,7 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
                 if ( key.equals(foundUser)){
-                    EndSession();
-                    Log.d(TAG,foundUser + " has entered the area");
+                    CheckCurrentUserHaveGoneOutOfGeoQueryArea();
                 } else {
                     //do nothing
                 }
@@ -525,6 +539,50 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
         });
     }
 
+    private void CheckCurrentUserHaveGoneOutOfGeoQueryArea(){
+        final double fixedGeoFireLatitude = currentUserLatitude;
+        final double fixedGeoFireLongitude = currentUserLongitude;
+        System.out.println("current user is " + currentUserLatitude + "," + currentUserLongitude);
+        Log.d(TAG,"fixed location for geofire is " + fixedGeoFireLatitude + "," + fixedGeoFireLongitude);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(currentUserLatitude, currentUserLongitude), 0.02);
+        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+            @Override
+            public void onKeyEntered(String key, GeoLocation location) {
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+                if ( key.equals(currentUserId)){
+                    Log.d(TAG,"I have exited and ready to end session");
+                    Intent intent = new Intent(getApplicationContext(), KenaMap.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // You need this if starting
+                    //  the activity from a service
+                    intent.setAction(Intent.ACTION_MAIN);
+                    intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                    startActivity(intent);
+                    EndSession();
+                } else {
+                    //do nothing
+                }
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation location) {
+
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+
+            }
+        });
+    }
+
     private void PromptPeterNearby(){
         Log.d(TAG,"PromptPeterNearby() is called");
         PromptKenaDialog promptKenaDialog = new PromptKenaDialog();
@@ -532,10 +590,16 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
     }
 
     private void EndSession(){
+        Log.d(TAG,"EndSession is called");
         mChronometer.stop();
-        Log.d(TAG,"PromptPeterNearbyMini() is called");
-        PromptEndSessionDialog promptEndSessionDialog = new PromptEndSessionDialog();
-        promptEndSessionDialog.show(getSupportFragmentManager(),"prompt dialog");
+        user.userName.firstName = kenaParkerName.toString();
+        user.userCar = new Car(kenaCarColor.getText().toString(),kenaCarBrand,kenaCarModel,kenaCarPlateNumber.getText().toString());
+//        Log.d(TAG,"PromptPeterNearbyMini() is called");
+//        PromptEndSessionDialog promptEndSessionDialog = new PromptEndSessionDialog();
+//        promptEndSessionDialog.show(getSupportFragmentManager(),"prompt dialog");
+        /*** Intent to Feedback***/
+        StorageReference flagStorageLocation = storageRef.child("users/" + currentUserId + "/gotflag.txt");
+        objToByteStreamUpload(user,flagStorageLocation);
         CalculatePoints();
     }
 
@@ -545,6 +609,28 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
         Log.d(TAG,"Elapsed time is " + elapsedTime + " seconds");
         pointsGainedFromKenaMap = (2 * elapsedTime) + r;
         Log.d(TAG,"Points gained by Kena is " + pointsGainedFromKenaMap + ", the random r generated is " + r);
+    }
+
+    private void objToByteStreamUpload(Object obj, StorageReference destination){
+
+        String objStr = new Gson().toJson(obj);
+        InputStream in = new ByteArrayInputStream(objStr.getBytes(Charset.forName("UTF-8")));
+        UploadTask uploadTask = destination.putStream(in);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                objToByteStreamUpload(user,storageRef.child("users/" + currentUserLongitude + "/gotflag.txt"));
+
+
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(getApplicationContext(), "Profile update successful!", Toast.LENGTH_LONG).show();
+                Log.i(TAG, "Flag Set");
+                // Use analytics to calculate the success rate
+            }
+        });
     }
 
     public void expandWhenBottomSheetIsClicked(View v){
