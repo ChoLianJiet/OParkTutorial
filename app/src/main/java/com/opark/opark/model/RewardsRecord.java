@@ -3,15 +3,15 @@ package com.opark.opark.model;
 public class RewardsRecord {
     String rewardsTitle;
     String rewardsMerchant;
-    String rewardsTimeOfRedemption;
+    String rewardsTimeOfPreRedemption;
     int rewardsOfferCost;
     int rewardsPointBeforeRedemption;
     int rewardsPointAfterRedemption;
 
-    public RewardsRecord(String rewardsTitle, String rewardsMerchant, String rewardsTimeOfRedemption, int rewardsOfferCost, int rewardsPointBeforeRedemption, int rewardsPointAfterRedemption) {
+    public RewardsRecord(String rewardsTitle, String rewardsMerchant, String rewardsTimeOfPreRedemption, int rewardsOfferCost, int rewardsPointBeforeRedemption, int rewardsPointAfterRedemption) {
         this.rewardsTitle = rewardsTitle;
         this.rewardsMerchant = rewardsMerchant;
-        this.rewardsTimeOfRedemption = rewardsTimeOfRedemption;
+        this.rewardsTimeOfPreRedemption = rewardsTimeOfPreRedemption;
         this.rewardsOfferCost = rewardsOfferCost;
         this.rewardsPointBeforeRedemption = rewardsPointBeforeRedemption;
         this.rewardsPointAfterRedemption = rewardsPointAfterRedemption;
@@ -33,12 +33,12 @@ public class RewardsRecord {
         this.rewardsMerchant = rewardsMerchant;
     }
 
-    public String getRewardsTimeOfRedemption() {
-        return rewardsTimeOfRedemption;
+    public String getrewardsTimeOfPreRedemption() {
+        return rewardsTimeOfPreRedemption;
     }
 
-    public void setRewardsTimeOfRedemption(String rewardsTimeOfRedemption) {
-        this.rewardsTimeOfRedemption = rewardsTimeOfRedemption;
+    public void setrewardsTimeOfPreRedemption(String rewardsTimeOfPreRedemption) {
+        this.rewardsTimeOfPreRedemption = rewardsTimeOfPreRedemption;
     }
 
     public int getRewardsOfferCost() {

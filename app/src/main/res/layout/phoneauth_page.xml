@@ -30,7 +30,7 @@
 
 
 
-    <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
+    <Button
         android:id="@+id/verify_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
             android:inputType="phone"/>
     </android.support.design.widget.TextInputLayout>
 
-    <br.com.simplepass.loading_button_lib.customViews.CircularProgressButton
+    <Button
         android:id="@+id/send_v_code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

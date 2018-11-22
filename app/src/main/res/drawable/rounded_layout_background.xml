@@ -4,8 +4,19 @@
         <shape android:shape="rectangle">
             <padding android:right="20dp"/>
             <padding android:left="20dp"/>
-            <corners android:radius="40dp"/>
+            <corners android:radius="20dp"/>
             <solid android:color="@color/peach"/>
         </shape>
     </item>
+
+
+    <item android:state_pressed="true" android:state_selected="false">
+        <shape android:shape="rectangle">
+            <padding android:right="10dp"/>
+            <padding android:left="10dp"/>
+            <corners android:radius="10dp"/>
+            <solid android:color="@color/colorPrimary"/>
+        </shape>
+    </item>
+
 </selector>

@@ -20,13 +20,13 @@
         <LinearLayout
             android:layout_width="150dp"
             android:gravity="center"
-            android:layout_height="150dp">
+            android:layout_height="match_parent">
             <ImageView
                 android:id="@+id/merchant_offer_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_marginTop="20dp"
+                android:layout_margin="10dp"
                 app:srcCompat="@drawable/maintenance_squareboi"
                 />
         </LinearLayout>
@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:text="Offer Title"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 />
 
             <TextView
@@ -75,7 +75,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/redeem_cost"
-                android:text="1000"
+                android:text="redeem\ncost"
+                android:textSize="16sp"
+                android:layout_marginTop="15dp"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="20dp"
                 android:layout_below="@id/merchant_offer_title"

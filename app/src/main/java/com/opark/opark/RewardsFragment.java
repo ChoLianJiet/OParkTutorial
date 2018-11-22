@@ -1,5 +1,6 @@
 package com.opark.opark;
 
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,12 +33,15 @@ import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOfferAdapter;
+import com.opark.opark.model.RewardsPreredemption;
 import com.opark.opark.model.RewardsRecord;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -43,7 +49,6 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class RewardsFragment extends Fragment implements MerchantOfferAdapter.ButtonClicked {
-    private Button redeemButton;
     private static final String TAG = "RewardsFragment";
     private List<MerchantOffer> merchantOffer = new ArrayList<>();
     MerchantOffer thisMerchantOffer = new MerchantOffer();
@@ -58,14 +63,19 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
     private FirebaseAuth mAuth;
     private FirebaseUser thisUser;
     private String redeemUid;
+    public static String merchantName;
     public static String merchantOfferTitle;
+    public static String merchantAddress;
+    public static String merchantOfferImageUrl;
     final long ONE_MEGABYTE = 1024 * 1024;
     private int userPoints;
     private int userPointsBefRed;
     private int pointsAfterRedemption;
     public static int redeemCost;
+    public static String merchantContact;
     public static String rewardsMerchant;
-
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
 
 
 
@@ -85,6 +95,7 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
     thisUser = mAuth.getCurrentUser();
     redeemUid = thisUser.getUid();
     userPointsStorageRef = FirebaseStorage.getInstance().getReference().child("users/" + redeemUid + "/points.txt");
+
 
 
 
@@ -110,34 +121,34 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
                 Log.d(TAG, "onChildAdded:  datasnapshot value " + dataSnapshot.getValue());
 
 
+                    Log.d(TAG, "onChildAdded: not adding " + dataSnapshot.hasChild("merchantsName"));
 
-//                merchantOffer.add(new MerchantOffer(String.valueOf(dataSnapshot.child("merchantOfferTitle").getValue()) ,String.valueOf(dataSnapshot.child("merchantName").getValue()),String.valueOf(dataSnapshot.child("merchantAddress").getValue()),String.valueOf(dataSnapshot.child("merchantContact").getValue()),String.valueOf(dataSnapshot.child("offerCost").getValue()),"asdsadas"));
-                merchantOffer.add(dataSnapshot.getValue(MerchantOffer.class));
+//                merchantOffer.add(new MerchantOffer(String.valueOf(dataSnapshot.child("merchantOfferTitle").getValue()) ,String.valueOf(dataSnapshot.child("merchantName").getValue()),String.valueOf(dataSnapshot.child("merchantAddress").getValue()),String.valueOf(dataSnapshot.child("merchantContact").getValue()),String.valueOf(dataSnapshot.child("offerCost").getValue())));
 
-                Log.d("INITDATA", "Data added as class");
+                if (!dataSnapshot.getKey().equals("merchantsName")) {
+                    merchantOffer.add(dataSnapshot.getValue(MerchantOffer.class));
 
-
-
-
-
-//                Log.d(TAG, "onChildAdded: merchant offer " + merchantOffer.get(1));
-
-                final MerchantOfferAdapter merchantOfferAdapter = new MerchantOfferAdapter(merchantOffer, new MerchantOfferAdapter.ButtonClicked() {
-                    @Override
-                    public void onButtonClicked(View v, int position) {
-
-                        deductPointsForRedemption();
-
-                        Log.d(TAG, "Rewards Fragment Button Clicked " + position);
-                    }
+                    Log.d("INITDATA", "Data added as class");
 
 
+                    final MerchantOfferAdapter merchantOfferAdapter = new MerchantOfferAdapter(merchantOffer, new MerchantOfferAdapter.ButtonClicked() {
+                        @Override
+                        public void onButtonClicked(View v, int position) {
+
+                            deductPointsForRedemption();
+
+                            Log.d(TAG, "Rewards Fragment Button Clicked " + position);
+                        }
 
 
-                });
+                    });
 
-                merchantRecView.setAdapter(merchantOfferAdapter);
-            }
+                    merchantRecView.setAdapter(merchantOfferAdapter);
+
+                }
+
+                }
+
 //           String.valueOf(dataSnapshot.child("offerImage").getValue())
 
             @Override
@@ -180,17 +191,40 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
 
 
 
+    private void userPreRedemption(){
+
+
+        SecureRandom random = new SecureRandom();
+        String preRedemptionCode = new BigInteger(30, random).toString(32).toUpperCase();
+        Log.d("redeem", "userPreRedemption:  "+ preRedemptionCode);
+
+
+
+        DatabaseReference preRedemptionDataRef = FirebaseDatabase.getInstance().getReference().child("users/pre-redeemedlist/"+ redeemUid );
+        RewardsPocketOffer rewardsPocketUpdate = new RewardsPocketOffer(merchantOfferTitle,merchantName,merchantAddress,merchantContact,preRedemptionCode,merchantOfferImageUrl);
+
+       String preRedeemedKey = preRedemptionDataRef.push().getKey();
+       preRedemptionDataRef.child(preRedeemedKey).setValue(rewardsPocketUpdate);
+
+        RewardsPreredemption thisRewardPreredeemed = new RewardsPreredemption(redeemUid,preRedeemedKey);
+
+
+        StorageReference preRedemptionStoRef= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+merchantName + "/"+merchantOfferTitle+"/userredemptioncode/"+preRedemptionCode);
+        objToByteStreamUpload(thisRewardPreredeemed ,preRedemptionStoRef);
+
+
+    }
+
+
 
     private void recordRewardsRedemption(){
 
 
 
-
-        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-        Long tsLong = System.currentTimeMillis()/1000;
+        Long timestamp = System.currentTimeMillis()/1000;
 
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-        cal.setTimeInMillis(tsLong* 1000L);
+        cal.setTimeInMillis(timestamp* 1000L);
         String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
 
         RewardsRecord thisMatchmakingRecord = new RewardsRecord(merchantOfferTitle,rewardsMerchant,date,redeemCost,userPointsBefRed, userPoints);
@@ -222,17 +256,29 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
                 } catch (UnsupportedEncodingException e){
                     e.printStackTrace();
                 }
-                if (userPoints>redeemCost){
+                if (userPoints>=redeemCost){
                     Log.d("redeem", "redeem cost " + redeemCost);
                 pointsAfterRedemption = (int) (Math.ceil(userPoints) - redeemCost );
+
+
                 objToByteStreamUpload(pointsAfterRedemption,userPointsStorageRef);
-                offerlistDatabaseRef.child(merchantOfferTitle).child("redeemedUsers").push().setValue(redeemUid);
+
+                DatabaseReference userPointsDataRef = FirebaseDatabase.getInstance().getReference().child("users/userPoints/" + redeemUid);
+                userPointsDataRef.setValue(pointsAfterRedemption);
+
+
+
+                /*User preredemption before Verification of code by Merchant*/
+                userPreRedemption();
+//                offerlistDatabaseRef.child(merchantOfferTitle).child("redeemedUsers").push().setValue(redeemUid);
 
                 Log.d("redeem","Points uploaded from Redeem is " + pointsAfterRedemption);}
 
                 else {
-                    Log.d("redeem", "redeem cost " + redeemCost);
 
+
+
+                    Log.d("redeem", "redeem cost " + redeemCost);
                     Log.d("redeem","Points insufficient " + userPoints);
                     InsufficientPointsDialog insufficientPointsDialog = new InsufficientPointsDialog(getContext());
                     insufficientPointsDialog.show();
@@ -267,9 +313,13 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(getContext(), "Your Rewards have been Redeemed", Toast.LENGTH_LONG).show();
-                Log.i(TAG, "Profile update successful!");
-                // Use analytics to calculate the success rate
+                try {
+                    Toast.makeText(getContext(), "Your Rewards have been Redeemed", Toast.LENGTH_LONG).show();
+                    Log.i(TAG, "Profile update successful!");
+                    // Use analytics to calculate the success rate
+                } catch (NullPointerException e ){
+                    e.printStackTrace();
+                }
             }
         });
     }

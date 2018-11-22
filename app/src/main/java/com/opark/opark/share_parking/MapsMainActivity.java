@@ -43,6 +43,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -77,6 +78,7 @@ import com.google.gson.Gson;
 import com.opark.opark.LoadingScreen;
 import com.opark.opark.ProfileNavFragment;
 import com.opark.opark.RewardsFragment;
+import com.opark.opark.RewardsPocketFragment;
 import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.NoUserPopUp;
 import com.opark.opark.R;
@@ -167,8 +169,12 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     private FragmentTransaction ft;
     private ProfileNavFragment userProfilePage;
     private RewardsFragment rewardsPageFrag;
+    private RewardsPocketFragment rewardsPockFrag;
     private Fragment currentFragment = null;
     private PhoneAuth phoneAuth;
+    TextView userPointsTextView;
+    View headerView;
+    int userPoints;
 
     //User Profile
     public static ArrayList<User> userObjList = new ArrayList<>();
@@ -188,6 +194,13 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         shareParkingButton = (Button) findViewById(R.id.share_parking_button);
         findParkingButton = (Button) findViewById(R.id.find_parking_button);
         mapContainer = (RelativeLayout) findViewById(R.id.map_page_container);
+
+
+
+
+
+
+
         //INVISIBLE PARKINGBUTTON
         shareParkingButton.setVisibility(View.INVISIBLE);
         findParkingButton.setVisibility(View.INVISIBLE);
@@ -196,6 +209,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         toolbar = (Toolbar) findViewById(R.id.toolbar_in_maps_main);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Map");
+
 
 
 // Inflate the header view at runtime
@@ -208,6 +222,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         drawerToggle.syncState();
 
 
+
         // Tie DrawerLayout events to the ActionBarToggle
         mDrawer.addDrawerListener(drawerToggle);
 
@@ -217,7 +232,9 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 //        View headerLayout = nvDrawer.inflateHeaderView(R.layout.nav_header_drawer_activity_main);
 
 
+        headerView = nvDrawer.getHeaderView(0);
 
+        userPointsTextView = headerView.findViewById(R.id.user_point_header);
 
 
         recenterButton = (FloatingActionButton) findViewById(R.id.recenter_button);
@@ -272,6 +289,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
             }
         });
 
+        Log.d(TAG, "onCreate: current uid" + currentUserID);
 
 
 
@@ -285,8 +303,75 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
    private void acquireUserProfileAndStoreLocal(){
 
        StorageReference userRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
+       StorageReference userPointRef =FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/points.txt");
+        final DatabaseReference userPointDataRef = FirebaseDatabase.getInstance().getReference().child("users/userPoints/" + currentUserID);
+
+
+
 
        final long ONE_MEGABYTE = 1024 * 1024;
+
+       userPointRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+           @Override
+           public void onSuccess(byte[] bytes) {
+
+
+               try {
+                   userPoints = (new Gson().fromJson(new String(bytes, "UTF-8"), Integer.class));
+                   Log.d(TAG, "onSuccess: " + userPoints);
+                   userPointsTextView.setText(String.valueOf(userPoints));
+
+
+
+
+               } catch (UnsupportedEncodingException e) {
+                   e.printStackTrace();
+               }
+
+
+
+           }
+       }).addOnFailureListener(new OnFailureListener() {
+                                   @Override
+                                   public void onFailure(@NonNull Exception e) {
+
+                                   }
+                               }
+       );
+
+
+       userPointDataRef.addValueEventListener(new ValueEventListener() {
+           @Override
+           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+               Log.d(TAG, "onDataChange: inside value listener");
+               Log.d(TAG, "onDataChange: datasnapshot" + dataSnapshot.getKey());
+               Log.d(TAG, "onDataChange: datasnapshot value" + dataSnapshot.getValue());
+
+
+               try {
+                   userPoints = dataSnapshot.getValue(Integer.class);
+//                userPoints = Integer.parseInt(String.valueOf(dataSnapshot.getValue()));
+                   userPointsTextView.setText(String.valueOf(userPoints));
+
+
+                   Log.d(TAG, "onDataChange: userPoints" + userPoints);
+               } catch (NullPointerException e ){
+
+                    userPointDataRef.setValue(userPoints);
+
+               }
+
+           }
+
+           @Override
+           public void onCancelled(@NonNull DatabaseError databaseError) {
+
+               Log.d(TAG, "onCancelled: " + databaseError);
+           }
+       });
+
+
+
        userRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
            @Override
            public void onSuccess(byte[] bytes) {
@@ -338,6 +423,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         switch (item.getItemId()) {
             case android.R.id.home:
                 mDrawer.openDrawer(GravityCompat.START);
+
                 return true;
         }
 
@@ -370,14 +456,18 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                             Log.d(TAG,"menuitem is not displayed");
 //                            Log.d("navmenuitem","menu item isnotchecked and setChecked(false) and return true");
                             try{
+                                    try{
                                 backStackCount= navFragmentManager.getBackStackEntryCount();
                                 Log.d(TAG, "onNavigationItemSelected: backstack count is " +backStackCount);
                                 if( backStackCount !=0){
-                                navFragmentManager.popBackStack();
+                                navFragmentManager.popBackStack();}
+
                                }
+                                    catch (NullPointerException e ){
+                                        Log.d(TAG, "onNavigationItemSelected: NullPoint");
+                                    }
 
-
-                                } catch (NullPointerException e ){Log.d(TAG,"first selected pop");}
+                                } catch (IllegalStateException e ){Log.d(TAG,"first selected pop");}
 
                                 selectDrawerItem(menuItem);
 
@@ -410,7 +500,9 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                     break;
 
             case R.id.nav_third_fragment:
-//                fragmentClass = ThirdFragment.class;
+                rewardsPockFrag = new RewardsPocketFragment();
+                fragment = rewardsPockFrag;
+                executeFragmentTransaction(fragment);
                 break;
             default:
 //                fragmentClass = FirstFragment.class;
@@ -1034,6 +1126,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
     private void signOut() {
         Log.d("signout", "signoutbutton Clicked");
+        LoginManager.getInstance().logOut();
         UserProfileSetup.mAuth = FirebaseAuth.getInstance();
         UserProfileSetup.mAuth.signOut();
         Intent intent = new Intent(MapsMainActivity.this, LoginActivity.class);

@@ -1,5 +1,6 @@
 package com.opark.opark.merchant_side;
 
+
 import com.google.firebase.storage.UploadTask;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
@@ -40,6 +41,8 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.UUID;
 
 public class MerchUploadOfferActivity extends AppCompatActivity {
   private static final int GALLERY = 55;
@@ -62,7 +65,6 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   private FirebaseUser currentMerchantFirebaseUser;
   private StorageTask mUploadTask;
   private ProgressBar mProgressBar;
-
 
 
   private String merchantCoName;
@@ -197,7 +199,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   }
 
   private String getFileExtension(Uri uri) {
-    ContentResolver cR = getContentResolver();
+      ContentResolver cR = getContentResolver();
     MimeTypeMap mime = MimeTypeMap.getSingleton();
     return mime.getExtensionFromMimeType(cR.getType(uri));
   }
@@ -222,7 +224,6 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
               .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                            progressDialog.dismiss();
 
                   Toast.makeText(MerchUploadOfferActivity.this, "Uploaded", Toast.LENGTH_SHORT).show();
                 }
@@ -230,7 +231,6 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
               .addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-//                            progressDialog.dismiss();
                   Toast.makeText(MerchUploadOfferActivity.this, "Failed "+e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
               })
@@ -239,7 +239,6 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
                 public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
                   double progress = (100.0*taskSnapshot.getBytesTransferred()/taskSnapshot
                           .getTotalByteCount());
-//                            progressDialog.setMessage("Uploaded "+(int)progress+"%");
                 }
               });
     }
@@ -327,7 +326,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
     offerTitle = offerTitleEntry.getText().toString();
     if (filePath != null) {
-       final StorageReference fileReference = merchantOfferStorageReference.child("merchants/offerlist/"+offerTitle).child("offerImage"
+       final StorageReference fileReference = merchantOfferStorageReference.child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"
               + "." + getFileExtension(filePath));
 
        merchantOfferImageRefFromSto = fileReference;
@@ -346,7 +345,6 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
 
                   Toast.makeText(MerchUploadOfferActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
-////
                   fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
@@ -394,9 +392,11 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
                   merchantOfferData.setOfferCost(offerRedemptionCost.getText().toString());
                   merchantOfferData.setOfferImage(uri.toString());
                   Log.d(TAG, "setFolderInDatabase: offer image" + offerImageForUpload);
-//
+
+//                  offerlistDatabaseRef.child("merchantsName/"+merchantCoName ).child(offerTitle).setValue(offerTitle );
+                  offerlistDatabaseRef.child("merchantsName/"+merchantCoName ).push().setValue(offerTitle);
+
                   offerlistDatabaseRef.child(offerTitle).setValue(merchantOfferData);
-                  offerlistDatabaseRef.child(offerTitle).child("redeemCount").setValue(0);
 
 
   }

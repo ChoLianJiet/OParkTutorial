@@ -51,11 +51,6 @@
         <activity android:name=".UserProfileSetup">
         </activity>
         <activity
-            android:name=".DrawerActivityMain"
-            android:label="@string/title_activity_drawer_main"
-            android:theme="@style/AppTheme">
-        </activity>
-        <activity
             android:name=".UserPopUp"
             android:theme="@style/AppTheme.CustomTheme">
         </activity>

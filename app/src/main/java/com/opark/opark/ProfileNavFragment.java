@@ -26,6 +26,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
+import com.opark.opark.model.MatchmakingRecord;
 import com.opark.opark.model.User;
 import com.opark.opark.share_parking.MapsMainActivity;
 
@@ -50,13 +51,17 @@ public class ProfileNavFragment extends Fragment {
     private TextView firstName, lastName, phoneNum, userEmail;
     private TextView carColour, carBrand, carModel, carPlate;
     private TextView firstLine, secondLine, city, postcode, countryState;
+
+    private TextView lastDate, lastSharer, lastFinder, lastPoints;
     String userEmailAddress;
     private FirebaseAuth mAuth;
+    private String currentUserID;
     private FirebaseUser currentUser;
     private Toolbar toolbar;
    private ProgressBar loadingCircle;
     private LinearLayout nameNumLayout1, nameNumlayout2 , carLayout;
     private ArrayList<User> userObjList = new ArrayList<>();
+    private ArrayList<MatchmakingRecord> mmObjList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
@@ -65,10 +70,16 @@ public class ProfileNavFragment extends Fragment {
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         userEmailAddress = currentUser.getEmail();
-         final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+           currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+
+
 
         bindViews(view);
-//        toolbar.setTitle("Profile");
+
+
+
+
 
         Log.d("View","Viewbinding success");
 
@@ -76,8 +87,7 @@ public class ProfileNavFragment extends Fragment {
 
         Log.d("UID","User get success");
 
-//        DownloadUserProfileFrag profileFrag = new DownloadUserProfileFrag();
-//        profileFrag.execute(currentUserID);
+
 
         profileEditButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,22 +101,6 @@ public class ProfileNavFragment extends Fragment {
         });
 
 
-//        final long ONE_MEGABYTE = 1024 * 1024;
-//        userRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-//            @Override
-//            public void onSuccess(byte[] bytes) {
-//                Log.d("Byte","getByte success");
-//
-//
-//                try {
-////                    userObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
-////                    Log.d("Gson","Gsonfrom json success");
-//
-//
-////                        for (int i = 0; i < MapsMainActivity.userObjList.size(); i++){
-//                            Log.d("I","Iteration success");
-////                            Log.i("Hello","heyhey" + MapsMainActivity.userObjList.get(i).getUserName().getFirstName());
-////                            firstName.setText(userObjList.get(i).getUserName().getFirstName());
                             lastName.setText(MapsMainActivity.lastName);
                             userEmail.setText(userEmailAddress);
                             phoneNum.setText(MapsMainActivity.phoneNum);
@@ -114,26 +108,7 @@ public class ProfileNavFragment extends Fragment {
                             carBrand.setText(MapsMainActivity.carBrand);
                             carModel.setText(MapsMainActivity.carModel);
                             carPlate.setText(MapsMainActivity.carPlate);
-////                            firstLine.setText(userObjList.get(i).getUserAddress().getFir stline());
-////                            secondLine.setText(userObjList.get(i).getUserAddress().getSecondline());
-////                            Log.d("secondline","secondline success");
-////                            city.setText(userObjList.get(i).getUserAddress().getCity());
-////
-////                            postcode.setText(userObjList.get(i).getUserAddress().getPostcode());
-////                            countryState.setText(userObjList.get(i).getUserAddress().getCountryState());
-//
-////                    }
-//
-//                } catch (NullPointerException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception exception) {
-//                // Handle any errors
-//            }
-//        });
+                            retrieveMatchMakingFromStorage();
 
 
 
@@ -150,6 +125,7 @@ public class ProfileNavFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         //you can set the title for your toolbar here for different fragments different titles
         getActivity().setTitle("Profile");
+
     }
 
 
@@ -163,6 +139,10 @@ public class ProfileNavFragment extends Fragment {
 //        firstName = (TextView) view.findViewById(R.id.first_name_edit);
         toolbar = (Toolbar) view.findViewById(R.id.toolbar_in_maps_main);
 
+        lastDate = view.findViewById(R.id.last_mm_date);
+        lastFinder = view.findViewById(R.id.last_finder);
+        lastSharer = view.findViewById(R.id.last_sharer);
+        lastPoints =view.findViewById(R.id.last_points);
         lastName = (TextView) view.findViewById(R.id.last_name_edit);
         userEmail = view.findViewById(R.id.email_text);
         phoneNum = (TextView) view.findViewById(R.id.phone_num_edit);
@@ -173,12 +153,46 @@ public class ProfileNavFragment extends Fragment {
         profileEditButton =(Button) view.findViewById(R.id.edit_profile_details);
 
 
+
+
+
     }
 
 
-    private void retrieveProfileFromStorage() {
+    private void retrieveMatchMakingFromStorage() {
+
+        StorageReference mmRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/matchmakingrecord/"+  "latestrecord.txt");
+        final long ONE_MEGABYTE = 1024 * 1024;
+        mmRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                try {
+                    mmObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), MatchmakingRecord.class));
+                    Log.d("Gson","Gsonfrom json success");
+
+                        for (int i = 0; i < mmObjList.size(); i++){
+
+                    lastDate.setText(mmObjList.get(i).getMatchmakingRecordTimestamp());
+                    lastFinder.setText("Finder: "+mmObjList.get(i).getPeterUid());
+                    lastSharer.setText("Sharer: "+mmObjList.get(i).getKenaUid());
+                    lastPoints.setText(String.valueOf(mmObjList.get(i).getUserPointsGained()) );
 
 
+            }
+
+                }catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+
+        }
+
+    }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
 
     }
 
@@ -242,100 +256,6 @@ public class ProfileNavFragment extends Fragment {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-
-
-/*
-
-
-    private class DownloadUserProfileFrag extends AsyncTask<String,Void,ArrayList<User>>  {
-        //        private TextView firstName, lastName, phoneNum;
-//        private TextView carColour, carBrand, carModel, carPlate;
-//        private TextView firstLine, secondLine, city, postcode, countryState;
-        ArrayList<User> userProfContent = new ArrayList<>();
-
-
-        protected ArrayList<User> doInBackground(String...currentUserID) {
-            Log.d("DUPF","I am in DUPF");
-
-
-
-            StorageReference userRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID [0]+ "/profile.txt");
-
-            Log.d("DUPF", "current user id is " + currentUserID[0] +"\n userRef is"+ userRef);
-
-
-            final long ONE_MEGABYTE = 1024 * 1024;
-            userRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                @Override
-                public void onSuccess(byte[] bytes) {
-                    Log.d("DUPF","getByte success");
-
-
-                    try {
-                        userProfContent.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
-//                        Log.d("DUPF","Gsonfrom json success" + "\n " +userObjList.get(1));
-//                            Log.i("Hello","heyhey" + MapsMainAct/ivity.userObjList.get(i).getUserName().getFirstName());
-//                            firstName.setText(userObjList.get(i).getUserName().getFirstName());
-
-////                            firstLine.setText(userObjList.get(i).getUserAddress().getFirstline());
-////                            secondLine.setText(userObjList.get(i).getUserAddress().getSecondline());
-////                            Log.d("secondline","secondline success");
-////                            city.setText(userObjList.get(i).getUserAddress().getCity());
-////
-////                            postcode.setText(userObjList.get(i).getUserAddress().getPostcode());
-////                            countryState.setText(userObjList.get(i).getUserAddress().getCountryState());
-
-//                    }
-
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle any erro
-                    Log.d("DUPF","download failed" + exception);
-                }
-            });
-            Log.d("DUPF", "returning "+userProfContent );
-
-            return userProfContent;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            carLayout.setVisibility(GONE);
-            nameNumLayout1.setVisibility(GONE);
-            nameNumlayout2.setVisibility(GONE);
-            loadingCircle.setVisibility(View.VISIBLE);
-        }
-
-            @Override
-            protected void onPostExecute(ArrayList<User> userDownloaded) {
-                try {
-                    super.onPostExecute(userDownloaded);
-                    Log.d("DUPF", "onPostExecute: entered ");
-                    for (int i = 0; i < userDownloaded.size(); i++) {
-                        lastName.setText(userDownloaded.get(i).userName.getFirstName());
-                        phoneNum.setText(userDownloaded.get(i).userName.getPhoneNum());
-                        carColour.setText(userDownloaded.get(i).userCar.getCarColour());
-                        carBrand.setText(userDownloaded.get(i).userCar.getCarBrand());
-                        carModel.setText(userDownloaded.get(i).userCar.getCarModel());
-                        carPlate.setText(userDownloaded.get(i).userCar.getCarPlate());
-
-                    }
-                    loadingCircle.setVisibility(GONE);
-                } catch (IndexOutOfBoundsException e)
-                { Log.d("DUPF", "error is " + e );}
-            }
-
-
-
-}
-
-*/
 
 
 

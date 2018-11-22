@@ -15,8 +15,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.opark.opark.R;
 import com.opark.opark.RewardsFragment;
+import com.opark.opark.RewardsPocketOffer;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -56,14 +59,6 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
             redeemCost = (TextView) itemView.findViewById(R.id.redeem_cost);
             merchantOfferImage = (ImageView) itemView.findViewById(R.id.merchant_offer_image);
             redeemButton = (Button) itemView.findViewById(R.id.redeem_button);
-//            redeemButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    mButtonClicked.onButtonClicked(v,getAdapterPosition());
-//                    Log.d("redeem", "onClick: " + getAdapterPosition() + merchantOfferTitle);
-//
-//                }
-//            });
 
         }
 
@@ -128,8 +123,15 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
             @Override
             public void onClick(View v) {
                 RewardsFragment.redeemCost = Integer.valueOf( merchantOfferList.get(i).getOfferCost());
+                RewardsFragment.merchantName = merchantOfferList.get(i).getMerchantName();
                 RewardsFragment.merchantOfferTitle = merchantOfferList.get(i).getMerchantOfferTitle();
                 RewardsFragment.rewardsMerchant = merchantOfferList.get(i).getMerchantName();
+                RewardsFragment.merchantAddress = merchantOfferList.get(i).getMerchantAddress();
+                RewardsFragment.merchantContact = merchantOfferList.get(i).getMerchantContact();
+                RewardsFragment.merchantOfferImageUrl = merchantOfferList.get(i).getOfferImage();
+
+
+
                 mButtonClicked.onButtonClicked(v, i);
 
                 Log.d("redeem", "onClick: " + RewardsFragment.merchantOfferTitle);

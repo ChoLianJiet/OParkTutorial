@@ -144,6 +144,7 @@
     <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: petrov.kristiyan:colorpicker-library-1.1.8" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-tasks-15.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.raycoarana.codeinputview:codeinputview-1.2.5" level="project" />
     <orderEntry type="library" name="Gradle: com.facebook.android:facebook-messenger-4.34.0" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:runtime-1.1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:transition-27.1.1" level="project" />
@@ -205,6 +206,7 @@
     <orderEntry type="library" name="Gradle: com.facebook.android:facebook-common-4.34.0" level="project" />
     <orderEntry type="library" name="Gradle: com.github.bumptech.glide:disklrucache:4.7.1@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.firebase:firebase-database-16.0.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.glomadrian:CodeInput-1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.12@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-places-15.0.1" level="project" />
     <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-location-15.0.1" level="project" />

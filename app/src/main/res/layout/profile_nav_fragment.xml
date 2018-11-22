@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:theme="@style/AppTheme"
+    android:fillViewport="true"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+
+<LinearLayout
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:layout_editor_absoluteX="0dp"
     android:background="@color/brightPeach"
+    android:paddingBottom="10dp"
     tools:layout_editor_absoluteY="25dp">
     <include
         android:id="@+id/toolbar_in_maps_main"
@@ -107,27 +117,35 @@
             android:layout_width="match_parent"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_height="wrap_content"
+            android:elevation="2dp"
             android:paddingTop="10dp"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:orientation="vertical"
             android:background="@color/brightPeach"
             android:paddingBottom="30dp">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
             <TextView
                 android:id="@+id/car_text_bold"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/mosk_ultra_bold_900"
                 android:text="CAR"
                 android:textSize="50sp" />
 
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingBottom="10dp">
             <TextView
                 android:id="@+id/car_model_edit"
                 android:layout_width="match_parent"
@@ -169,7 +187,64 @@
                 android:textColor="@color/black"
                 android:textSize="20sp"/>
 
+
+
         </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="#f2d6cd"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_margin="10dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:textSize="18sp"
+                    android:text="Last MatchMaking Record"/>
+
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:id="@+id/last_mm_date"
+                    android:text="date n Time"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:id="@+id/last_sharer"
+                    android:text= "Sharer"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:id="@+id/last_finder"
+                    android:text= "Finder"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:id="@+id/last_points"
+                    android:text= "Points Earned"
+                    />
+
+
+
+            </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
         <Button
             android:id="@+id/edit_profile_details"
@@ -200,4 +275,5 @@
 
 </LinearLayout>
 
+</ScrollView>
 

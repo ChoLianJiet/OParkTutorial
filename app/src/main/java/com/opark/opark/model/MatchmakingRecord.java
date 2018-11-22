@@ -9,10 +9,13 @@ public class MatchmakingRecord {
     public String peterUid;
     public LatLng peterLatLng;
     public LatLng kenaLatLng;
+
+
+    public int userPointsGained;
     public double timeElapsed;
 
 
-    public MatchmakingRecord(String sessionKey, String matchmakingRecordTimestamp, String kenaUid, String peterUid, LatLng peterLatLng, LatLng kenaLatLng, double timeElapsed ) {
+    public MatchmakingRecord(String sessionKey, String matchmakingRecordTimestamp, String kenaUid, String peterUid, LatLng peterLatLng, LatLng kenaLatLng, double timeElapsed, int userPointsGained ) {
         this.sessionKey = sessionKey;
         this.matchmakingRecordTimestamp = matchmakingRecordTimestamp;
         this.kenaUid = kenaUid;
@@ -20,6 +23,7 @@ public class MatchmakingRecord {
         this.peterLatLng = peterLatLng;
         this.kenaLatLng = kenaLatLng;
         this.timeElapsed = timeElapsed;
+        this.userPointsGained = userPointsGained;
 
     }
 
@@ -80,5 +84,12 @@ public class MatchmakingRecord {
     }
 
 
+    public int getUserPointsGained() {
+        return userPointsGained;
+    }
+
+    public void setUserPointsGained(int userPointsGained) {
+        this.userPointsGained = userPointsGained;
+    }
 
 }

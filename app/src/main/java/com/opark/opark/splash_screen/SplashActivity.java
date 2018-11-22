@@ -87,7 +87,7 @@ try {
     }
 
 
-    private void updateUI(FirebaseUser currentUser) {
+    public void updateUI(FirebaseUser currentUser) {
         try {
             if (currentUser != null) {
 

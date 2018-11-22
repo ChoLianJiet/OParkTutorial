@@ -16,16 +16,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.model.User;
+import com.opark.opark.share_parking.MapsMainActivity;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -96,7 +100,7 @@ public class UserProfileSetup extends AppCompatActivity {
 
         // Retrieve FirebaseUser object via intent string extra
         // String is converted into FirebaseUser object via Gson
-        firebaseUserUID = getIntent().getStringExtra("firebaseUser");
+        firebaseUserUID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
 
 
@@ -105,10 +109,6 @@ public class UserProfileSetup extends AppCompatActivity {
 
         //Provided by Library but haven't test if useful or not
         expandableListener();
-
-
-
-
 
 
         /**EXPANDING LAYOUT**/
@@ -525,7 +525,9 @@ public class UserProfileSetup extends AppCompatActivity {
     }
 
     private void attemptUserSignOut(){
+
         Log.d("signout", "signoutbutton Clicked");
+        LoginManager.getInstance().logOut();
         mAuth = FirebaseAuth.getInstance();
         mAuth.signOut();
         Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
@@ -565,11 +567,12 @@ else {
         objToByteStreamUpload(user, userFolder);
 
 
+            DatabaseReference userPointsDaRef = FirebaseDatabase.getInstance().getReference().child("users/userPoints/"+firebaseUserUID);
+            userPointsDaRef.setValue(userPoints);
         StorageReference userRewardsFolder = storageRef.child("users/" +firebaseUserUID + "/points.txt");
         objToByteStreamUpload(userPoints,userRewardsFolder);
 
-        //TODO intent to card swipe or other page ? maybe upload prof pic ?
-        Intent intent = new Intent(UserProfileSetup.this, LoginActivity.class);
+        Intent intent = new Intent(UserProfileSetup.this, MapsMainActivity.class);
         finish();
         startActivity(intent);}
     }
@@ -586,6 +589,8 @@ else {
                 editTexts[i].setError(getString(R.string.error_field_required));
                 focusView = editTexts[i];
                 cancel = true;
+
+
                 if(carColour==null){
                     carColour.setError(getString(R.string.error_field_required));
                     focusView=carColour;

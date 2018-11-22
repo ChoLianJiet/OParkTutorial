@@ -34,7 +34,7 @@ public class InsufficientPointsDialog extends Dialog implements
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View v)  {
         dismiss();
     }
 }

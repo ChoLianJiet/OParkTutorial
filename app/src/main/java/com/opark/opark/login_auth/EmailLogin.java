@@ -49,7 +49,10 @@ import com.google.firebase.storage.StorageReference;
 import com.opark.opark.BuildConfig;
 import com.opark.opark.R;
 import com.opark.opark.UserProfileSetup;
+import com.opark.opark.merchant_side.MerchActivity;
+import com.opark.opark.merchant_side.MerchProfileSetup;
 import com.opark.opark.share_parking.MapsMainActivity;
+import com.opark.opark.splash_screen.SplashActivity;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -60,9 +63,14 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 
 /** * Created by Supriya on 9/11/2016. */
 public class EmailLogin extends Fragment {
-
+    private boolean hasMerchantProfile;
+    private boolean isMerchantApproved;
+    private boolean isMerchantWhileSplash;
     private FirebaseAuth mAuth;
     // UI references.
+
+    private String currentMerchantEmail;
+
     private TextView phoneAuthTextButton;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -215,25 +223,145 @@ public class EmailLogin extends Fragment {
 //        Fragment fragment = getFragmentManager().findFragmentById(R.id.);
 
     }
-//
-//    @Override
-//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//        Log.d("emaillogin","Fragment is created");
-//    }
 
-//    @Override
-//    public void onViewCreated(View v,  @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(v, savedInstanceState);
-//        // Check if user is signed in (non-null) and update UI accordingly.
-//        FirebaseUser currentUser = mAuth.getCurrentUser();
-//        mAuth.addAuthStateListener(mAuthListener);
-//
-//        updateUI(currentUser);
-//    }
 
 
     public void updateUI(FirebaseUser currentUser) {
+        try {
+            if (currentUser != null) {
+
+                final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                Log.d("EmailLogin", "updateUI: currentUserID" + currentUserID);
+                currentMerchantEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+                checkIsMerchantOrUser(currentUserID);
+
+
+            }else {
+                // No user is signed in
+                Log.d("EmailLogin", "updateUI: NoUser");
+                return;
+            } }catch (NullPointerException e) {
+
+            Log.d("Login Null", "login null caught");
+        }
+    }
+
+
+
+    /**below are methods to check if logged in is a User or Merchant**/
+
+    private void checkIsMerchantOrUser(final String userID){
+
+        StorageReference merchRef = FirebaseStorage.getInstance().getReference().child("merchants/" +"merchantlist/"+ currentMerchantEmail + "/isMerchant.txt");
+        merchRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // file exists
+                Log.d("EmailLogin", "is Merchant");
+                Log.d("EmailLogin", "uri: " + uri.toString());
+
+                isMerchantWhileSplash =true;
+                checkHasMerchProfile(userID);
+
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                //file not found
+                Log.d("EmailLogin", "not Merchant");
+                isMerchantWhileSplash=false;
+                checkIsUser(userID);
+            }
+        });
+    }
+
+    private void checkHasMerchProfile(final String userID){
+
+        final StorageReference hasMerchProf = FirebaseStorage.getInstance().getReference().child("merchants/" + "merchantlist/" + currentMerchantEmail + "/merchProf.txt");
+        hasMerchProf.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+
+                hasMerchantProfile = true;
+                Log.d("EmailLogin", "Merchant has profile ");
+                checkIsMerchApproved(userID);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("EmailLogin", "Merchant has no profile");
+                hasMerchantProfile = false;
+                //MERCH PROFILE SETUP
+                Intent merchProfSetupIntent = new Intent(getActivity(), MerchProfileSetup.class);
+                getActivity().finish();
+                startActivity(merchProfSetupIntent);
+            }
+        });
+
+    }
+
+    private void checkIsMerchApproved(String userID){
+        final StorageReference isApproved = FirebaseStorage.getInstance().getReference().child("merchants/" + "merchantlist/" + currentMerchantEmail + "/isApproved.txt");
+        isApproved.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Log.d("EmailLogin", "onSuccess: approved merchant");
+                isMerchantApproved = true;
+                //TODO intent to MerchActivity
+                Intent merchActIntent = new Intent(getActivity(), MerchActivity.class);
+                getActivity().finish();
+                startActivity(merchActIntent);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("EmailLogin", "onFailure: not approved");
+                isMerchantApproved = false;
+                //TODO intent to merchwaiting approval
+                Intent merchApprovIntent = new Intent(getActivity(), MerchWaitingApproval.class);
+                getActivity().finish();
+                startActivity(merchApprovIntent);
+
+            }
+        });
+    }
+
+    private void checkIsUser(final String userID){
+
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("users/" + userID + "/profile.txt");
+        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // file exists
+                Log.d("login", "user logged in");
+                Log.d("urlget", "uri: " + uri.toString());
+
+                Intent intent = new Intent(getActivity(), MapsMainActivity.class);
+                intent.putExtra("firebaseUser", userID);
+                getActivity().finish();
+                startActivity(intent);
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                //file not found
+                String firebaseUserUID = mAuth.getCurrentUser().getUid();
+                Log.d("urlget", "New User, No profile");
+                Intent intent = new Intent(getActivity(), UserProfileSetup.class);
+                intent.putExtra("firebaseUser", firebaseUserUID);
+                getActivity().finish();
+                startActivity(intent);
+            }
+        });
+    }
+
+
+
+
+    /*public void updateUI(FirebaseUser currentUser) {
         try {
             if (currentUser != null) {
 
@@ -279,7 +407,7 @@ public class EmailLogin extends Fragment {
 
 
         }
-    }
+    }*/
 
     private void handleFacebookAccessToken(AccessToken token) {
         Log.d("facebook token", "handleFacebookAccessToken:" + token);

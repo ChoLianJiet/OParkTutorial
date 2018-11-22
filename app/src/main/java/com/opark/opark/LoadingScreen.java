@@ -89,6 +89,7 @@ public class LoadingScreen extends AppCompatActivity {
         matchmakingRef.child(currentUserID).child("adatem").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                try{
                 String adatemValue = dataSnapshot.getValue().toString();
                 if (adatemValue.equals("2")) {
                     CalculatePoints();
@@ -98,8 +99,10 @@ public class LoadingScreen extends AppCompatActivity {
                 } else {
 
                 }
+                }catch (NullPointerException e ){
+                        e.printStackTrace();
+                }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -218,7 +221,7 @@ public class LoadingScreen extends AppCompatActivity {
         cal.setTimeInMillis(tsLong* 1000L);
         String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
 
-        MatchmakingRecord thisMatchmakingRecord = new MatchmakingRecord("none",date,currentUserID,"none",null,kenaLatLng,elapsedTime);
+        MatchmakingRecord thisMatchmakingRecord = new MatchmakingRecord("none",date,currentUserID,"none",null,kenaLatLng,elapsedTime,pointsToUploadFromLoadingScreen);
         matchMakingRecordStoRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/matchmakingrecord/" + "sharingrecord/" + date);
         latestMatchmakingRecord = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/matchmakingrecord/"+  "latestrecord.txt");
         objToByteStreamUpload(thisMatchmakingRecord,matchMakingRecordStoRef);

@@ -75,8 +75,8 @@ public class PhoneAuth extends Fragment {
 
         verificationCodeEntry = (EditText) v.findViewById(R.id.verification_code_entry);
         phoneEntry = (EditText) v.findViewById(R.id.phone_num_enter);
-        verifyButton = (CircularProgressButton) v.findViewById(R.id.verify_button);
-        sendCodeButton = (CircularProgressButton) v.findViewById(R.id.send_v_code);
+        verifyButton = (Button) v.findViewById(R.id.verify_button);
+        sendCodeButton = (Button) v.findViewById(R.id.send_v_code);
 
 
         mAuth = FirebaseAuth.getInstance();
@@ -114,6 +114,8 @@ public class PhoneAuth extends Fragment {
                 verifyVerificationCode(vCode);
 
 
+
+
             }
         });
 
@@ -123,15 +125,18 @@ public class PhoneAuth extends Fragment {
             public void onVerificationCompleted(PhoneAuthCredential credential) {
 
                 vCode = credential.getSmsCode();
-                // This callback will be invoked in two situations:
-                // 1 - Instant verification. In some cases the phone number can be instantly
-                //     verified without needing to send or enter a verification code.
+
+
+/*                 This callback will be invoked in two situations:
+                 1 - Instant verification. In some cases the phone number can be instantly
+                     verified without needing to send or enter a verification code.
+
+                 2 - Auto-retrieval. On some devices Google Play services can automatically
+                     detect the incoming verification SMS and perform verification without
+                     user action.*/
 
 
 
-                // 2 - Auto-retrieval. On some devices Google Play services can automatically
-                //     detect the incoming verification SMS and perform verification without
-                //     user action.
                 if (vCode != null) {
                     verificationCodeEntry.setText(vCode);
                     //verifying the code
@@ -140,7 +145,7 @@ public class PhoneAuth extends Fragment {
 
                 Log.d(TAG, "onVerificationCompleted:" + credential);
 
-//                signInWithPhoneAuthCredential(credential);
+                signInWithPhoneAuthCredential(credential);
             }
 
             @Override
@@ -169,7 +174,7 @@ public class PhoneAuth extends Fragment {
                 // The SMS verification code has been sent to the provided phone number, we
                 // now need to ask the user to enter the code and then construct a credential
                 // by combining the code with a verification ID.
-//                super.onCodeSent(mVerificationId, token);
+                super.onCodeSent(mVerificationId, token);
                 Log.d(TAG, "onCodeSent:" + verificationId);
                 verifyButton.setVisibility(View.VISIBLE);
 

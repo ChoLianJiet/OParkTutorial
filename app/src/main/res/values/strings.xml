@@ -21,7 +21,7 @@
     <string name="action_sign_in_short">Sign In</string>
     <string name="error_field_required">Field Required</string>
     <string name="error_invalid_email">The email you entered is invalid</string>
-    <string name="error_invalid_password">The password you entered does not satisfied requirements</string>
+    <string name="error_invalid_password">The password you entered does not satisfy requirements</string>
     <string name="email_registration">Email</string>
     <string name="confirm_password_text">Confirm Password</string>
     <string name="name_registration">Name</string>
