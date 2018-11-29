@@ -1,4 +1,4 @@
-package com.opark.opark;
+package com.opark.opark.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDialog;
 import android.support.v7.app.AppCompatDialogFragment;
+
+import com.opark.opark.R;
 
 public class PromptKenaDialog extends AppCompatDialogFragment {
 
