@@ -1,4 +1,4 @@
-package com.opark.opark;
+package com.opark.opark.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -10,18 +10,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.opark.opark.share_parking.MapsMainActivity;
 
-public class PromptEndSessionDialog extends AppCompatDialogFragment {
-
+public class PromptDetectedFFKDialogForKena extends AppCompatDialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Congratulations!")
-                .setMessage("Yay! You have succesfully exchanged parking!")
-                .setPositiveButton("End Session", new DialogInterface.OnClickListener() {
+        builder.setTitle("FFK Detected :(")
+                .setMessage("We have detected that you are trying to FFK. Are you leaving without exchanging parking? FFK will cause your rating to below")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        DatabaseReference togetherRef = FirebaseDatabase.getInstance().getReference().child("together").child(MapsMainActivity.currentUserID);
-                        togetherRef.child("pointsGainedFromSharing").setValue(LoadingScreen.pointsGainedFromLoadingScreen + PeterMap.pointsGainedFromPeterMap + KenaMap.pointsGainedFromKenaMap);
+                        dialog.dismiss();
+//                        getActivity().finish();
                     }
                 });
         return builder.create();
