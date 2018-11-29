@@ -1293,11 +1293,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         }
 
 
-            else
 
-            {
-            super.onBackPressed();
-        }
 }
 
 
