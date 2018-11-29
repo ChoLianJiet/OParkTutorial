@@ -352,6 +352,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
        );
 
 
+
        userPointDataRef.addValueEventListener(new ValueEventListener() {
            @Override
            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -369,7 +370,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                    Log.d(TAG, "onDataChange: userPoints" + userPoints);
                } catch (NullPointerException e ){
 
-                    userPointDataRef.setValue(userPoints);
+                   userPointDataRef.setValue(userPoints);
 
                }
 
@@ -381,7 +382,6 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                Log.d(TAG, "onCancelled: " + databaseError);
            }
        });
-
 
 
        userRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
@@ -418,14 +418,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
            }
        });
 
-
-
-
-
    }
-
-
-
 
 
 
@@ -554,6 +547,9 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
 
 
+
+
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -643,7 +639,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                     } else {
                         System.out.println("Location saved on server successfully as lat[" + latitude + "], lon[" + longitude + "]!");
                         loadLocationForThisUser();
-
+                        acquireUserProfileAndStoreLocal();
                         dismissLoading();
                     }
                 }
@@ -993,6 +989,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 }
             });
             saveFoundUserId();
+
             dismissLoading();
 
             if(position == 123) {

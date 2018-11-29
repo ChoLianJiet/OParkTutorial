@@ -39,8 +39,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.opark.opark.chat.ChatAdapter;
-import com.opark.opark.chat.ChatMessage;
+
 import com.opark.opark.share_parking.MapsMainActivity;
 
 public class PeterMap extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnCameraMoveStartedListener {
@@ -79,7 +78,6 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
     //Chat
     private EditText chatEditText;
     private FloatingActionButton fab;
-    private ChatAdapter mAdapter;
     private ListView chatListView;
 
 
@@ -136,9 +134,9 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
             public void onClick(View v) {
                 String text = chatEditText.getText().toString();
                 if(!text.equals("")){
-                    ChatMessage chat = new ChatMessage(text,FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-                    FirebaseDatabase.getInstance().getReference().child("together").child(MapsMainActivity.foundUser).child("messages").push().setValue(chat);
-                    chatEditText.setText("");
+//                    ChatMessage chat = new ChatMessage(text,FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+//                    FirebaseDatabase.getInstance().getReference().child("together").child(MapsMainActivity.foundUser).child("messages").push().setValue(chat);
+//                    chatEditText.setText("");
                 }
 
             }
@@ -201,14 +199,12 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
     @Override
     protected void onStart() {
         super.onStart();
-        mAdapter = new ChatAdapter(this,FirebaseDatabase.getInstance().getReference().child("together").child(foundUser),UserPopUpFragment.kenaParkerName.getText().toString());
-        chatListView.setAdapter(mAdapter);
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mAdapter.cleanup();
     }
 
     private void getCurrentUserLocation(){

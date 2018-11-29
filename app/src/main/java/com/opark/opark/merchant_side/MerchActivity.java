@@ -23,7 +23,6 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.github.glomadrian.codeinputlib.CodeInput;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,8 +40,7 @@ import com.opark.opark.merchant_side.merchant_class.Merchant;
 import com.opark.opark.model.RewardsPreredemption;
 import com.opark.opark.model.User;
 
-import com.raycoarana.codeinputview.CodeInputView;
-import com.raycoarana.codeinputview.OnCodeCompleteListener;
+
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;

@@ -53,8 +53,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.opark.opark.card_swipe.MainActivityCardSwipe;
-import com.opark.opark.chat.ChatAdapter;
-import com.opark.opark.chat.ChatMessage;
+
 import com.opark.opark.share_parking.MapsMainActivity;
 
 import java.text.DecimalFormat;
@@ -103,7 +102,6 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
     //Chat
     private EditText chatEditText;
     private FloatingActionButton fab;
-    private ChatAdapter mAdapter;
     private ListView chatListView;
 
 
@@ -158,12 +156,11 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = chatEditText.getText().toString();
-                if(!text.equals("")){
-                    ChatMessage chat = new ChatMessage(text,FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-                    FirebaseDatabase.getInstance().getReference().child("together").child(currentUserId).child("messages").push().setValue(chat);
-                    chatEditText.setText("");
-                }
+//                String text = chatEditText.getText().toString();
+//                if(!text.equals("")){
+//                    FirebaseDatabase.getInstance().getReference().child("together").child(currentUserId).child("messages").push().setValue(chat);
+//                    chatEditText.setText("");
+//                }
 
             }
         });
@@ -217,14 +214,12 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
     @Override
     protected void onStart() {
         super.onStart();
-        mAdapter = new ChatAdapter(this,FirebaseDatabase.getInstance().getReference().child("together").child(currentUserId),UserPopUpFragment.kenaParkerName.getText().toString());
-        chatListView.setAdapter(mAdapter);
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mAdapter.cleanup();
     }
 
     private void getCurrentUserLocation(){
