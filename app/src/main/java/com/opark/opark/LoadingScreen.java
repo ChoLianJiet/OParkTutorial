@@ -1,10 +1,21 @@
 package com.opark.opark;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Chronometer;
+import android.widget.Toast;
+
+import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
@@ -46,19 +57,20 @@ public class LoadingScreen extends AppCompatActivity {
 
     private DatabaseReference matchmakingRef;
     private FirebaseStorage storage;
+    private StorageReference storageRef;
+    private StorageReference userRewardsFolder;
+    private String currentUserID;
+    private Button cancelButton;
+    private int userPoints;
+    Chronometer mChronometer;
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
     private String CurrentUserID;
-    private StorageReference storageRef;
     private StorageReference latestMatchmakingRecord;
     private StorageReference matchMakingRecordStoRef;
-    private StorageReference userRewardsFolder;
-    private String currentUserID;
     private double kenaLat;
     private double kenaLng;
     private LatLng kenaLatLng;
-    private Button cancelButton;
-    private int userPoints;
     double startTime;
     double elapsedTime;
     public static double pointsGainedFromLoadingScreen;
@@ -75,6 +87,9 @@ public class LoadingScreen extends AppCompatActivity {
         currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         matchmakingRef = FirebaseDatabase.getInstance().getReference().child("matchmaking");
         startTime = SystemClock.currentThreadTimeMillis();
+
+        mChronometer = (Chronometer) findViewById(R.id.chronometer);
+        mChronometer.start();
 
         LottieAnimationView lottieAnimationView = (LottieAnimationView) findViewById(R.id.animation);
         lottieAnimationView.setImageAssetsFolder("images/");
@@ -232,5 +247,13 @@ public class LoadingScreen extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+    super.onPause();
+    }
 
+    @Override
+    protected void onStop() {
+    super.onStop();
+    }
 }

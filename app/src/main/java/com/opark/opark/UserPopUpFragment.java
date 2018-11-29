@@ -1,10 +1,10 @@
 package com.opark.opark;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,21 +35,22 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.opark.opark.model.User;
+import com.opark.opark.motion_vehicle_tracker.Map;
 import com.opark.opark.share_parking.MapsMainActivity;
 
 import org.w3c.dom.Text;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.android.gms.flags.impl.SharedPreferencesFactory.getSharedPreferences;
 
 public class UserPopUpFragment extends Fragment {
 
     final String TAG = "UserPopUpFragment";
-    public static String USER_DECLINE_PREFS;
-    public static String USER_DECLINE_KEY;
-    public static String DECLINED = "declined";
+    public static String KENA_DETAILS_ID_PREFS;
+    public static String KENA_DETAILS_ID_KEY;
     final long ONE_MEGABYTE = 1024 * 1024;
 
     FirebaseStorage firebaseStorage;
@@ -57,26 +60,25 @@ public class UserPopUpFragment extends Fragment {
     private DatabaseReference togetherRef;
 
     FrameLayout mFrameLayout;
-    TextView kenaParkerName;
-    TextView carModel;
-    TextView carPlateNumber;
-    TextView carColor;
+    public static TextView kenaParkerName;
+    public static TextView carModel;
+    public static TextView carPlateNumber;
+    public static TextView carColor;
     ArrayList<User> userObjList = new ArrayList<>();
     String foundUser;
     Button acceptButton;
     Button declineButton;
     FloatingActionButton xButton;
-    UserPopUpFragment userPopUpFragment;
+    OnUserPopUpFragmentListener mCallback;
+    List<String> words = new ArrayList<>();
 
-
-
-    public static UserPopUpFragment newInstance(){
-        return new UserPopUpFragment();
+    public static interface OnUserPopUpFragmentListener {
+        void onArticleSelected(int position);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.user_pop_up_fragment, container, false);
 
         bindViews(view);
@@ -85,8 +87,10 @@ public class UserPopUpFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 MapsMainActivity.kenaMarker.remove();
-//                MapsMainActivity.kenaMarker = null;
+                int position = 124;
+                mCallback.onArticleSelected(position);
                 returnToMain();
+                matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM0);
             }
         });
 
@@ -94,6 +98,8 @@ public class UserPopUpFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 acceptUser();
+                int position = 124;
+                mCallback.onArticleSelected(position);
             }
         });
 
@@ -101,6 +107,8 @@ public class UserPopUpFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 declineUser();
+                int position = 123;
+                mCallback.onArticleSelected(position);
             }
         });
 
@@ -110,6 +118,25 @@ public class UserPopUpFragment extends Fragment {
 
         return view;
 
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        if (context instanceof OnUserPopUpFragmentListener){
+            mCallback = (OnUserPopUpFragmentListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + "must implement OnUserPopUpFragmentListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallback = null;
     }
 
     @Override
@@ -166,6 +193,7 @@ public class UserPopUpFragment extends Fragment {
                     carModel.setText(userObjList.get(0).getUserCar().getCarBrand() + userObjList.get(0).getUserCar().getCarModel());
                     carPlateNumber.setText(userObjList.get(0).getUserCar().getCarPlate());
                     carColor.setText(userObjList.get(0).getUserCar().getCarColour());
+
                 } catch (UnsupportedEncodingException e){
                     e.printStackTrace();
                 }
@@ -182,9 +210,10 @@ public class UserPopUpFragment extends Fragment {
 
         matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM2);
         togetherRef.child(foundUser).child("peter").setValue(MapsMainActivity.currentUserID);
+
         Intent intent = new Intent(getActivity(),PeterMap.class);
         startActivity(intent);
-//        getActivity().finish();
+
     }
 
     private void declineUser(){
@@ -199,52 +228,56 @@ public class UserPopUpFragment extends Fragment {
         MapsMainActivity.oldHashSet.clear();
 
         MapsMainActivity.kenaMarker.remove();
-//        MapsMainActivity.kenaMarker = null;
 
         Log.i(TAG,foundUser + " has been removed from newArrayList due to declining");
         Log.i(TAG,"MapsMainActivity newArraylist " + MapsMainActivity.newArrayList);
         Log.i(TAG,"MapsMainActivity oldArraylist" + MapsMainActivity.oldArrayList);
-//        getActivity().finish();
 
     }
+
 
     private void returnToMain(){
 
-//        mFrameLayout.setVisibility(View.INVISIBLE);
-//        FragmentManager manager = getFragmentManager();
-//        FragmentTransaction transaction = manager.beginTransaction();
-//        transaction.remove(MapsMainActivity.userPopUpFragment);
-//        transaction.addToBackStack(null);
-//        transaction.commit();
-        matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM0);
-    }
+        FragmentManager manager = getFragmentManager();
+        manager.popBackStack();
+        FragmentTransaction transaction = manager.beginTransaction();
 
+        if (MapsMainActivity.position != 123){
+            transaction.remove(MapsMainActivity.userPopUpFragment);
+            Log.d(TAG,"userPopUpFragment is removed");
+        } else {
+            transaction.remove(MapsMainActivity.userPopUpFragment);
+            transaction.remove(MapsMainActivity.userPopUpFragment1);
+            Log.d(TAG,"userPopUpFragment and userPopUpFragment1 is removed");
+        }
+        MapsMainActivity.kenaMarker.remove();
+        transaction.commit();
+    }
 
     private void listenToDatabase(){
 
         matchmakingRef.child(foundUser).child("adatem").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                try {
-                String adatemValue = dataSnapshot.getValue().toString();
-                if (adatemValue != MapsMainActivity.ADATEM1){
-                    FragmentManager manager = getFragmentManager();
-                    FragmentTransaction transaction = manager.beginTransaction();
-                    transaction.remove(MapsMainActivity.userPopUpFragment);
-                    transaction.addToBackStack(null);
-                    transaction.commit();
+                    try {
+                        String adatemValue = dataSnapshot.getValue().toString();
+                        if (adatemValue.equals("Not Available") || adatemValue == MapsMainActivity.ADATEM0) {
+//                            MapsMainActivity.kenaMarker.remove();
+                            returnToMain();
+                            int position = 123;
+                            mCallback.onArticleSelected(position);
+                            MapsMainActivity.kenaMarker.remove();
+                        }
+                    } catch (NullPointerException e) {
+                        System.out.println(e);
+                    }
+            }
 
-                    MapsMainActivity.kenaMarker.remove();
-//                    MapsMainActivity.kenaMarker = null;
-                }} catch (NullPointerException e) {
-                    System.out.println(e);
+                @Override
+                public void onCancelled (DatabaseError databaseError){
+
                 }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
         });
     }
+
 }

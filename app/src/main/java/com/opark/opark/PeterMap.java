@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Chronometer;
@@ -38,8 +39,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-//import com.opark.opark.chat.ChatAdapter;
-//import com.opark.opark.chat.ChatMessage;
+import com.opark.opark.chat.ChatAdapter;
+import com.opark.opark.chat.ChatMessage;
 import com.opark.opark.share_parking.MapsMainActivity;
 
 public class PeterMap extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnCameraMoveStartedListener {
@@ -78,7 +79,7 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
     //Chat
     private EditText chatEditText;
     private FloatingActionButton fab;
-//    private ChatAdapter mAdapter;
+    private ChatAdapter mAdapter;
     private ListView chatListView;
 
 
@@ -96,27 +97,27 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
         mapFragment.getMapAsync(this);
         FirebaseApp.initializeApp(getApplicationContext());
 
-//        View bottomSheet = findViewById(R.id.bottom_sheet_peter);
-//        mBottomSheetBehavior= BottomSheetBehavior.from(bottomSheet);
+        View bottomSheet = findViewById(R.id.bottom_sheet_peter);
+        mBottomSheetBehavior= BottomSheetBehavior.from(bottomSheet);
 
         mChronometer = (Chronometer) findViewById(R.id.chronometer);
         mChronometer.start();
 
-//        kenaParkerName = findViewById(R.id.kena_name);
-//        kenaCarColor = findViewById(R.id.kena_car_color);
-//        kenaCarModel = findViewById(R.id.kena_car_modal);
-//        kenaCarPlateNumber = findViewById(R.id.kena_car_plate_number);
+        kenaParkerName = findViewById(R.id.kena_name);
+        kenaCarColor = findViewById(R.id.kena_car_color);
+        kenaCarModel = findViewById(R.id.kena_car_modal);
+        kenaCarPlateNumber = findViewById(R.id.kena_car_plate_number);
 
 
-//        this.kenaParkerName.setText(UserPopUpFragment.kenaParkerName.getText().toString());
-//        this.kenaCarModel.setText(UserPopUpFragment.carModel.getText().toString());
-//        this.kenaCarPlateNumber.setText(UserPopUpFragment.carPlateNumber.getText().toString());
-//        this.kenaCarColor.setText(UserPopUpFragment.carColor.getText().toString());
+        this.kenaParkerName.setText(UserPopUpFragment.kenaParkerName.getText().toString());
+        this.kenaCarModel.setText(UserPopUpFragment.carModel.getText().toString());
+        this.kenaCarPlateNumber.setText(UserPopUpFragment.carPlateNumber.getText().toString());
+        this.kenaCarColor.setText(UserPopUpFragment.carColor.getText().toString());
 
         //Chat
-//        chatListView = (ListView) findViewById(R.id.list_view);
-//        chatEditText = (EditText) findViewById(R.id.input_text) ;
-//        fab = (FloatingActionButton) findViewById(R.id.fab) ;
+        chatListView = (ListView) findViewById(R.id.list_view);
+        chatEditText = (EditText) findViewById(R.id.input_text) ;
+        fab = (FloatingActionButton) findViewById(R.id.fab) ;
 
         recenterButton = (FloatingActionButton) findViewById(R.id.recenter_button);
         recenterButton.setVisibility(View.INVISIBLE);
@@ -135,8 +136,8 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
             public void onClick(View v) {
                 String text = chatEditText.getText().toString();
                 if(!text.equals("")){
-//                    ChatMessage chat = new ChatMessage(text,FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-//                    FirebaseDatabase.getInstance().getReference().child("together").child(MapsMainActivity.foundUser).child("messages").push().setValue(chat);
+                    ChatMessage chat = new ChatMessage(text,FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                    FirebaseDatabase.getInstance().getReference().child("together").child(MapsMainActivity.foundUser).child("messages").push().setValue(chat);
                     chatEditText.setText("");
                 }
 
@@ -163,7 +164,7 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
                         setRecenterButton();
                         break;
                     case BottomSheetBehavior.STATE_DRAGGING:
-                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                         recenterButton.setVisibility(View.INVISIBLE);
                         break;
                     case BottomSheetBehavior.STATE_EXPANDED:
@@ -181,6 +182,14 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
             }
         });
 
+        chatListView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                return false;
+            }
+        });
+
     }
 
     @Override
@@ -192,14 +201,14 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
     @Override
     protected void onStart() {
         super.onStart();
-//        mAdapter = new ChatAdapter(this,FirebaseDatabase.getInstance().getReference().child("together").child(foundUser),UserPopUpFragment.kenaParkerName.getText().toString());
-//        chatListView.setAdapter(mAdapter);
+        mAdapter = new ChatAdapter(this,FirebaseDatabase.getInstance().getReference().child("together").child(foundUser),UserPopUpFragment.kenaParkerName.getText().toString());
+        chatListView.setAdapter(mAdapter);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-//        mAdapter.cleanup();
+        mAdapter.cleanup();
     }
 
     private void getCurrentUserLocation(){

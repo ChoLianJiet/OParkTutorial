@@ -101,6 +101,10 @@ android {
         implementation 'com.github.flipkart-incubator:circular-image:1.0'
         implementation 'com.github.stfalcon:chatkit:0.2.2'
         implementation 'com.squareup.picasso:picasso:2.5.2'*/
+
+
+        //Chat Bubble View
+        implementation 'com.github.lguipeng:BubbleView:1.0.1'
     }
 
 
