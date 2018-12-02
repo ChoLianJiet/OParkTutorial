@@ -209,16 +209,27 @@ public class FeedbackModel {
 
     public void getLastFeedbackCompleted() {
 
-        flagStorageLocation.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+        flagStorageLocation.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
-            public void onSuccess(byte[] bytes) {
-                try {
-                    Car car = (new Gson().fromJson(new String(bytes, "UTF-8"), Car.class));
-                    mCallback.onLastFeedbackCompleted(car.carBrand.isEmpty(), car);
+            public void onSuccess(Uri uri) {
 
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                flagStorageLocation.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        try {
+                            Car car = (new Gson().fromJson(new String(bytes, "UTF-8"), Car.class));
+                            mCallback.onLastFeedbackCompleted(car.carBrand.isEmpty(), car);
+
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        feedbackSubmitted();
+                    }
+                });;
             }
         });
     }
