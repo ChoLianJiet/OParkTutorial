@@ -3,6 +3,7 @@ package com.opark.opark.feedback;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -208,7 +209,7 @@ public class FeedbackModel {
     }
 
     public void getLastFeedbackCompleted() {
-
+        Log.i(TAG, "getLastFeedbackCompleted");
         flagStorageLocation.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -218,19 +219,21 @@ public class FeedbackModel {
                     public void onSuccess(byte[] bytes) {
                         try {
                             Car car = (new Gson().fromJson(new String(bytes, "UTF-8"), Car.class));
+                            Log.i(TAG, "onSuccess");
                             mCallback.onLastFeedbackCompleted(car.carBrand.isEmpty(), car);
 
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        feedbackSubmitted();
-                    }
-                });;
+                });
             }
-        });
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i(TAG, "Failure " + e.getMessage());
+                feedbackSubmitted();
+            }
+        });;
     }
 }
