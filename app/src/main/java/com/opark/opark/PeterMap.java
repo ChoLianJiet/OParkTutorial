@@ -57,6 +57,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.opark.opark.dialogs.SorryKenaHasFFKedForPeter;
+import com.opark.opark.feedback.FeedbackDialog;
 import com.opark.opark.model.Car;
 import com.opark.opark.model.User;
 import com.opark.opark.share_parking.MapsMainActivity;
@@ -702,6 +703,29 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
         objToByteStreamUpload(user,flagStorageLocation);
         CalculatePoints();
         /*** Intent to Feedback***/
+        FeedbackDialog dialog = new FeedbackDialog();
+        dialog.setArguments(dialog.setCarDetails(user.userCar));
+        dialog.show(getSupportFragmentManager(), "");
+
+        final StorageReference userRewardsFolder = storageRef.child("users/" +currentUserId + "/points.txt");
+        userRewardsFolder.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+
+                Double currentPoints = null;
+                try {
+                    currentPoints = new Gson().fromJson(new String(bytes, "UTF-8"), Double.class);
+                    double totalPoints = currentPoints + KenaMap.pointsGainedFromKenaMap + PeterMap.pointsGainedFromPeterMap;
+                    objToByteStreamUpload(totalPoints,userRewardsFolder);
+                    DatabaseReference userPointsDaRef = FirebaseDatabase.getInstance().getReference().child("users/userPoints/"+currentUserId);
+                    userPointsDaRef.setValue(totalPoints);
+                    Toast.makeText(getApplicationContext(), "Total points: " + totalPoints, Toast.LENGTH_SHORT).show();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 
     private void objToByteStreamUpload(Object obj, StorageReference destination){

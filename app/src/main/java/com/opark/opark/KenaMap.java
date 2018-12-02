@@ -57,6 +57,8 @@ import com.google.gson.Gson;
 import com.opark.opark.dialogs.PromptDetectedFFKDialogForKena;
 import com.opark.opark.dialogs.PromptEndSessionDialog;
 import com.opark.opark.dialogs.PromptKenaDialog;
+import com.opark.opark.feedback.FeedbackDialog;
+import com.opark.opark.feedback.FeedbackModel;
 import com.opark.opark.model.Car;
 import com.opark.opark.model.User;
 
@@ -123,7 +125,6 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
     StorageReference storageRef;
     User user = new User();
     private boolean peterIsInside = false;
-
 
 
     @Override
@@ -768,6 +769,32 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
         objToByteStreamUpload(user,flagStorageLocation);
         CalculatePoints();
         /*** Intent to Feedback***/
+
+        FeedbackDialog dialog = new FeedbackDialog();
+        dialog.setArguments(dialog.setCarDetails(user.userCar));
+        dialog.show(getSupportFragmentManager(), "");
+
+
+        final StorageReference userRewardsFolder = storageRef.child("users/" +currentUserId + "/points.txt");
+        userRewardsFolder.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+
+                Double currentPoints = null;
+                try {
+                    currentPoints = new Gson().fromJson(new String(bytes, "UTF-8"), Double.class);
+                    double totalPoints = currentPoints + KenaMap.pointsGainedFromKenaMap + PeterMap.pointsGainedFromPeterMap
+                            + LoadingScreen.pointsGainedFromLoadingScreen;
+                    objToByteStreamUpload(totalPoints,userRewardsFolder);
+                    DatabaseReference userPointsDaRef = FirebaseDatabase.getInstance().getReference().child("users/userPoints/"+currentUserId);
+                    userPointsDaRef.setValue(totalPoints);
+                    Toast.makeText(getApplicationContext(), "Total points: " + totalPoints, Toast.LENGTH_SHORT).show();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 
     private void CalculatePoints(){

@@ -87,12 +87,15 @@ import com.opark.opark.LoadingScreen;
 import com.opark.opark.ProfileNavFragment;
 import com.opark.opark.RewardsFragment;
 import com.opark.opark.RewardsPocketFragment;
+import com.opark.opark.feedback.FeedbackDialog;
+import com.opark.opark.feedback.FeedbackModel;
 import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.NoUserPopUp;
 import com.opark.opark.R;
 import com.opark.opark.UserPopUpFragment;
 import com.opark.opark.UserProfileSetup;
 import com.opark.opark.login_auth.PhoneAuth;
+import com.opark.opark.model.Car;
 import com.opark.opark.model.User;
 
 
@@ -106,7 +109,8 @@ import java.util.List;
 public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnInfoWindowClickListener,
-        LocationListener, GoogleMap.OnCameraMoveStartedListener,UserPopUpFragment.OnUserPopUpFragmentListener {
+        LocationListener, GoogleMap.OnCameraMoveStartedListener,UserPopUpFragment.OnUserPopUpFragmentListener,
+        FeedbackModel.FeedbackModelCallback{
 
     //CONSTANT
     private static final String TAG = "MapsMainActivity";
@@ -191,6 +195,9 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     //User Profile
     public static ArrayList<User> userObjList = new ArrayList<>();
     public static String lastName, phoneNum, carColour, carPlate, carBrand, carModel;
+
+    //Feedback Model object
+    public FeedbackModel feedbackObj;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -303,8 +310,8 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
         Log.d(TAG, "onCreate: current uid" + currentUserID);
 
-
-
+        feedbackObj = new FeedbackModel(getApplicationContext(), this);
+        feedbackObj.getLastFeedbackCompleted();
 
     }
 
@@ -511,6 +518,10 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 break;
             default:
 //                fragmentClass = FirstFragment.class;
+                FeedbackDialog dialog = new FeedbackDialog();
+                Car car = new Car("Blue","Toyota","Harrier","BJT 2883");
+                dialog.setArguments(dialog.setCarDetails(car));
+                dialog.show(getSupportFragmentManager(), "");
         }
 
         //replacing the fragment
@@ -1189,6 +1200,15 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
             Log.d(TAG,"this position is " + this.position);
         }
 
+    }
+
+    @Override
+    public void onLastFeedbackCompleted(boolean isCompleted, Car car) {
+        if(!isCompleted) {
+            FeedbackDialog dialog = new FeedbackDialog();
+            dialog.setArguments(dialog.setCarDetails(car));
+            dialog.show(getSupportFragmentManager(), "");
+        }
     }
 
     private interface LatLngInterpolator {
