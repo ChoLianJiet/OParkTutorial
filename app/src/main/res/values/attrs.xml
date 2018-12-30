@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <resources>
     <declare-styleable name="CardStackView">
         <attr name="visibleCount" format="integer"/>
@@ -22,5 +21,23 @@
         <attr name="rightOverlay" format="reference"/>
         <attr name="bottomOverlay" format="reference"/>
         <attr name="topOverlay" format="reference"/>
+
     </declare-styleable>
+
+
+
+
+
+
+    <declare-styleable name="SearchViewBehavior1">
+        <attr name="finalYPosition" format="dimension"/>
+        <attr name="startXPosition" format="dimension"/>
+        <attr name="startToolbarPosition" format="dimension"/>
+        <attr name="startHeight" format="dimension"/>
+        <attr name="finalHeight" format="dimension"/>
+    </declare-styleable>
+
 </resources>
+
+
+

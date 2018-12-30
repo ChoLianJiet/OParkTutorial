@@ -107,7 +107,7 @@
         </activity>
         <activity android:name=".login_auth.EmailLogin">
         </activity>
-        <activity android:name=".RewardsFragment">
+        <activity android:name=".rewards_redemption.RewardsFragment">
         </activity>
         <activity android:name="merchant_all.merchant_prof.MerchantProfileSetup">
         </activity>

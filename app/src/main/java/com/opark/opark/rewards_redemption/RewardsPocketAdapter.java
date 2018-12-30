@@ -1,6 +1,5 @@
-package com.opark.opark;
+package com.opark.opark.rewards_redemption;
 
-import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -8,12 +7,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 
-import com.opark.opark.merchant_side.merchant_offer.MerchantOfferAdapter;
+import com.opark.opark.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

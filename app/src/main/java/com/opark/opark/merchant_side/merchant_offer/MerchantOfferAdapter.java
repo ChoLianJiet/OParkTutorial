@@ -12,21 +12,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.opark.opark.R;
-import com.opark.opark.RewardsFragment;
-import com.opark.opark.RewardsPocketOffer;
+import com.opark.opark.merchant_side.merchant_class.Merchant;
+import com.opark.opark.rewards_redemption.ConfirmPreRedeem;
+import com.opark.opark.rewards_redemption.RewardsFragment;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdapter.MerchantOfferAdapterViewHolder> {
+public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdapter.MerchantOfferAdapterViewHolder> implements  Filterable {
     private Context context;
     public  ButtonClicked mButtonClicked;
+    List<MerchantOffer> originalList;
 
     public interface ButtonClicked{
         void onButtonClicked(View v, int position);
@@ -72,6 +75,8 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
     public MerchantOfferAdapter(List<MerchantOffer> merchantOfferList, ButtonClicked buttonClicked){
         this.merchantOfferList = merchantOfferList;
         this.mButtonClicked = buttonClicked;
+        this.originalList = new ArrayList<>(merchantOfferList);
+
 
     }
 
@@ -122,13 +127,13 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
         holder.redeemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RewardsFragment.redeemCost = Integer.valueOf( merchantOfferList.get(i).getOfferCost());
-                RewardsFragment.merchantName = merchantOfferList.get(i).getMerchantName();
-                RewardsFragment.merchantOfferTitle = merchantOfferList.get(i).getMerchantOfferTitle();
-                RewardsFragment.rewardsMerchant = merchantOfferList.get(i).getMerchantName();
-                RewardsFragment.merchantAddress = merchantOfferList.get(i).getMerchantAddress();
-                RewardsFragment.merchantContact = merchantOfferList.get(i).getMerchantContact();
-                RewardsFragment.merchantOfferImageUrl = merchantOfferList.get(i).getOfferImage();
+                ConfirmPreRedeem.redeemCost = Integer.valueOf( merchantOfferList.get(i).getOfferCost());
+                ConfirmPreRedeem.merchantName = merchantOfferList.get(i).getMerchantName();
+                ConfirmPreRedeem.merchantOfferTitle = merchantOfferList.get(i).getMerchantOfferTitle();
+                ConfirmPreRedeem.rewardsMerchant = merchantOfferList.get(i).getMerchantName();
+                ConfirmPreRedeem.merchantAddress = merchantOfferList.get(i).getMerchantAddress();
+                ConfirmPreRedeem.merchantContact = merchantOfferList.get(i).getMerchantContact();
+                ConfirmPreRedeem.merchantOfferImageUrl = merchantOfferList.get(i).getOfferImage();
 
 
 
@@ -170,6 +175,51 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
     {
         this.mButtonClicked=listener;
     }
+
+
+    @Override
+    public Filter getFilter() {
+        return exampleFilter;
+    }
+
+    private Filter exampleFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<MerchantOffer> filteredList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(originalList);
+                Log.d("filter", "performFiltering: Constraints is null/0 "+ originalList);
+            } else {
+
+                Log.d("filter", "performFiltering: Constraints is not null "+ originalList);
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                Log.d("filter", "performFiltering: filterPattern " + filterPattern);
+                for (MerchantOffer item : originalList) {
+                    if (item.getMerchantOfferTitle().toLowerCase().contains(filterPattern)) {
+                        Log.d("filter", "performFiltering: item contain filterPattern " + item.getMerchantOfferTitle().toLowerCase().contains(filterPattern));
+                        filteredList.add(item);
+                    }
+
+                    //TODO to add more filters for address and merchants name
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            Log.d("filter", "publishResults: +" + results.values);
+            merchantOfferList.clear();
+            merchantOfferList.addAll( (List<MerchantOffer>) results.values);
+            notifyDataSetChanged();
+        }
+    };
 
 
 }

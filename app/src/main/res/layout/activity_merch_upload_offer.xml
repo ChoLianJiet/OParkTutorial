@@ -55,6 +55,17 @@
                     android:hint="Offer Title"/>
 
                 <EditText
+                    android:id="@+id/offer_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="15"
+                    android:clickable="true"
+                    android:maxLines="1"
+                    android:focusable="false"
+                    android:hint="Category"
+                    />
+
+                <EditText
                     android:id="@+id/points_cost"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -62,6 +73,19 @@
                     android:maxLines="1"
                     android:maxLength="4"
                     android:hint="Redemption amount (enter 500-2000)"/>
+
+
+                <EditText
+                    android:id="@+id/offer_expiry_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="15"
+                    android:maxLines="1"
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:hint="Expiry Date"
+                    />
+
 
 
 

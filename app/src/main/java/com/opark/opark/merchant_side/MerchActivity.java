@@ -2,9 +2,7 @@ package com.opark.opark.merchant_side;
 
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -36,14 +34,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.opark.opark.R;
+import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.merchant_side.merchant_class.Merchant;
-import com.opark.opark.model.RewardsPreredemption;
-import com.opark.opark.model.User;
-
+import com.opark.opark.rewards_redemption.RewardsPreredemption;
 
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -52,6 +48,7 @@ public class MerchActivity extends AppCompatActivity implements View.OnFocusChan
     private DatabaseReference offerlistDatabaseRef;
     private DatabaseReference offerlistMerchantDataRef;
     private StorageReference merchantProfileNameRef;
+    private TextView signOutButton;
     private String merchantProfileName;
     private String merchantEmail;
     private String offerSelected;
@@ -66,9 +63,9 @@ public class MerchActivity extends AppCompatActivity implements View.OnFocusChan
     private EditText mPinHiddenEditText;
 
     private Spinner whichOffer;
-    ImageButton merchProfImgButton;
-    ImageButton uploadOfferImgButton;
-    ImageButton contactSupportImgButton;
+    TextView merchProfImgButton;
+    TextView uploadOfferImgButton;
+    TextView contactSupportImgButton;
     TextView amountRedeemedTextView;
     TextView errorCode;
     StorageReference rewardStoRef;
@@ -179,7 +176,12 @@ public class MerchActivity extends AppCompatActivity implements View.OnFocusChan
 
 
 
-
+signOutButton.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+         signOut();
+    }
+});
 
 
 
@@ -204,6 +206,7 @@ public class MerchActivity extends AppCompatActivity implements View.OnFocusChan
         merchProfImgButton = findViewById(R.id.merchant_profile);
         uploadOfferImgButton = findViewById(R.id.upload_offer);
         contactSupportImgButton = findViewById(R.id.contact_support);
+        signOutButton = findViewById(R.id.merch_sign_out);
         code1 = (EditText) findViewById(R.id.code1);
         code2 = (EditText) findViewById(R.id.code2);
         code3 = (EditText) findViewById(R.id.code3);
@@ -741,8 +744,19 @@ public void getMerchStuff() {
 
     }
 
+    private void signOut() {
+        Log.d("signout", "signoutbutton Clicked");
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.signOut();
+        Intent intent = new Intent(MerchActivity.this, LoginActivity.class);
+        finish();
+        startActivity(intent);
+    }
+
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
+
 }

@@ -1,4 +1,4 @@
-package com.opark.opark.model;
+package com.opark.opark.rewards_redemption;
 
 public class RewardsRecord {
     String rewardsTitle;

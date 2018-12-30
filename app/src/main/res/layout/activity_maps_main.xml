@@ -159,7 +159,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:background="@color/brightPeach"
+            android:background="@color/peach"
 
             app:headerLayout="@layout/nav_header_drawer_activity_main"
             app:menu="@menu/drawer_view">

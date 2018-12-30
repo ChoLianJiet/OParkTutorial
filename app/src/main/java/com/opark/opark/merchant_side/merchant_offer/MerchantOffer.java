@@ -2,11 +2,22 @@ package com.opark.opark.merchant_side.merchant_offer;
 
 public class MerchantOffer {
   private String merchantOfferTitle, merchantName, merchantAddress, merchantContact, offerCost;
-  private String  offerImage;
+  private String  offerImage, expiryDate, offerCategories;
   public MerchantOffer() {
   }
 
-  public MerchantOffer(String merchantOfferTitle, String merchantName, String merchantAddress, String merchantContact, String offerCost ) {
+    public MerchantOffer(String merchantOfferTitle, String merchantName, String merchantAddress, String merchantContact, String offerCost, String offerImage, String expiryDate, String offerCategories) {
+        this.merchantOfferTitle = merchantOfferTitle;
+        this.merchantName = merchantName;
+        this.merchantAddress = merchantAddress;
+        this.merchantContact = merchantContact;
+        this.offerCost = offerCost;
+        this.offerImage = offerImage;
+        this.expiryDate = expiryDate;
+        this.offerCategories = offerCategories;
+    }
+
+    public MerchantOffer(String merchantOfferTitle, String merchantName, String merchantAddress, String merchantContact, String offerCost ) {
     this.merchantOfferTitle = merchantOfferTitle;
     this.merchantName = merchantName;
     this.merchantAddress = merchantAddress;
@@ -63,9 +74,23 @@ public class MerchantOffer {
     this.offerCost = offerCost;
   }
 
+    public String getExpiryDate() {
+        return expiryDate;
+    }
 
+    public void setExpiryDate(String expiryDate) {
+        this.expiryDate = expiryDate;
+    }
 
-  // This method creates an ArrayList that has three Person objects
+    public String getOfferCategories() {
+        return offerCategories;
+    }
+
+    public void setOfferCategories(String offerCategories) {
+        this.offerCategories = offerCategories;
+    }
+
+// This method creates an ArrayList that has three Person objects
 // Checkout the project associated with this tutorial on Github if
 // you want to use the same images.
 

@@ -240,7 +240,6 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
         });
 
         detectKenaFFK();
-        detectCurrentUserWentIntoSmallGeoFire();
     }
 
     @Override
@@ -438,6 +437,8 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
                 }
 
                 setKenaMarker(foundUserLocation);
+                detectCurrentUserWentIntoSmallGeoFire();
+
             }
 
             @Override
@@ -651,17 +652,17 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
 
     private void detectCurrentUserWentIntoSmallGeoFire(){
 
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(fixedGeoFireLatitude[0], fixedGeoFireLongitude[0]),0.005);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(fixedGeoFireLatitude[0], fixedGeoFireLongitude[0]),0.02);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
                 if (key.equals(currentUserId)){
-                    Intent intent = new Intent(getApplicationContext(), PeterMap.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // You need this if starting
-                    //  the activity from a service
-                    intent.setAction(Intent.ACTION_MAIN);
-                    intent.addCategory(Intent.CATEGORY_LAUNCHER);
-                    startActivity(intent);
+//                    Intent intent = new Intent(getApplicationContext(), PeterMap.class);
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // You need this if starting
+//                    //  the activity from a service
+//                    intent.setAction(Intent.ACTION_MAIN);
+//                    intent.addCategory(Intent.CATEGORY_LAUNCHER);
+//                    startActivity(intent);
                     EndSession();
                     Log.d(TAG,"I have entered the area");
                 } else {
@@ -696,11 +697,7 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
         mChronometer.stop();
         user.userName.firstName = kenaParkerName.toString();
         user.userCar = new Car(kenaCarColor.getText().toString(),kenaCarBrand,kenaCarModel,kenaCarPlateNumber.getText().toString());
-//        Log.d(TAG,"PromptPeterNearbyMini() is called");
-//        PromptEndSessionDialog promptEndSessionDialog = new PromptEndSessionDialog();
-//        promptEndSessionDialog.show(getSupportFragmentManager(),"prompt dialog");
-        StorageReference flagStorageLocation = storageRef.child("users/" + currentUserId + "/gotflag.txt");
-        objToByteStreamUpload(user,flagStorageLocation);
+
         CalculatePoints();
         /*** Intent to Feedback***/
         FeedbackDialog dialog = new FeedbackDialog();
@@ -755,6 +752,8 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
         elapsedTime = (SystemClock.elapsedRealtime()-mChronometer.getBase())/1000;
         Log.d(TAG,"Elapsed time is " + elapsedTime + " seconds");
         pointsGainedFromPeterMap = (0.1 * elapsedTime) + r;
+        pointsGainedFromPeterMap = (int) (Math.ceil(pointsGainedFromPeterMap));
+
         Log.d(TAG,"Points gained by Kena is " + pointsGainedFromPeterMap + ", the random r generated is " + r);
     }
 

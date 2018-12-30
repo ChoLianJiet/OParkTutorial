@@ -1,4 +1,4 @@
-package com.opark.opark;
+package com.opark.opark.rewards_redemption;
 
 public class RewardsPocketOffer {
     private String merchantOfferTitle, merchantName, merchantAddress, merchantContact, preRedemptionCode;

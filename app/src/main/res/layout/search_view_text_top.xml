@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.opark.opark.SearchViewLinLay
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/search_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:ellipsize="end"
+        android:hint="Search"
+        android:maxLines="1"
+        android:textColor="@color/font_Brown"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
+
+</com.opark.opark.SearchViewLinLay>

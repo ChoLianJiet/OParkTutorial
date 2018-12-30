@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_marginBottom="10dp"
-    tools:context=".RewardsPocketFragment">
+    tools:context=".rewards_redemption.RewardsPocketFragment">
 
 
     <android.support.v7.widget.CardView

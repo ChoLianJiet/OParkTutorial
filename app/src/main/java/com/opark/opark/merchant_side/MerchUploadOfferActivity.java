@@ -2,13 +2,19 @@ package com.opark.opark.merchant_side;
 
 
 import com.google.firebase.storage.UploadTask;
+import com.opark.opark.CategoryDialog;
+
+import android.app.DatePickerDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.icu.util.Calendar;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -56,6 +63,8 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   private Bitmap offerImageForUpload;
   private EditText offerTitleEntry;
   private EditText offerRedemptionCost;
+  public static EditText offerCategory;
+  public static EditText offerExpiryDate;
   private FirebaseStorage merchantOfferStorage;
   private StorageReference merchantOfferStorageReference;
   private StorageReference merchantOfferImageRefFromSto;
@@ -65,14 +74,19 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   private FirebaseUser currentMerchantFirebaseUser;
   private StorageTask mUploadTask;
   private ProgressBar mProgressBar;
+  private CategoryDialog categoryDialog;
 
+  private String yy,mm,dd;
 
   private String merchantCoName;
   private String merchantCoPhone;
   private String merchantCoAddress;
-
+  public Context mContext;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+
+    mContext = this;
+
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_merch_upload_offer);
 
@@ -106,7 +120,18 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     });
 
 
+    offerCategory.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
+        categoryDialog = new CategoryDialog();
+
+        categoryDialog.show(fragmentManager,"");
+
+
+      }
+    });
 
 
     uploadButton.setOnClickListener(new View.OnClickListener() {
@@ -120,15 +145,43 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     });
 
 
+
+    offerExpiryDate.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        final DatePickerDialog datePickerDialog = new DatePickerDialog(mContext);
+
+        datePickerDialog.getDatePicker();
+        datePickerDialog.show();
+        datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+          @Override
+          public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+
+            yy = Integer.toString(year);
+            mm = Integer.toString(month + 1);
+            dd = Integer.toString(day) ;
+
+            offerExpiryDate.setText(dd + "/" + mm + "/ " + yy);
+
+
+            datePickerDialog.dismiss();
+          }
+        });
+
+
+      }
+    });
+
   }
 
   private void bindViews() {
-
+    offerExpiryDate=findViewById(R.id.offer_expiry_date);
     mProgressBar = findViewById(R.id.progress_bar);
     offerPicture = findViewById(R.id.offer_picture);
     offerTitleEntry=findViewById(R.id.offer_title);
     offerRedemptionCost=findViewById(R.id.points_cost);
     uploadButton = findViewById(R.id.upload_offer_button);
+    offerCategory = findViewById(R.id.offer_category);
   }
 
 
@@ -402,6 +455,10 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   }
 
 
+  @Override
+  public void onPointerCaptureChanged(boolean hasCapture) {
+
+  }
 }
 
 

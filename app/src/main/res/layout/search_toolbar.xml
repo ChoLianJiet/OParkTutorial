@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_height="150dp"
+    android:layout_width="match_parent"
+    app:titleMarginTop="20dp"
+    android:minHeight="?attr/actionBarSize"
+    app:theme="@style/AppTheme"
+    android:background="@color/peach"
+    android:gravity="top"
+    android:layout_gravity="top"
+
+    >
+
+</android.support.v7.widget.Toolbar>

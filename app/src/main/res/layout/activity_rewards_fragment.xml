@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
-    tools:context=".RewardsFragment">
+    tools:context=".rewards_redemption.RewardsFragment">
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
@@ -26,7 +26,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_margin="10dp"
                 app:srcCompat="@drawable/maintenance_squareboi"
                 />
         </LinearLayout>

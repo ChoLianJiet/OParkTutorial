@@ -7,9 +7,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -64,6 +69,12 @@ public class ProfileNavFragment extends Fragment {
     private ArrayList<MatchmakingRecord> mmObjList = new ArrayList<>();
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         // Defines the xml file for the fragment
         View view=  inflater.inflate(R.layout.profile_nav_fragment, parent, false);
@@ -113,6 +124,7 @@ public class ProfileNavFragment extends Fragment {
 
 
 
+
         return view;
 
 
@@ -125,6 +137,8 @@ public class ProfileNavFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         //you can set the title for your toolbar here for different fragments different titles
         getActivity().setTitle("Profile");
+        toolbar.setTitle("Profile");
+
 
     }
 
@@ -137,7 +151,7 @@ public class ProfileNavFragment extends Fragment {
 //        nameNumlayout2=(LinearLayout) view.findViewById(R.id.name_num_2);
 //        carLayout= (LinearLayout) view.findViewById(R.id.car_1);
 //        firstName = (TextView) view.findViewById(R.id.first_name_edit);
-        toolbar = (Toolbar) view.findViewById(R.id.toolbar_in_maps_main);
+       toolbar = (Toolbar) view.findViewById(R.id.toolbar_in_maps_main);
 
         lastDate = view.findViewById(R.id.last_mm_date);
         lastFinder = view.findViewById(R.id.last_finder);
@@ -152,7 +166,7 @@ public class ProfileNavFragment extends Fragment {
         carPlate = (TextView) view.findViewById(R.id.car_plate_edit);
         profileEditButton =(Button) view.findViewById(R.id.edit_profile_details);
 
-
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
 
 
@@ -258,8 +272,17 @@ public class ProfileNavFragment extends Fragment {
     }
 
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // The action bar home/up action should open or close the mDrawer.
+        switch (item.getItemId()) {
+            case android.R.id.home:
 
+                return true;
+        }
 
+        return super.onOptionsItemSelected(item);
+    }
 }
 
 

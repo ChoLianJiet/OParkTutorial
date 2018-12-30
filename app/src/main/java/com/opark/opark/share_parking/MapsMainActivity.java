@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -14,8 +13,6 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
-import android.location.LocationManager;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -24,23 +21,25 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 //import android.app.Fragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 //import android.app.FragmentManager;
 
 
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -56,9 +55,6 @@ import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -83,10 +79,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.opark.opark.LoadingScreen;
 import com.opark.opark.ProfileNavFragment;
-import com.opark.opark.RewardsFragment;
-import com.opark.opark.RewardsPocketFragment;
+import com.opark.opark.rewards_redemption.RewardsFragment;
+import com.opark.opark.rewards_redemption.RewardsPocketFragment;
 import com.opark.opark.feedback.FeedbackDialog;
 import com.opark.opark.feedback.FeedbackModel;
 import com.opark.opark.login_auth.LoginActivity;
@@ -99,12 +96,11 @@ import com.opark.opark.model.Car;
 import com.opark.opark.model.User;
 
 
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+
+import static com.opark.opark.rewards_redemption.RewardsFragment.merchantOfferAdapter;
 
 public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -175,7 +171,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
     //NavDrawer variables
     public static DrawerLayout mDrawer;
-    private Toolbar toolbar;
+    public static Toolbar toolbar;
     public static NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private MenuItem oldMenuItem;
@@ -336,17 +332,19 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
 
                try {
-                   userPoints = (new Gson().fromJson(new String(bytes, "UTF-8"), Integer.class));
-                   Log.d(TAG, "onSuccess: " + userPoints);
-                   userPointsTextView.setText(String.valueOf(userPoints));
+
+                   try {
+                       userPoints = (new Gson().fromJson(new String(bytes, "UTF-8"), Integer.class));
+                       Log.d(TAG, "onSuccess: " + userPoints);
+                       userPointsTextView.setText(String.valueOf(userPoints));
 
 
-
-
-               } catch (UnsupportedEncodingException e) {
+                   } catch (UnsupportedEncodingException e) {
+                       e.printStackTrace();
+                   }
+               }catch (JsonSyntaxException e){
                    e.printStackTrace();
                }
-
 
 
            }
@@ -497,7 +495,6 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     public void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the fragment to show based on nav item clicked
 
-        Class fragmentClass = null;
         switch(menuItem.getItemId()) {
             case R.id.nav_first_fragment:
                 userProfilePage = new ProfileNavFragment();
@@ -1311,6 +1308,8 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
             mDrawer.closeDrawer(GravityCompat.START);
 
         }
+
+//        else if(RewardsFragment.searchView) {}
 
 
 
