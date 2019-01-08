@@ -119,13 +119,14 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
     StorageReference storageRef;
     GeoFire geoFire;
     GeoQuery geoQuery;
-    double[] fixedGeoFireLatitude = new double[1];
-    double[] fixedGeoFireLongitude = new double[1];
+    final static double[] fixedGeoFireLatitude = new double[1];
+    final static double[] fixedGeoFireLongitude = new double[1];
     private String foundUser;
     double currentUserLatitude;
     double currentUserLongitude;
     double foundUserLatitude;
     double foundUserLongitude;
+    private LatLng fixLocation;
     private LatLng foundUserLocation;
     private LatLng currentUserLocation;
     Marker kenaMarker;
@@ -412,6 +413,7 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
 
     private void getFoundUserLocation(){
         foundUser = MapsMainActivity.foundUser;
+        Log.d(TAG, "getFoundUserLocation: foundUser after long click in PeterMap is " + foundUser);
         geofireRef.child(foundUser).child("l").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -429,16 +431,15 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
                         Log.d(TAG, "foundUserLongitude is: " + foundUserLongitude);
                     }
 
-                    foundUserLocation = new LatLng(foundUserLatitude, foundUserLongitude);
-                    Log.d(TAG, "foundUserLocation is: " + foundUserLocation);
+                    Log.d(TAG, "fixed location is " + fixedGeoFireLatitude[0] + "," + fixedGeoFireLongitude[0]);
                     fixedGeoFireLatitude[0] =foundUserLatitude;
                     fixedGeoFireLongitude[0] = foundUserLongitude;
+                    fixLocation = new LatLng(fixedGeoFireLatitude[0],fixedGeoFireLongitude[0]);
 
                 }
 
-                setKenaMarker(foundUserLocation);
+                setKenaMarker(fixLocation);
                 detectCurrentUserWentIntoSmallGeoFire();
-
             }
 
             @Override
@@ -652,7 +653,7 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
 
     private void detectCurrentUserWentIntoSmallGeoFire(){
 
-        geoQuery = geoFire.queryAtLocation(new GeoLocation(fixedGeoFireLatitude[0], fixedGeoFireLongitude[0]),0.02);
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(fixedGeoFireLatitude[0], fixedGeoFireLongitude[0]),0.01);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
@@ -697,7 +698,6 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
         mChronometer.stop();
         user.userName.firstName = kenaParkerName.toString();
         user.userCar = new Car(kenaCarColor.getText().toString(),kenaCarBrand,kenaCarModel,kenaCarPlateNumber.getText().toString());
-
         CalculatePoints();
         /*** Intent to Feedback***/
         FeedbackDialog dialog = new FeedbackDialog();
@@ -752,8 +752,7 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
         elapsedTime = (SystemClock.elapsedRealtime()-mChronometer.getBase())/1000;
         Log.d(TAG,"Elapsed time is " + elapsedTime + " seconds");
         pointsGainedFromPeterMap = (0.1 * elapsedTime) + r;
-        pointsGainedFromPeterMap = (int) (Math.ceil(pointsGainedFromPeterMap));
-
+        pointsGainedFromPeterMap = Math.ceil(pointsGainedFromPeterMap);
         Log.d(TAG,"Points gained by Kena is " + pointsGainedFromPeterMap + ", the random r generated is " + r);
     }
 

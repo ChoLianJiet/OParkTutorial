@@ -1,7 +1,9 @@
 package com.opark.opark.share_parking;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
@@ -32,15 +34,21 @@ import android.support.v7.widget.Toolbar;
 
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -67,8 +75,10 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -80,7 +90,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.opark.opark.CustomInfoWindowAdapter;
 import com.opark.opark.LoadingScreen;
+import com.opark.opark.MarkerTag;
+import com.opark.opark.PeterMap;
 import com.opark.opark.ProfileNavFragment;
 import com.opark.opark.rewards_redemption.RewardsFragment;
 import com.opark.opark.rewards_redemption.RewardsPocketFragment;
@@ -98,7 +111,10 @@ import com.opark.opark.model.User;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import static com.opark.opark.rewards_redemption.RewardsFragment.merchantOfferAdapter;
 
@@ -118,6 +134,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     private static int DISTANCE = 10;
     private float DEFAULT_ZOOM = 18f;
     private float DEFAULT_TILT = 45f;
+    final long ONE_MEGABYTE = 1024 * 1024;
     private String GEOFENCE_ID = "myGeofenceID";
 
     public static String ADATEM0 = "0";
@@ -132,10 +149,11 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     public static Location mLastLocation;
-    private static GoogleMap mMap;
-    private Button shareParkingButton;
-    private Button findParkingButton;
+    public static GoogleMap mMap;
+    public static Button shareParkingButton;
+    public static Button findParkingButton;
     private Button signOutButton;
+    private Button cancelButton;
     private FloatingActionButton recenterButton;
     private GeoFire geoFire;
     private GeoQuery geoQuery;
@@ -156,8 +174,11 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     public static HashSet<String> newHashSet = new HashSet<>();
     public static HashSet<String> oldHashSet = new HashSet<>();
     public static Marker kenaMarker;
+    private ArrayList<Marker> kenaMarkerArrayList = new ArrayList<>();
+    public static HashMap<String,Marker> hasMapMarker = new HashMap<>();
     public static LatLng peterParkerLocation;
     private LatLng kenaParkerLocation;
+    private String ownMarkerID;
     public static Location peterParker = new Location("");
     public static String foundUser;
     public ProgressBar loadingCircle;
@@ -167,7 +188,15 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     private PopupWindow popUpWindow;
     private LayoutInflater layoutInflater;
     private int backStackCount;
+    private static Context infoWindowContextForMapsMain;
 
+
+    //Kena Details
+    public static ArrayList<User> kenaUserObjList = new ArrayList<>();
+    private String kenaParkerName;
+    private String kenaCarModel;
+    private String kenaCarPlateNumber;
+    private String kenaCarColor;
 
     //NavDrawer variables
     public static DrawerLayout mDrawer;
@@ -209,12 +238,8 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         shareParkingButton = (Button) findViewById(R.id.share_parking_button);
         findParkingButton = (Button) findViewById(R.id.find_parking_button);
         mapContainer = (RelativeLayout) findViewById(R.id.map_page_container);
-
-
-
-
-
-
+        cancelButton = (Button) findViewById(R.id.cancel_map_main_button);
+        cancelButton.setVisibility(View.INVISIBLE);
 
         //INVISIBLE PARKINGBUTTON
 //        shareParkingButton.setVisibility(View.INVISIBLE);
@@ -224,8 +249,6 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         toolbar = (Toolbar) findViewById(R.id.toolbar_in_maps_main);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Map");
-
-
 
 // Inflate the header view at runtime
 
@@ -274,6 +297,8 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onClick(View v) {
                 setMatchkingFolderInDatabse();
+                shareParkingButton.setVisibility(View.INVISIBLE);
+                findParkingButton.setVisibility(View.INVISIBLE);
                 shareParking();
             }
         });
@@ -303,6 +328,17 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 signOut();
             }
         });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelButton.setVisibility(View.GONE);
+                cancelUser();
+                reverseExchangeButtons(shareParkingButton,findParkingButton);
+            }
+        });
+
+
 
         Log.d(TAG, "onCreate: current uid" + currentUserID);
 
@@ -345,6 +381,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                }catch (JsonSyntaxException e){
                    e.printStackTrace();
                }
+
 
 
            }
@@ -593,9 +630,18 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        infoWindowContextForMapsMain = getApplicationContext();
         Toast.makeText(this, "Map is ready", Toast.LENGTH_SHORT).show();
         mMap = googleMap;
         mMap.setOnCameraMoveStartedListener(this);
+        try {
+
+            mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsMainActivity.this));
+
+        } catch (NullPointerException e){
+            Log.d(TAG, "onMapReady: setInfoWindowAdapter" + e);
+        }
+        mMap.setOnInfoWindowClickListener(null);
     }
 
     private void getLocationPermission() {
@@ -858,10 +904,22 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     //Share Parking Pressed will set adatem and sessionKey in database
     private void setMatchkingFolderInDatabse() {
 
-        String key = matchmakingRef.child(currentUserID + "/SessionKey").push().getKey();
-        Matchmaking bothAdatemAndKey = new Matchmaking(ADATEM0, key);
-        matchmakingRef.child(currentUserID).setValue(bothAdatemAndKey);
-        Log.i("Opark", "Session key is:" + key);
+        matchmakingRef.child(currentUserID + "/sessionKey").setValue(currentUserID);
+        matchmakingRef.child(currentUserID + "/sessionKey").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String key = dataSnapshot.getValue().toString();
+                Matchmaking bothAdatemAndKey = new Matchmaking(ADATEM0, key);
+                matchmakingRef.child(currentUserID).setValue(bothAdatemAndKey);
+                Log.i("Opark", "Session key is:" + key);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     //FIND OTHER USERS LOCATION
@@ -869,7 +927,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         geoQuery = geoFire.queryAtLocation(new GeoLocation(latitude, longitude), 100.0);
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
-            public void onKeyEntered(final String key, GeoLocation location) {
+            public void onKeyEntered(final String key, final GeoLocation location) {
 
                 if (!key.equals(currentUserID)) {
                     matchmakingRef.child(key).child("adatem").addValueEventListener(new ValueEventListener() {
@@ -885,15 +943,17 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                                         oldArrayList.remove(key);
                                         Log.d(TAG, key + " has been removed due to becoming not 0, oldArrayList consist of " + oldArrayList);
                                     }
-                                } else if (adatemValue.equals(ADATEM0) && !oldArrayList.contains(key)) {
+                                } else if (adatemValue.equals(ADATEM0)) {
+                                    setKenaMarkers(new LatLng(location.latitude,location.longitude),key,ADATEM0);
+                                    if(!oldArrayList.contains(key)) {
+                                        newArrayList.add(key);
+                                        newHashSet.addAll(newArrayList);
+                                        newArrayList.clear();
+                                        newArrayList.addAll(newHashSet);
+                                        newHashSet.clear();
 
-                                    newArrayList.add(key);
-                                    newHashSet.addAll(newArrayList);
-                                    newArrayList.clear();
-                                    newArrayList.addAll(newHashSet);
-                                    newHashSet.clear();
-
-                                    Log.d(TAG, "newArrayList consist of " + newArrayList);
+                                        Log.d(TAG, "newArrayList consist of " + newArrayList);
+                                    }
 
                                 } else if (!adatemValue.equals(ADATEM0)) {
 
@@ -904,6 +964,11 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                                     newArrayList.clear();
                                     newArrayList.addAll(newHashSet);
                                     newHashSet.clear();
+                                    if(adatemValue.equals(ADATEM1)){
+                                        setKenaMarkers(new LatLng(location.latitude,location.longitude),key,ADATEM1);
+                                    } else  {
+                                        removeKenaMarkers(key);
+                                    }
 
                                     Log.d(TAG, "newArrayList consist of " + newArrayList);
 
@@ -964,6 +1029,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     private void setMarkerForKenaOneByOne() {
         showLoading();
         if (!newArrayList.isEmpty()) {
+            exchangeButtons(shareParkingButton,findParkingButton);
             int i = 0;
             foundUser = newArrayList.get(i);
 
@@ -988,37 +1054,47 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                     }
                     kenaParkerLocation = new LatLng(kenaLatitude, kenaLongitude);
                     Log.d(TAG, "foundUserLocation is: " + kenaParkerLocation);
-                    setKenaMarker(kenaParkerLocation);
+
+                    saveFoundUserId();
+
+                    dismissLoading();
+
+                    if(position == 123) {
+                        kenaMarker.remove();
+                        userPopUpFragment1 = new UserPopUpFragment();
+                        FragmentManager manager = getSupportFragmentManager();
+                        manager.popBackStack();
+                        Log.d(TAG, "setMarkerForKenaOneByOne: "+ manager.getBackStackEntryCount());
+                        manager.beginTransaction()
+                                .add(R.id.popupuser, userPopUpFragment1, null)
+                                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                                .show(userPopUpFragment1)
+                                .addToBackStack(null)
+                                .commit();
+                        Log.d(TAG,"position is 123");
+                        setKenaMarker(kenaParkerLocation);
+                    } else {
+                        userPopUpFragment = new UserPopUpFragment();
+                        FragmentManager manager = getSupportFragmentManager();
+                        manager.beginTransaction()
+                                .add(R.id.popupuser, userPopUpFragment, null)
+                                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                                .show(userPopUpFragment)
+                                .addToBackStack(null)
+                                .commit();
+                        Log.d(TAG,"position is not 123");
+                        setKenaMarker(kenaParkerLocation);
+                    }
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
 
                 }
+
             });
-            saveFoundUserId();
 
-            dismissLoading();
 
-            if(position == 123) {
-                userPopUpFragment1 = new UserPopUpFragment();
-                FragmentManager manager = getSupportFragmentManager();
-                manager.popBackStack();
-                Log.d(TAG, "setMarkerForKenaOneByOne: "+ manager.getBackStackEntryCount());
-                manager.beginTransaction()
-                    .add(R.id.popupuser, userPopUpFragment1, null)
-                        .addToBackStack(null)
-                    .commit();
-                Log.d(TAG,"position is 123");
-            } else {
-                userPopUpFragment = new UserPopUpFragment();
-                FragmentManager manager = getSupportFragmentManager();
-                manager.beginTransaction()
-                        .add(R.id.popupuser, userPopUpFragment, null)
-                        .addToBackStack(null)
-                        .commit();
-                Log.d(TAG,"position is not 123");
-            }
 //            }
 
 //            UserPopUpFragment userPopUpFragment = new UserPopUpFragment();
@@ -1059,6 +1135,136 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(thisLocation, DEFAULT_ZOOM, DEFAULT_TILT, 0)));
         Log.d(TAG, "kenaMarker is set!");
+    }
+
+    private void setKenaMarkers(final LatLng thisLocation, final String fndUser, final String adatemValue) {
+        Log.d(TAG, "setKenaMarkers: is called and fndUser is " + fndUser);
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        StorageReference storageRef = firebaseStorage.getReference();
+        final MarkerTag yourMarkerTag = new MarkerTag();
+        yourMarkerTag.setUID(fndUser);
+
+        final StorageReference getKenaProfileRef = storageRef.child("users/" + fndUser + "/profile.txt");
+        getKenaProfileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+
+                try {
+                    kenaUserObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
+                    Log.d(TAG, "Gsonfrom json success");
+                    for(int i=0; i < kenaUserObjList.size(); i++ ) {
+                        kenaParkerName = kenaUserObjList.get(i).getUserName().getFirstName() + kenaUserObjList.get(i).getUserName().getLastName();
+                        kenaCarModel = kenaUserObjList.get(i).getUserCar().getCarBrand() + kenaUserObjList.get(i).getUserCar().getCarModel();
+                        kenaCarPlateNumber = kenaUserObjList.get(i).getUserCar().getCarPlate();
+                        kenaCarColor = kenaUserObjList.get(i).getUserCar().getCarColour();
+                    }
+
+                } catch (UnsupportedEncodingException e){
+                    e.printStackTrace();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.d(TAG,"fragment is not created, exception: " + exception);
+            }
+        }).addOnCompleteListener(new OnCompleteListener<byte[]>() {
+            @Override
+            public void onComplete(@NonNull Task<byte[]> task) {
+//                matchmakingRef.child(fndUser).child("sessionKey").addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        if (adatemValue.equals(ADATEM0)){
+                            kenaMarker = mMap.addMarker(new MarkerOptions()
+                                    .position(thisLocation)
+                                    .snippet(kenaCarColor + " " + kenaCarModel + " (" + kenaCarPlateNumber + ") " )
+                                    .title(kenaParkerName)
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+
+
+                            yourMarkerTag.setYesNoTag("yes");
+                            kenaMarker.setTag(yourMarkerTag);
+                            Log.d(TAG, "onComplete: kenaMarker getTag of yourMarkerTag is " + ((MarkerTag) kenaMarker.getTag()).getYesNoTag() + " & " + ((MarkerTag) kenaMarker.getTag()).getUID());
+                            hasMapMarker.put(fndUser,kenaMarker);
+
+                            foundUser = ((MarkerTag) kenaMarker.getTag()).getUID();
+                            Log.d(TAG,"foundUser MarkerTag getUID is " + foundUser);
+
+//                            mMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
+//                                @Override
+//                                public void onInfoWindowLongClick(Marker marker) {
+//                                    Log.d("LONG", "CLICKED long and fndUser is " + fndUser);
+//
+//                                    foundUser = CustomInfoWindowAdapter.tvUserIDView.getText().toString();
+//
+//                                    matchmakingRef.child(CustomInfoWindowAdapter.tvUserIDView.getText().toString()).child("adatem").setValue(MapsMainActivity.ADATEM2);
+//                                    togetherRef.child(CustomInfoWindowAdapter.tvUserIDView.getText().toString()).child("peter").setValue(MapsMainActivity.currentUserID);
+//                                    Intent intent = new Intent(MapsMainActivity.this,PeterMap.class);
+//                                    startActivity(intent);
+//                                }
+//                            });
+                        } else if (adatemValue.equals(ADATEM1)) {
+                            kenaMarker = mMap.addMarker(new MarkerOptions()
+                                    .position(thisLocation)
+                                    .snippet(kenaCarColor + " " + kenaCarModel + " (" + kenaCarPlateNumber + ") " )
+                                    .title(kenaParkerName)
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+                            yourMarkerTag.setYesNoTag("no");
+                            kenaMarker.setTag(yourMarkerTag);
+                            Log.d(TAG, "onComplete: kenaMarker getTag of yourMarkerTag is " + ((MarkerTag) kenaMarker.getTag()).getYesNoTag() + " & " + ((MarkerTag) kenaMarker.getTag()).getUID());
+                            hasMapMarker.put(fndUser,kenaMarker);
+//                            mMap.setOnInfoWindowLongClickListener(null);
+                        }
+
+                        Log.d(TAG, "kenaMarker is set! Which is " + kenaMarker);
+
+                        Log.d(TAG,"unique key is " + fndUser);
+
+                        Log.d(TAG, "onDataChange: hasMapMarker have " + hasMapMarker);
+
+//                        kenaMarkerArrayList.add(kenaMarker);
+//                        Log.d(TAG, "onDataChange: kenaMarkerArrayList contains " + kenaMarkerArrayList);
+//                        for(int i=0; i < kenaMarkerArrayList.size(); i++ )
+//                            if(!hasMapMarker.containsValue(kenaMarkerArrayList.get(i)) ){
+//                                kenaMarkerArrayList.get(i).remove();
+//                                Log.d(TAG, "onDataChange: marker of " + kenaMarkerArrayList.get(i) + " has been removed");
+//                                Log.d(TAG, "onDataChange: after remove, kenaMarkerArrayList contains " + kenaMarkerArrayList);
+//                            } else {
+//
+//                            }
+
+//                        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsMainActivity.this));
+
+            }
+        });
+
+
+    }
+
+    private void removeKenaMarkers(final String fndUser) {
+
+        matchmakingRef.child(fndUser).child("sessionKey").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String uniqueKey = dataSnapshot.getValue().toString();
+                Log.d(TAG, "unique key to remove is " + uniqueKey);
+                try {
+                    kenaMarker = hasMapMarker.get(uniqueKey);
+                    Log.d(TAG, "onDataChange: kenaMarker in hasMapMarker to remove is " + kenaMarker);
+                    kenaMarker.remove();
+                    Log.d(TAG, "kenaMarker is removed!");
+                } catch (NullPointerException e){
+                    Log.d(TAG, "onDataChange: hasMapMarker " + e);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
@@ -1118,6 +1324,11 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
             //Set Marker Count to 1 after first marker is created
             markerCount = 1;
             markerInMiddle = true;
+            ownMarkerID = mk.getId();
+            final MarkerTag yourMarkerTag = new MarkerTag();
+            yourMarkerTag.setUID(currentUserID);
+            yourMarkerTag.setYesNoTag("own");
+            mk.setTag(yourMarkerTag);
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
                 // TODO: Consider calling
@@ -1229,7 +1440,9 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onInfoWindowClick(Marker marker) {
         Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
+
     }
+
 
     private void saveFoundUserId() {
         SharedPreferences prefs = getSharedPreferences(USER_ID_PREFS, 0);
@@ -1308,14 +1521,69 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
             mDrawer.closeDrawer(GravityCompat.START);
 
         }
+    }
+
+    private void cancelUser(){
+        MapsMainActivity.kenaMarker.remove();
+        position = 124;
+        returnToMain();
+        matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM0);
+    }
+
+    private void returnToMain(){
+
+        FragmentManager manager = getSupportFragmentManager();
+        manager.popBackStack();
+        FragmentTransaction transaction = manager.beginTransaction();
+
+        if (MapsMainActivity.position != 123){
+            transaction.remove(MapsMainActivity.userPopUpFragment);
+            Log.d(TAG,"userPopUpFragment is removed");
+        } else {
+            transaction.remove(MapsMainActivity.userPopUpFragment);
+            transaction.remove(MapsMainActivity.userPopUpFragment1);
+            Log.d(TAG,"userPopUpFragment and userPopUpFragment1 is removed");
+        }
+        MapsMainActivity.kenaMarker.remove();
+        transaction.commit();
+    }
+
+    private void exchangeButtons(Button btn1, Button btn2) {
+
+        cancelButton.setVisibility(View.VISIBLE);
+        Animation animZoomIn = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.zoom_in);
+        cancelButton.startAnimation(animZoomIn);
+
+        ObjectAnimator animationBtn1 = ObjectAnimator.ofFloat(btn1,"translationX",250f);
+        animationBtn1.setDuration(500);
+
 
 //        else if(RewardsFragment.searchView) {}
 
+        ObjectAnimator animationBtn2 = ObjectAnimator.ofFloat(btn2,"translationX",-250f);
+        animationBtn2.setDuration(500);
+        animationBtn1.start();
+        animationBtn2.start();
 
 
-}
+    }
 
+    private void reverseExchangeButtons(Button btn1, Button btn2){
+        ObjectAnimator animationBtn1 = ObjectAnimator.ofFloat(btn1,"translationX",-15f);
+        animationBtn1.setDuration(500);
+        animationBtn1.start();
 
+        ObjectAnimator animationBtn2 = ObjectAnimator.ofFloat(btn2,"translationX",15f);
+        animationBtn2.setDuration(500);
+        animationBtn2.start();
 
+        cancelButton.setVisibility(View.INVISIBLE);
+        cancelButton.setAnimation(null);
+
+    }
+
+    public static Context getMapsMainContext(){
+        return MapsMainActivity.infoWindowContextForMapsMain;
+    }
 
 }

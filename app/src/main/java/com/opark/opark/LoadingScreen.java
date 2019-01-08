@@ -110,7 +110,7 @@ public class LoadingScreen extends AppCompatActivity {
                     CalculatePoints();
                     Intent intent = new Intent(LoadingScreen.this, KenaMap.class);
                     startActivity(intent);
-//                    finish();
+                    finish();
                 } else {
 
                 }
@@ -128,6 +128,8 @@ public class LoadingScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 matchmakingRef.child(currentUserID).child("adatem").setValue("Not Available");
+                MapsMainActivity.shareParkingButton.setVisibility(View.VISIBLE);
+                MapsMainActivity.findParkingButton.setVisibility(View.VISIBLE);
                 finish();
                 recordMatchMaking();
                 CalculatePoints();

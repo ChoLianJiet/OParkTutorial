@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.opark.opark.KenaMap;
 import com.opark.opark.R;
 import com.opark.opark.model.Car;
 import com.opark.opark.share_parking.MapsMainActivity;
@@ -98,6 +99,7 @@ public class FeedbackDialog extends DialogFragment implements FeedbackModel.Feed
                             Toast.makeText(getContext(), "User comment: " + userComment.getText().toString() +
                                     " Rating: " + selectedEmojiIndex+1, Toast.LENGTH_LONG).show();
                             getDialog().dismiss();
+                            getActivity().finish();
                             return true;
                         }
                     }
