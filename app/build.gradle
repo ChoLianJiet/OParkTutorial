@@ -67,6 +67,7 @@ android {
         implementation 'com.google.android.gms:play-services-location:15.0.1'
         implementation 'com.google.android.gms:play-services-places:15.0.1'
         implementation 'com.google.android.gms:play-services-maps:15.0.1'
+        implementation 'com.google.maps.android:android-maps-utils:0.5+'
         implementation files('libs/gson-2.2.2.jar')
         implementation files('libs/signalr-client-sdk.jar')
         implementation files('libs/signalr-client-sdk-android.jar')

@@ -24,8 +24,10 @@ import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -83,16 +85,16 @@ public class UserPopUpFragment extends Fragment {
 
         bindViews(view);
 
-        xButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MapsMainActivity.kenaMarker.remove();
-                int position = 124;
-                mCallback.onArticleSelected(position);
-                returnToMain();
-                matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM0);
-            }
-        });
+//        xButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                MapsMainActivity.kenaMarker.remove();
+//                int position = 124;
+//                mCallback.onArticleSelected(position);
+//                returnToMain();
+//                matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM0);
+//            }
+//        });
 
         acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,6 +102,7 @@ public class UserPopUpFragment extends Fragment {
                 acceptUser();
                 int position = 124;
                 mCallback.onArticleSelected(position);
+                getFragmentManager().isDestroyed();
             }
         });
 
@@ -203,8 +206,14 @@ public class UserPopUpFragment extends Fragment {
             public void onFailure(@NonNull Exception exception) {
                 Log.d(TAG,"fragment is not created, exception: " + exception);
             }
+        }).addOnCompleteListener(new OnCompleteListener<byte[]>() {
+            @Override
+            public void onComplete(@NonNull Task<byte[]> task) {
+//                listenToDatabase();
+            }
         });
     }
+
 
     private void acceptUser(){
 
@@ -242,14 +251,14 @@ public class UserPopUpFragment extends Fragment {
         manager.popBackStack();
         FragmentTransaction transaction = manager.beginTransaction();
 
-        if (MapsMainActivity.position != 123){
+//        if (MapsMainActivity.position != 123){
             transaction.remove(MapsMainActivity.userPopUpFragment);
-            Log.d(TAG,"userPopUpFragment is removed");
-        } else {
-            transaction.remove(MapsMainActivity.userPopUpFragment);
-            transaction.remove(MapsMainActivity.userPopUpFragment1);
-            Log.d(TAG,"userPopUpFragment and userPopUpFragment1 is removed");
-        }
+//            Log.d(TAG,"userPopUpFragment is removed");
+//        } else {
+//            transaction.remove(MapsMainActivity.userPopUpFragment);
+//            transaction.remove(MapsMainActivity.userPopUpFragment1);
+//            Log.d(TAG,"userPopUpFragment and userPopUpFragment1 is removed");
+//        }
         MapsMainActivity.kenaMarker.remove();
         transaction.commit();
     }
