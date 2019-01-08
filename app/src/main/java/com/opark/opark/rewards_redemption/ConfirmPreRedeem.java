@@ -138,7 +138,7 @@ public class ConfirmPreRedeem extends DialogFragment {
 
                     objToByteStreamUpload(pointsAfterRedemption,RewardsFragment.userPointsStorageRef);
 
-                    DatabaseReference userPointsDataRef = FirebaseDatabase.getInstance().getReference().child("users/userPoints/" + redeemUid);
+                    DatabaseReference userPointsDataRef = FirebaseDatabase.getInstance().getReference().child("users/userPoints/" + RewardsFragment.redeemUid);
                     userPointsDataRef.setValue(pointsAfterRedemption);
 
 

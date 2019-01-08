@@ -43,6 +43,7 @@ import com.google.gson.Gson;
 import com.opark.opark.R;
 import com.opark.opark.merchant_side.merchant_class.Merchant;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
+import com.opark.opark.rewards_redemption.ConfirmPreRedeem;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -75,9 +76,10 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   private StorageTask mUploadTask;
   private ProgressBar mProgressBar;
   private CategoryDialog categoryDialog;
-
+  private  UploadProgressBarDialog uploadProgressBarDialog;
   private String yy,mm,dd;
 
+  private String merchantOfferExpiryDate;
   private String merchantCoName;
   private String merchantCoPhone;
   private String merchantCoAddress;
@@ -312,6 +314,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     merchantOfferData.setMerchantAddress(merchantCoAddress);
     merchantOfferData.setMerchantContact(merchantCoPhone);
     merchantOfferData.setOfferCost(offerRedemptionCost.getText().toString());
+    merchantOfferData.setExpiryDate(offerExpiryDate.getText().toString());
 //    merchantOfferData.setOfferImage(BitMapToString(offerImageForUpload));
     Log.d(TAG, "setFolderInDatabase: offer image" + offerImageForUpload);
 
@@ -376,7 +379,9 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
 
   private void uploadFile() {
-
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    uploadProgressBarDialog = new UploadProgressBarDialog();
+    uploadProgressBarDialog.show(fragmentManager, "");
     offerTitle = offerTitleEntry.getText().toString();
     if (filePath != null) {
        final StorageReference fileReference = merchantOfferStorageReference.child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"
@@ -392,7 +397,10 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
                   handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+
                       mProgressBar.setProgress(0);
+                      uploadProgressBarDialog.dismiss();
+
                     }
                   }, 500);
 
@@ -444,6 +452,8 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
                   merchantOfferData.setMerchantContact(merchantCoPhone);
                   merchantOfferData.setOfferCost(offerRedemptionCost.getText().toString());
                   merchantOfferData.setOfferImage(uri.toString());
+                  merchantOfferData.setExpiryDate(offerExpiryDate.getText().toString());
+                  merchantOfferData.setOfferCategories(offerCategory.getText().toString());
                   Log.d(TAG, "setFolderInDatabase: offer image" + offerImageForUpload);
 
 //                  offerlistDatabaseRef.child("merchantsName/"+merchantCoName ).child(offerTitle).setValue(offerTitle );
@@ -451,9 +461,60 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
                   offerlistDatabaseRef.child(offerTitle).setValue(merchantOfferData);
 
+                  String categoryString = offerCategory.getText().toString();
+      Log.d(TAG, "setUpMerchantOffer: getText" + offerCategory.getText().toString() );
+                  switch(categoryString) {
+                      case "Food & Beverages":
+                            setUpCategory(categoryString,merchantOfferData);
+                          break;
+
+                      case "Health & Beauty":
+                          setUpCategory(categoryString,merchantOfferData);
+                          break;
+
+                      case "Shopping":
+                          setUpCategory(categoryString,merchantOfferData);
+
+                          break;
+
+                      case "Services":
+                           setUpCategory(categoryString,merchantOfferData);
+
+                          break;
+
+                      case "Travel":
+                          setUpCategory(categoryString,merchantOfferData);
+
+                          break;
+
+                      case "Entertainment":
+                          setUpCategory(categoryString,merchantOfferData);
+
+                          break;
+
+
+                      default:
+                          break;
+
+
+
+                  }
 
   }
 
+
+
+
+  private void setUpCategory(String catString, MerchantOffer merchOffer){
+
+      Log.d(TAG, "setUpCategory: ");
+      DatabaseReference categoryDataRef = FirebaseDatabase.getInstance().getReference().child("offercategory/" + catString );
+
+      categoryDataRef.child(merchOffer.getMerchantOfferTitle()).setValue(merchOffer);
+      Log.d(TAG, "setUpCategory: merchOffer Image " + merchOffer.getOfferImage());
+
+
+  }
 
   @Override
   public void onPointerCaptureChanged(boolean hasCapture) {

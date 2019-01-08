@@ -40,6 +40,7 @@ import com.opark.opark.rewards_redemption.RewardsPreredemption;
 
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 
@@ -217,6 +218,19 @@ signOutButton.setOnClickListener(new View.OnClickListener() {
 //        rewardsCode =  findViewById(R.id.rewards_code);
         errorCode = findViewById(R.id.error_code_text);
         whichOffer = findViewById(R.id.which_offer_spinner);
+        try {
+            Field popup = Spinner.class.getDeclaredField("mPopup");
+            popup.setAccessible(true);
+
+            // Get private mPopup member variable and try cast to ListPopupWindow
+            android.widget.ListPopupWindow popupWindow = (android.widget.ListPopupWindow) popup.get(whichOffer);
+
+            // Set popupWindow height to 500px
+            popupWindow.setHeight(1000);
+        }
+        catch (NoClassDefFoundError | ClassCastException | NoSuchFieldException | IllegalAccessException e) {
+            // silently fail...
+        }
 
 
     }

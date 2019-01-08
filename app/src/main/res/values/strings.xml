@@ -84,4 +84,17 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+
+    <string name="food_and_beverage_category">Food &amp; Beverage</string>
+    <string name="health_and_beauty_category">Health &amp; Beauty</string>
+    <string name="shopping_category">Shopping</string>
+    <string name="services_category">Services</string>
+    <string name="travel_category">Travel</string>
+    <string name="entertainment_category">Entertainment</string>
+
+
+
+
 </resources>

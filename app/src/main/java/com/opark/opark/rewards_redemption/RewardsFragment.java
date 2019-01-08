@@ -24,6 +24,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -131,7 +132,7 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
     private CoordinatorLayout coordinatorLayout;
     private Toolbar mToolbar;
     private CollapsingToolbarLayout collapsingToolbarLayout;
-    private AppBarLayout appBarLayout;
+    public static AppBarLayout appBarLayout;
     private boolean isHideToolbarView = false;
     private EditText editTextSearch;
     private boolean editTextSearchIsExpanded;
@@ -141,6 +142,7 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
     private TabLayout tabLayout;
 
     private ViewPager mViewPager;
+    private NestedScrollView nestedScrollView;
 
 
 
@@ -636,7 +638,7 @@ private void animateSlideLayout() {
 
 
 
-            editTextSearch.setText(editTextSearchBig.getText().toString());
+        editTextSearch.setText(editTextSearchBig.getText().toString());
 
         editTextSearch.setSelection(editTextSearchBig.getText().length());
 
@@ -801,6 +803,8 @@ private void animateSlideLayout() {
         appBarLayout = view.findViewById(R.id.app_bar_layout);
         mViewPager = (ViewPager) view.findViewById(R.id.offer_view_pager);
         tabLayout =view.findViewById(R.id.tab_layout);
+//        nestedScrollView = view.findViewById(R.id.nest_scrollview);
+//        nestedScrollView.setFillViewport(true);
 //        merchantRecView = (RecyclerView) view.findViewById(R.id.merchant_offer_recview);
     }
 
