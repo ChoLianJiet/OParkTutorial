@@ -90,11 +90,14 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.opark.opark.BrandsOfferFragment;
+import com.opark.opark.BrandsOfferFragment1;
 import com.opark.opark.CustomInfoWindowAdapter;
 import com.opark.opark.LoadingScreen;
 import com.opark.opark.MarkerTag;
 import com.opark.opark.PeterMap;
 import com.opark.opark.ProfileNavFragment;
+import com.opark.opark.ShowBrandOffer;
 import com.opark.opark.rewards_redemption.RewardsFragment;
 import com.opark.opark.rewards_redemption.RewardsPocketFragment;
 import com.opark.opark.feedback.FeedbackDialog;
@@ -1502,10 +1505,13 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         } else if (fragment != null ){
 
 
-            Log.d("backpress","Back Pressed when fragment is profnav");
+            Log.d("backpress","Back Pressed when fragment is " + fragment  );
 //            navFragmentManager = getFragmentManager();
 //            ft = navFragmentManager.beginTransaction();
 
+
+
+//            Log.d(TAG, "onBackPressed: Showbrandoffervisibl " + BrandsOfferFragment1.showBrandOffer1.isVisible());
             navFragmentManager.popBackStack();
 
             mapContainer.setVisibility(View.VISIBLE);
@@ -1514,7 +1520,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 //                            ft.remove(userProfilePage);
 //                            ft.replace(R.id.map_page_container,null);
 //                            ft.commit();
-                            fragment=null;
+            fragment=null;
             oldMenuItem = null;
 
 

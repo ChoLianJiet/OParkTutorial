@@ -1,17 +1,11 @@
 package com.opark.opark.rewards_redemption;
 
-import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.location.Location;
-import android.support.animation.DynamicAnimation;
-import android.support.animation.SpringAnimation;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -22,78 +16,34 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.opark.opark.AllOfferFragment;
-import com.opark.opark.InsufficientPointsDialog;
 import com.opark.opark.R;
-import com.opark.opark.SearchViewLinLay;
 import com.opark.opark.TabLayoutPagerAdapter;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOfferAdapter;
-import com.opark.opark.share_parking.MapsMainActivity;
 
-import org.w3c.dom.Text;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.nio.charset.Charset;
-import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
-
-import butterknife.Bind;
-
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class RewardsFragment extends Fragment implements MerchantOfferAdapter.ButtonClicked, TextWatcher {
     private static final String TAG = "RewardsFragment";
@@ -126,8 +76,7 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
     public RecyclerView merchantRecView;
 
 
-    private SearchViewLinLay searchViewLinLay;
-    private SearchViewLinLay searchViewLinLayTop;
+
     private static Context context;
     private CoordinatorLayout coordinatorLayout;
     private Toolbar mToolbar;
@@ -139,9 +88,9 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
     private EditText editTextSearchBig;
     boolean isCollapsed = false;
     public static FragmentManager rewardsFragmentManager;
-    private TabLayout tabLayout;
+    public static TabLayout tabLayout;
 
-    private ViewPager mViewPager;
+    public static ViewPager mViewPager;
     private NestedScrollView nestedScrollView;
 
 
@@ -172,9 +121,15 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
 //try {
 
 
+
+        Log.d(TAG, "childfragmean  " + getActivity().getFragmentManager().getBackStackEntryCount());
+
+        rewardsFragmentManager = getFragmentManager();
+
         editTextSearchIsExpanded=false;
 
         bindViews(view);
+
 
 
 
@@ -206,32 +161,6 @@ public class RewardsFragment extends Fragment implements MerchantOfferAdapter.Bu
 
 
 
-//        editTextSearch = searchViewLinLay.findViewById(R.id.search_textview);
-//
-//
-//        editTextSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View view, boolean b) {
-//                if (editTextSearch.hasFocus()) {
-//
-//                    Log.d(TAG, "onFocusChange:  has focus");
-//                appBarLayout.setExpanded(false);
-//                collapsingToolbarLayout.offsetTopAndBottom(0);
-//                }
-//            }
-//        });
-//        testText.setClickable(true);
-//
-//        testText.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                appBarLayout.setExpanded(false);
-////                animateSlideLayout();
-//
-////                collapsingToolbarLayout.offsetTopAndBottom(0);
-//            }
-//        });
-
 
 
 
@@ -252,7 +181,6 @@ appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener
 
                 expandToolbar();
 
-//            appBarLayout.setExpanded(false);
 
             Log.d("offset", "isCollapsed" + isCollapsed + "Vertical OffSet =" +verticalOffset + "\nmaxScrollD =" + maxScrollDistance);
             Log.d("offset", "onOffsetChanged: Collapsing");
@@ -303,7 +231,7 @@ appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener
 
 });
 
-        mToolbar.setTitle(null);
+//        mToolbar.setTitle("Rewards");
 //        mToolbarLayout.setTitle("Rewards");
 //        mToolbarLayout.setCollapsedTitleTextColor(Color.WHITE);
 
@@ -337,84 +265,6 @@ appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener
     }
 
 
-//
-//    private void initializeData(final RecyclerView merchantRecView){
-//
-//        Log.d("INITDATA", "initializeData: initialising data");
-//
-//
-////        merchantOffer = new ArrayList<>();
-//        offerlistDatabaseRef.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//                Log.d(TAG, "onChildAdded: datasnapshot key" + dataSnapshot.getKey());
-//                Log.d(TAG, "onChildAdded: datasnapshot children" + dataSnapshot.getChildren());
-//                Log.d(TAG, "onChildAdded: datasnapshot " +  String.valueOf(dataSnapshot.child("offerCost").getValue()));
-//                Log.d(TAG, "onChildAdded:  datasnapshot value " + dataSnapshot.getValue());
-//                Log.d(TAG, "onChildAdded: not adding " + dataSnapshot.hasChild("merchantsName"));
-//
-////                merchantOffer.add(new MerchantOffer(String.valueOf(dataSnapshot.child("merchantOfferTitle").getValue()) ,String.valueOf(dataSnapshot.child("merchantName").getValue()),String.valueOf(dataSnapshot.child("merchantAddress").getValue()),String.valueOf(dataSnapshot.child("merchantContact").getValue()),String.valueOf(dataSnapshot.child("offerCost").getValue())));
-//
-//                if (!dataSnapshot.getKey().equals("merchantsName")) {
-//                    merchantOffer.add(dataSnapshot.getValue(MerchantOffer.class));
-//
-//                    Log.d("INITDATA", "Data added as class");
-//
-//
-//                      merchantOfferAdapter = new MerchantOfferAdapter(merchantOffer, new MerchantOfferAdapter.ButtonClicked() {
-//                        @Override
-//                        public void onButtonClicked(View v, int position) {
-//                            try {
-//                                FragmentManager fragmentManager = getFragmentManager();
-//                                confirmPreRedeem = new ConfirmPreRedeem();
-//                                confirmPreRedeem.show(fragmentManager, "");
-////                            confirmPreRedeem.getDialog().setCancelable(false);
-//                                //                            deductPointsForRedemption();
-//
-//
-//                                Log.d(TAG, "Rewards Fragment Button Clicked " + position);
-//
-//                            } catch (IllegalStateException e){
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//
-//                    });
-//
-//                    merchantRecView.setAdapter(merchantOfferAdapter);
-//
-//                }
-//
-//                }
-//
-////           String.valueOf(dataSnapshot.child("offerImage").getValue())
-//
-//            @Override
-//            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//
-////        merchantOffer.add(new MerchantOffer("Kenny Rogers 10 % off", "Kenny Rogers","10 JLN SB INDAH, SERI KEMBANGAN","+60165555555", "1000","sd;fadsijf"));
-////        merchantOffer.add(new MerchantOffer("Kenny Rogers 20 % off", "Kenny Rogers","10 JLN SB INDAH, SERI KEMBANGAN","+60165555555", "1000",));
-////        merchantOffer.add(new MerchantOffer("Kenny Rogers 40 % off", "Kenny Rogers","10 JLN SB INDAH, SERI KEMBANGAN","+60165555555", "1000",));
-//    }
 
 
 
@@ -427,133 +277,6 @@ appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener
 
     }
 
-
-
-
-//    private static void userPreRedemption(){
-//
-//
-//        SecureRandom random = new SecureRandom();
-//        String preRedemptionCode = new BigInteger(30, random).toString(32).toUpperCase();
-//        if (preRedemptionCode.contains("")&& (preRedemptionCode.length()!= 6)){
-//            Log.d(TAG, "userPreRedemption: ERROR CODE GENERATION");
-//            userPreRedemption();}
-//        else {
-//            Log.d("redeem", "userPreRedemption:  " + preRedemptionCode);
-//
-//
-//            DatabaseReference preRedemptionDataRef = FirebaseDatabase.getInstance().getReference().child("users/pre-redeemedlist/" + redeemUid);
-//            RewardsPocketOffer rewardsPocketUpdate = new RewardsPocketOffer(merchantOfferTitle, merchantName, merchantAddress, merchantContact, preRedemptionCode, merchantOfferImageUrl);
-//
-//            String preRedeemedKey = preRedemptionDataRef.push().getKey();
-//            preRedemptionDataRef.child(preRedeemedKey).setValue(rewardsPocketUpdate);
-//
-//            RewardsPreredemption thisRewardPreredeemed = new RewardsPreredemption(redeemUid, preRedeemedKey);
-//
-//
-//            StorageReference preRedemptionStoRef = FirebaseStorage.getInstance().getReference().child("merchants/offerlist/" + merchantName + "/" + merchantOfferTitle + "/userredemptioncode/" + preRedemptionCode);
-//            objToByteStreamUpload(thisRewardPreredeemed, preRedemptionStoRef);
-//        }
-//
-//    }
-
-
-
-
-
-//    public static void deductPointsForRedemption(){
-//
-//
-//        userPointsStorageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-//            @Override
-//            public void onSuccess(byte[] bytes) {
-//                try{
-//                try {
-//                    userPoints = (new Gson().fromJson(new String(bytes, "UTF-8"), Integer.class));
-//                    userPointsBefRed = userPoints;
-//                    Log.d(TAG, "Gsonfrom json success, Points is " + userPoints);
-//
-//                } catch (UnsupportedEncodingException e){
-//                    e.printStackTrace();
-//                }} catch (JsonSyntaxException e ){
-//                    e.printStackTrace();
-//            }
-//                if (userPoints>=redeemCost){
-//                    Log.d("redeem", "redeem cost " + redeemCost);
-//                pointsAfterRedemption = (int) (Math.ceil(userPoints) - redeemCost );
-//
-//
-//                objToByteStreamUpload(pointsAfterRedemption,userPointsStorageRef);
-//
-//                DatabaseReference userPointsDataRef = FirebaseDatabase.getInstance().getReference().child("users/userPoints/" + redeemUid);
-//                userPointsDataRef.setValue(pointsAfterRedemption);
-//
-//
-//
-//                /*User preredemption before Verification of code by Merchant*/
-//                userPreRedemption();
-////                offerlistDatabaseRef.child(merchantOfferTitle).child("redeemedUsers").push().setValue(redeemUid);
-//
-//                Log.d("redeem","Points uploaded from Redeem is " + pointsAfterRedemption);}
-//
-//                else {
-//
-//
-//                    Log.d("redeem", "redeem cost " + redeemCost);
-//                    Log.d("redeem","Points insufficient " + userPoints);
-//                    InsufficientPointsDialog insufficientPointsDialog = new InsufficientPointsDialog(getAppContext());
-//                    insufficientPointsDialog.show();
-//                return;
-//                }
-//            }
-//
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception exception) {
-//                Log.d(TAG,"fragment is not created, exception: " + exception);
-//            }
-//        }).addOnCompleteListener(new OnCompleteListener<byte[]>() {
-//            @Override
-//            public void onComplete(@NonNull Task<byte[]> task) {
-//                Log.d(TAG, "onComplete:  Complete JOr outside completed Calc");
-//                confirmPreRedeem.getDialog().dismiss();
-//
-//            }
-//
-//
-//
-//        });
-//
-//    }
-
-
-//    public static void objToByteStreamUpload(Object obj, StorageReference destination){
-//
-//        String objStr = new Gson().toJson(obj);
-//        InputStream in = new ByteArrayInputStream(objStr.getBytes(Charset.forName("UTF-8")));
-//        UploadTask uploadTask = destination.putStream(in);
-//        uploadTask.addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception exception) {
-//                Log.d(TAG, "onFailure: Failure to upload in storage ");
-//                // Use analytics to find out why is the error
-//                // then only implement the best corresponding measures
-//
-//
-//            }
-//        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//            @Override
-//            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                try {
-//                    Toast.makeText(getAppContext(), "Your Rewards have been Redeemed", Toast.LENGTH_LONG).show();
-//                    Log.i(TAG, "Profile update successful!");
-//                    // Use analytics to calculate the success rate
-//                } catch (NullPointerException e ){
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//    }
 
 
 
@@ -859,6 +582,9 @@ private void animateSlideLayout() {
 
         // Set the adapter onto the view pager
         mViewPager.setAdapter(adapter);
+
+
+
     }
 
 

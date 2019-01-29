@@ -30,9 +30,17 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
     private Context context;
     public  ButtonClicked mButtonClicked;
     List<MerchantOffer> originalList;
+    public CardClicked mCardClicked;
 
     public interface ButtonClicked{
         void onButtonClicked(View v, int position);
+
+
+
+    }
+
+    public interface CardClicked{
+        void onCardClicked(View v, int position);
 
 
 
@@ -72,10 +80,11 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
 
 
     List<MerchantOffer> merchantOfferList;
-    public MerchantOfferAdapter(List<MerchantOffer> merchantOfferList, ButtonClicked buttonClicked){
+    public MerchantOfferAdapter(List<MerchantOffer> merchantOfferList, ButtonClicked buttonClicked, CardClicked cardClicked){
         this.merchantOfferList = merchantOfferList;
         this.mButtonClicked = buttonClicked;
         this.originalList = new ArrayList<>(merchantOfferList);
+        this.mCardClicked = cardClicked;
 
 
     }
@@ -91,7 +100,7 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
     @NonNull
     @Override
     public MerchantOfferAdapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_rewards_fragment, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_rewards_fragment, parent, false);
         MerchantOfferAdapterViewHolder merchantOfferAdapterViewHolder = new MerchantOfferAdapterViewHolder(v);
 
 
@@ -147,7 +156,15 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
             }
         });
 
-//
+
+        holder.merchantCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCardClicked.onCardClicked(view,i);
+
+                Log.d("cardclick", "onClick: " + view + "i " + i);
+            }
+        });
 
     }
 

@@ -677,7 +677,11 @@ public void getMerchStuff() {
 
 
     Log.d(TAG, "onCreate: Merch Name " + merchantProfileName);
+
+    Character merchantBrandsChar0 = merchantProfileName.charAt(0);
     offerlistDatabaseRef = FirebaseDatabase.getInstance().getReference().child("offerlist");
+
+
     offerlistMerchantDataRef = FirebaseDatabase.getInstance().getReference().child("offerlist/merchantsName/" + merchantProfileName);
     offerlistMerchantDataRef.addChildEventListener(new ChildEventListener() {
         @Override
