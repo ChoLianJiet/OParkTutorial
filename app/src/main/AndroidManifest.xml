@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW"/>
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <!-- FACEBOOK META DATA ELEMENT -->
     <application
@@ -56,6 +57,10 @@
         </activity>
         <activity
             android:name=".NoUserPopUp"
+            android:theme="@style/AppTheme.CustomTheme">
+        </activity>
+        <activity
+            android:name=".FinishUserPopUp"
             android:theme="@style/AppTheme.CustomTheme">
         </activity>
         <activity

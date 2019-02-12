@@ -164,7 +164,7 @@ public class UserPopUpFragment extends Fragment {
         mFrameLayout = (FrameLayout) view.findViewById(R.id.popupuser);
 
         SharedPreferences prefs = this.getActivity().getSharedPreferences(MapsMainActivity.USER_ID_PREFS, Context.MODE_PRIVATE);
-        foundUser = prefs.getString(MapsMainActivity.USER_ID_KEY, null);
+        foundUser = MapsMainActivity.foundUser;
 
 
 
@@ -228,6 +228,7 @@ public class UserPopUpFragment extends Fragment {
     private void declineUser(){
 
         matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM0);
+        matchmakingRef.child(foundUser).child("peterParker").setValue("NotOccupiedByAnyoneYet");
         MapsMainActivity.newArrayList.remove(foundUser);
 
         MapsMainActivity.oldArrayList.add(foundUser);
@@ -235,8 +236,6 @@ public class UserPopUpFragment extends Fragment {
         MapsMainActivity.oldArrayList.clear();
         MapsMainActivity.oldArrayList.addAll(MapsMainActivity.oldHashSet);
         MapsMainActivity.oldHashSet.clear();
-
-        MapsMainActivity.kenaMarker.remove();
 
         Log.i(TAG,foundUser + " has been removed from newArrayList due to declining");
         Log.i(TAG,"MapsMainActivity newArraylist " + MapsMainActivity.newArrayList);

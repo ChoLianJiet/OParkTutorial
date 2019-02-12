@@ -100,6 +100,7 @@ public class FeedbackDialog extends DialogFragment implements FeedbackModel.Feed
                                     " Rating: " + selectedEmojiIndex+1, Toast.LENGTH_LONG).show();
                             getDialog().dismiss();
                             getActivity().finish();
+                            MapsMainActivity.foundUser = null;
                             return true;
                         }
                     }

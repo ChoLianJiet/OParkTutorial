@@ -13,9 +13,12 @@ import android.widget.Chronometer;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
@@ -56,6 +59,7 @@ public class LoadingScreen extends AppCompatActivity {
     final long ONE_MEGABYTE = 1024 * 1024;
 
     private DatabaseReference matchmakingRef;
+    private DatabaseReference geofireRef;
     private FirebaseStorage storage;
     private StorageReference storageRef;
     private StorageReference userRewardsFolder;
@@ -86,6 +90,7 @@ public class LoadingScreen extends AppCompatActivity {
         userRewardsFolder = storageRef.child("users/" + currentUserID + "/points.txt");
         currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         matchmakingRef = FirebaseDatabase.getInstance().getReference().child("matchmaking");
+        geofireRef = FirebaseDatabase.getInstance().getReference().child("geofire");
         startTime = SystemClock.currentThreadTimeMillis();
 
         mChronometer = (Chronometer) findViewById(R.id.chronometer);
@@ -101,33 +106,17 @@ public class LoadingScreen extends AppCompatActivity {
 
 //        animate(animationView);
 
-        matchmakingRef.child(currentUserID).child("adatem").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                try{
-                String adatemValue = dataSnapshot.getValue().toString();
-                if (adatemValue.equals("2")) {
-                    CalculatePoints();
-                    Intent intent = new Intent(LoadingScreen.this, KenaMap.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-
-                }
-                }catch (NullPointerException e ){
-                        e.printStackTrace();
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        if (MapsMainActivity.locationIsPinned) {
+            SharePinnedLocation();
+        } else if (!MapsMainActivity.locationIsPinned) {
+            ShareUnpinnedLocation();
+        }
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                matchmakingRef.child(currentUserID).child("adatem").setValue("Not Available");
+                matchmakingRef.child(currentUserID).removeValue();
+                geofireRef.child(currentUserID).removeValue();
                 MapsMainActivity.shareParkingButton.setVisibility(View.VISIBLE);
                 MapsMainActivity.findParkingButton.setVisibility(View.VISIBLE);
                 finish();
@@ -138,7 +127,83 @@ public class LoadingScreen extends AppCompatActivity {
         });
     }
 
-    private void GetPointsStorage(){
+    private void ShareUnpinnedLocation(){
+        MapsMainActivity.geoFire.setLocation(currentUserID, new GeoLocation(MapsMainActivity.latitude, MapsMainActivity.longitude), new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+                if (error != null) {
+                    System.err.println("There was an error saving the location to GeoFire: " + error);
+                } else {
+                    System.out.println("Location saved on server successfully on geofireRef as lat[" + MapsMainActivity.latitude + "], lon[" + MapsMainActivity.longitude + "]!");
+
+                }
+            }
+        });
+
+        matchmakingRef.child(currentUserID).child("adatem").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                try {
+                    String adatemValue = dataSnapshot.getValue().toString();
+                    if (adatemValue.equals("2")) {
+                        CalculatePoints();
+                        Intent intent = new Intent(LoadingScreen.this, KenaMap.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+
+                    }
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void SharePinnedLocation(){
+        MapsMainActivity.geoFire.setLocation(currentUserID, new GeoLocation(MapsMainActivity.pinnedLatitude, MapsMainActivity.pinnedLongitude), new GeoFire.CompletionListener() {
+            @Override
+            public void onComplete(String key, DatabaseError error) {
+                if (error != null) {
+                    System.err.println("There was an error saving the location to GeoFire: " + error);
+                } else {
+                    System.out.println("Location saved on server successfully on geofireRef as lat[" + MapsMainActivity.latitude + "], lon[" + MapsMainActivity.longitude + "]!");
+
+                }
+            }
+        });
+
+        matchmakingRef.child(currentUserID).child("adatem").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                try {
+                    String adatemValue = dataSnapshot.getValue().toString();
+                    if (adatemValue.equals("2")) {
+                        CalculatePoints();
+                        Intent intent = new Intent(LoadingScreen.this, KenaMap.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+
+                    }
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void GetPointsStorage() {
 
         userRewardsFolder.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
@@ -151,48 +216,48 @@ public class LoadingScreen extends AppCompatActivity {
 
 
 //                    Log.d(TAG,"pointsToUploadFromLoadingScreen is " + pointsToUploadFromLoadingScreen);
-                } catch (UnsupportedEncodingException e){
+                } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
                 pointsToUploadFromLoadingScreen = (int) (Math.ceil(pointsGainedFromLoadingScreen) + userPoints);
-                objToByteStreamUpload(pointsToUploadFromLoadingScreen,userRewardsFolder);
-                Log.d(TAG,"Points uploaded from Loading Screen is " + pointsToUploadFromLoadingScreen);
+                objToByteStreamUpload(pointsToUploadFromLoadingScreen, userRewardsFolder);
+                Log.d(TAG, "Points uploaded from Loading Screen is " + pointsToUploadFromLoadingScreen);
             }
 
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Log.d(TAG,"fragment is not created, exception: " + exception);
+                Log.d(TAG, "fragment is not created, exception: " + exception);
             }
         });
 
     }
 
-    private void CalculatePoints(){
+    private void CalculatePoints() {
 
-        elapsedTime = ((SystemClock.currentThreadTimeMillis())-startTime)/1000;
+        elapsedTime = ((SystemClock.currentThreadTimeMillis()) - startTime) / 1000;
 
 
-        if(elapsedTime >= 30 && elapsedTime < 60){
-            pointsGainedFromLoadingScreen = 30*2;
-        } else if (elapsedTime >= 60 && elapsedTime < 90){
-            pointsGainedFromLoadingScreen = (30*2) + (30*2.5);
-        } else if ( elapsedTime >= 90 && elapsedTime < 120){
-            pointsGainedFromLoadingScreen = (30*2) + (30*2.5) + (30*3);
-        } else if ( elapsedTime == 120){
-            pointsGainedFromLoadingScreen = (30*2) + (30*2.5) + (30*3) + (30*3.5);
-        } else if (elapsedTime >120){
-            pointsGainedFromLoadingScreen = (30*2) + (30*2.5) + (30*3) + (30*3.5) + (elapsedTime-120)*4;
-        } else{
+        if (elapsedTime >= 30 && elapsedTime < 60) {
+            pointsGainedFromLoadingScreen = 30 * 2;
+        } else if (elapsedTime >= 60 && elapsedTime < 90) {
+            pointsGainedFromLoadingScreen = (30 * 2) + (30 * 2.5);
+        } else if (elapsedTime >= 90 && elapsedTime < 120) {
+            pointsGainedFromLoadingScreen = (30 * 2) + (30 * 2.5) + (30 * 3);
+        } else if (elapsedTime == 120) {
+            pointsGainedFromLoadingScreen = (30 * 2) + (30 * 2.5) + (30 * 3) + (30 * 3.5);
+        } else if (elapsedTime > 120) {
+            pointsGainedFromLoadingScreen = (30 * 2) + (30 * 2.5) + (30 * 3) + (30 * 3.5) + (elapsedTime - 120) * 4;
+        } else {
             pointsGainedFromLoadingScreen = 0;
         }
 
         pointsGainedFromLoadingScreen = Math.ceil(pointsGainedFromLoadingScreen);
-        Log.d(TAG,"Elapsed time is " + elapsedTime);
-        Log.d(TAG,"Points Gained From Loading Screen is " + pointsGainedFromLoadingScreen);
+        Log.d(TAG, "Elapsed time is " + elapsedTime);
+        Log.d(TAG, "Points Gained From Loading Screen is " + pointsGainedFromLoadingScreen);
     }
 
-    public void objToByteStreamUpload(Object obj, StorageReference destination){
+    public void objToByteStreamUpload(Object obj, StorageReference destination) {
 
         String objStr = new Gson().toJson(obj);
         InputStream in = new ByteArrayInputStream(objStr.getBytes(Charset.forName("UTF-8")));
@@ -222,7 +287,7 @@ public class LoadingScreen extends AppCompatActivity {
         finish();
     }
 
-    public void recordMatchMaking(){
+    public void recordMatchMaking() {
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -230,32 +295,30 @@ public class LoadingScreen extends AppCompatActivity {
 
         kenaLat = MapsMainActivity.mLastLocation.getLatitude();
         kenaLng = MapsMainActivity.mLastLocation.getLongitude();
-        kenaLatLng = new LatLng(kenaLat,kenaLng);
+        kenaLatLng = new LatLng(kenaLat, kenaLng);
         String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-        Long tsLong = System.currentTimeMillis()/1000;
+        Long tsLong = System.currentTimeMillis() / 1000;
 
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-        cal.setTimeInMillis(tsLong* 1000L);
+        cal.setTimeInMillis(tsLong * 1000L);
         String date = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
 
-        MatchmakingRecord thisMatchmakingRecord = new MatchmakingRecord("none",date,currentUserID,"none",null,kenaLatLng,elapsedTime,pointsToUploadFromLoadingScreen);
+        MatchmakingRecord thisMatchmakingRecord = new MatchmakingRecord("none", date, currentUserID, "none", null, kenaLatLng, elapsedTime, pointsToUploadFromLoadingScreen);
         matchMakingRecordStoRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/matchmakingrecord/" + "sharingrecord/" + date);
-        latestMatchmakingRecord = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/matchmakingrecord/"+  "latestrecord.txt");
-        objToByteStreamUpload(thisMatchmakingRecord,matchMakingRecordStoRef);
-        objToByteStreamUpload(thisMatchmakingRecord,latestMatchmakingRecord);
-
-
+        latestMatchmakingRecord = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/matchmakingrecord/" + "latestrecord.txt");
+        objToByteStreamUpload(thisMatchmakingRecord, matchMakingRecordStoRef);
+        objToByteStreamUpload(thisMatchmakingRecord, latestMatchmakingRecord);
 
 
     }
 
     @Override
     protected void onPause() {
-    super.onPause();
+        super.onPause();
     }
 
     @Override
     protected void onStop() {
-    super.onStop();
+        super.onStop();
     }
 }

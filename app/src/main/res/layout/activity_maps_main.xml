@@ -77,26 +77,44 @@
 
         <Button
             android:id="@+id/share_parking_button"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            android:layout_width="130dp"
+            android:layout_height="50dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:layout_marginBottom="60dp"
             android:layout_marginStart="20dp"
             android:layout_weight="1"
-            android:background="@color/colorPrimary"
+            android:background="@drawable/share_parking_button"
             android:text="Share"
             android:textSize="20dp"/>
 
+        <ImageButton
+            android:id="@+id/pin_location_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/pin_location_button"
+            android:layout_alignBottom="@+id/share_parking_button"
+            android:layout_centerHorizontal="true"
+            app:srcCompat="@drawable/pin_location_icon"/>
+
+        <ImageButton
+            android:id="@+id/remove_pin_location_button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/pin_location_button"
+            android:layout_alignBottom="@+id/share_parking_button"
+            android:layout_centerHorizontal="true"
+            app:srcCompat="@drawable/red_cross"/>
+
         <Button
             android:id="@+id/find_parking_button"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            android:layout_width="130dp"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@+id/share_parking_button"
             android:layout_alignParentEnd="true"
-            android:layout_alignTop="@+id/share_parking_button"
             android:layout_marginEnd="20dp"
             android:layout_weight="1"
-            android:background="@color/colorPrimaryDark"
+            android:background="@drawable/share_parking_button"
             android:text="Search"
             android:textSize="20dp"/>
 
