@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.opark.opark.AdminActivity;
 import com.opark.opark.merchant_side.MerchActivity;
 import com.opark.opark.merchant_side.MerchProfileSetup;
 import com.opark.opark.UserProfileSetup;
@@ -94,8 +95,16 @@ try {
                 final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 Log.d(TAG, "updateUI: currentUserID" + currentUserID);
 
-                checkIsMerchantOrUser(currentUserID);
-
+                
+                if (FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("oparkadmin1@admin.com")){
+                    Log.d(TAG, "updateUI:  is admin ");
+                    Intent adminIntent = new Intent(this,AdminActivity.class);
+                    finish();
+                    startActivity(adminIntent);
+                }
+                else {
+                    checkIsMerchantOrUser(currentUserID);
+                }
 
         }else {
                 // No user is signed in
@@ -147,6 +156,7 @@ try {
                 hasMerchantProfile = true;
                 Log.d(TAG, "Merchant has profile ");
                 checkIsMerchApproved(userID);
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

@@ -36,19 +36,18 @@ import java.nio.charset.Charset;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private static final String TAG = "RegisterActivity" ;
+    private static final String TAG = "RegisterActivity";
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private EditText mConfirmPasswordView;
     private Switch merchantSwitch;
     private Switch userSwitch;
-    public static boolean isMerchant ;
+    public static boolean isMerchant;
     public static boolean isUser;
 
     // Firebase instance variables
     private FirebaseAuth mAuth;
-
 
 
     @Override
@@ -74,14 +73,13 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
 
-
         mAuth = FirebaseAuth.getInstance();
 
 
         userSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if ((isChecked)&&(merchantSwitch.isChecked())){
+                if ((isChecked) && (merchantSwitch.isChecked())) {
                     userSwitch.setChecked(true);
                     merchantSwitch.setChecked(false);
 //                    merchantSwitch.toggle();
@@ -89,28 +87,23 @@ public class RegisterActivity extends AppCompatActivity {
                     Log.d("switch", "onCheckedChanged: user " + userSwitch.isChecked());
                     Log.d("switch", "onCheckedChanged: merch" + merchantSwitch.isChecked());
 
-                }
-
-                else if ((isChecked)&&(!merchantSwitch.isChecked())){
+                } else if ((isChecked) && (!merchantSwitch.isChecked())) {
                     userSwitch.setChecked(true);
                     merchantSwitch.setChecked(false);
                     Log.d("switch", "onCheckedChanged: user" + userSwitch.isChecked());
                     Log.d("switch", "onCheckedChanged: merch" + merchantSwitch.isChecked());
 
                 }
-
-
 
 
             }
         });
 
 
-
         merchantSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if ((isChecked)&&(userSwitch.isChecked())){
+                if ((isChecked) && (userSwitch.isChecked())) {
                     merchantSwitch.setChecked(true);
                     userSwitch.setChecked(false);
 //                    merchantSwitch.toggle();
@@ -118,17 +111,13 @@ public class RegisterActivity extends AppCompatActivity {
                     Log.d("switch", "onCheckedChanged: user " + userSwitch.isChecked());
                     Log.d("switch", "onCheckedChanged: merch" + merchantSwitch.isChecked());
 
-                }
-
-                else if ((isChecked)&&(!userSwitch.isChecked())){
+                } else if ((isChecked) && (!userSwitch.isChecked())) {
                     merchantSwitch.setChecked(true);
                     userSwitch.setChecked(false);
                     Log.d("switch", "onCheckedChanged: user" + userSwitch.isChecked());
                     Log.d("switch", "onCheckedChanged: merch" + merchantSwitch.isChecked());
 
                 }
-
-
 
 
             }
@@ -144,7 +133,6 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
-
     private void attemptRegistration() {
 
         // Reset errors displayed in the form.
@@ -152,16 +140,14 @@ public class RegisterActivity extends AppCompatActivity {
         mPasswordView.setError(null);
 
 
-
-
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
-        Log.d(TAG, "outside:  Password is" +password);
+        Log.d(TAG, "outside:  Password is" + password);
 
         Log.d(TAG, "outside TextUtils not empty" + (TextUtils.isEmpty(password)));
-        Log.d(TAG, "outside Password not Valid" + !isPasswordValid(password)) ;
+        Log.d(TAG, "outside Password not Valid" + !isPasswordValid(password));
         Log.d(TAG, "password lower " + password.toLowerCase());
         Log.d(TAG, "password upper " + password.toUpperCase());
 
@@ -180,10 +166,9 @@ public class RegisterActivity extends AppCompatActivity {
         //TODO to check the logic
         // Check for a valid password, if the user entered one.
         if ((TextUtils.isEmpty(password) || !isPasswordValid(password)) || password.equals(password.toLowerCase()) ||
-                password.equals(password.toUpperCase()) || !password.matches(".*\\d+.*"))
-        {
-            Log.d(TAG, "attemptRegistration:  Password is" +password);
-            Log.d(TAG, "attemptRegistration: isEmpty ? " +!TextUtils.isEmpty(password) );
+                password.equals(password.toUpperCase()) || !password.matches(".*\\d+.*")) {
+            Log.d(TAG, "attemptRegistration:  Password is" + password);
+            Log.d(TAG, "attemptRegistration: isEmpty ? " + !TextUtils.isEmpty(password));
             Log.d(TAG, "attemptRegistration:  is Valid ? " + !isPasswordValid(password));
 
             Log.d(TAG, "password lower " + password.toLowerCase());
@@ -201,7 +186,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email))  {
+        if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
@@ -232,88 +217,81 @@ public class RegisterActivity extends AppCompatActivity {
         String confirmPassword = mConfirmPasswordView.getText().toString();
 
 
-
-
-
-
         return confirmPassword.equals(password) && password.length() >= 6;
     }
 
 
     // Firebase User creation
 
-    private void    createFirebaseUser(){
+    private void createFirebaseUser() {
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
-        isMerchant=checkIsMerchant();
-        isUser= checkIsUser();
-        if((!isMerchant)&&(!isUser)){
+        isMerchant = checkIsMerchant();
+        isUser = checkIsUser();
+        if ((!isMerchant) && (!isUser)) {
 
-            showErrorDialog("Identity","Please select User or Merchant");
+            showErrorDialog("Identity", "Please select User or Merchant");
             Log.d("error", "onComplete: Please select either merchant or user");
 
-           } else {
+        } else {
 
-            mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                Log.d("OparkRegister", " createUser onComplete" +  task.isSuccessful());
+            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    Log.d("OparkRegister", " createUser onComplete" + task.isSuccessful());
 
-                if (!task.isSuccessful()){
-                    Log.d ("OparkRegister", "createUser Failed");
-                    showErrorDialog("Something went wrong","Registration attempt failed");
+                    if (!task.isSuccessful()) {
+                        Log.d("OparkRegister", "createUser Failed");
+                        showErrorDialog("Something went wrong", "Registration attempt failed");
 
-                } else {
-                    isMerchant=checkIsMerchant();
-                    isUser= checkIsUser();
-
-
-                    if ((isMerchant )&& (!isUser)){
-
-                        Log.d("identity", "onComplete: is merchant" );
-
-                        //Create merchant temp file for checking
-                        FirebaseStorage storage = FirebaseStorage.getInstance();
-                        StorageReference storageRef = storage.getReference();
-                        final String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-                        StorageReference merchFolder = storageRef.child("merchants/" + "merchantlist/" + currentUserEmail  + "/isMerchant.txt");
-                        objToByteStreamUpload(isMerchant, merchFolder);
+                    } else {
+                        isMerchant = checkIsMerchant();
+                        isUser = checkIsUser();
 
 
-                        Intent merchantIntent = new Intent(RegisterActivity.this,MerchProfileSetup.class);
-                        finish();
-                        startActivity(merchantIntent);
+                        if ((isMerchant) && (!isUser)) {
+
+                            Log.d("identity", "onComplete: is merchant");
+
+                            //Create merchant temp file for checking
+                            FirebaseStorage storage = FirebaseStorage.getInstance();
+                            StorageReference storageRef = storage.getReference();
+                            final String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                            StorageReference merchFolder = storageRef.child("merchants/" + "merchantlist/" + currentUserEmail + "/isMerchant.txt");
+                            objToByteStreamUpload(isMerchant, merchFolder);
 
 
-                    }else if ((isUser)&&(!isMerchant)){
+                            Intent merchantIntent = new Intent(RegisterActivity.this, MerchProfileSetup.class);
+                            finish();
+                            startActivity(merchantIntent);
+
+
+                        } else if ((isUser) && (!isMerchant)) {
 //
 
-                        Log.d("identity", "onComplete: is user" );
+                            Log.d("identity", "onComplete: is user");
 
-                        Intent intent = new Intent (RegisterActivity.this, UserProfileSetup.class);
-                        finish();
-                        startActivity(intent);}
+                            Intent intent = new Intent(RegisterActivity.this, UserProfileSetup.class);
+                            finish();
+                            startActivity(intent);
+                        } else {
+
+                            Log.d("error", "onComplete: Please select either merchant or user");
 
 
-                    else {
-
-                        Log.d("error", "onComplete: Please select either merchant or user");
+                        }
 
 
                     }
 
 
                 }
-
-
-
-            }
-        });}
+            });
         }
+    }
 
 
-
-// On Back Pressed
+    // On Back Pressed
     @Override
     public void onBackPressed() {
         finish();
@@ -322,27 +300,26 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
-
-    private boolean checkIsMerchant(){
-        if (merchantSwitch.isChecked()){
+    private boolean checkIsMerchant() {
+        if (merchantSwitch.isChecked()) {
 
             Log.d("switch", "checkIsMerchant:  is merchant" + merchantSwitch.isChecked());
 
-            return  true;
-        }else  return false;
+            return true;
+        } else return false;
 
 
     }
 
-    private boolean checkIsUser(){
-        if (userSwitch.isChecked()){
+    private boolean checkIsUser() {
+        if (userSwitch.isChecked()) {
 
             Log.d("switch", "checkIsMerchant:  is user" + userSwitch.isChecked());
 
 //            merchantSwitch.setChecked(false);
 //            merchantSwitch.toggle();
-            return  true;
-        }else  return false;
+            return true;
+        } else return false;
 
 
     }
@@ -353,13 +330,13 @@ public class RegisterActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton(android.R.string.ok,null)
+                .setPositiveButton(android.R.string.ok, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
 
 
-    private void objToByteStreamUpload(Object obj, StorageReference destination){
+    private void objToByteStreamUpload(Object obj, StorageReference destination) {
 
         String objStr = new Gson().toJson(obj);
         InputStream in = new ByteArrayInputStream(objStr.getBytes(Charset.forName("UTF-8")));
@@ -367,7 +344,7 @@ public class RegisterActivity extends AppCompatActivity {
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                showErrorDialog("Profile Registration Failed.","Failed to update your profile. Try again maybe? ");
+                showErrorDialog("Profile Registration Failed.", "Failed to update your profile. Try again maybe? ");
                 // Use analytics to find out why is the error
                 // then only implement the best corresponding measures
 

@@ -51,8 +51,11 @@ import com.opark.opark.merchant_side.merchant_offer.MerchantOfferAdapter;
 import com.opark.opark.rewards_redemption.ConfirmPreRedeem;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
@@ -84,6 +87,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   private  UploadProgressBarDialog uploadProgressBarDialog;
   private String yy,mm,dd;
   public static MerchantOfferAdapter merchantOfferAdapter;
+  private EditText offerDescription;
 
   private String merchantOfferExpiryDate;
   private String merchantCoName;
@@ -190,6 +194,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     offerRedemptionCost=findViewById(R.id.points_cost);
     uploadButton = findViewById(R.id.upload_offer_button);
     offerCategory = findViewById(R.id.offer_category);
+    offerDescription = findViewById(R.id.offer_details);
   }
 
 
@@ -381,7 +386,27 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
 
 
+  public void objToByteStreamUpload(String obj, StorageReference destination){
 
+    String objStr = new Gson().toJson(obj);
+    InputStream in = new ByteArrayInputStream(objStr.getBytes(Charset.forName("UTF-8")));
+    UploadTask uploadTask = destination.putStream(in);
+    uploadTask.addOnFailureListener(new OnFailureListener() {
+      @Override
+      public void onFailure(@NonNull Exception exception) {
+        // Use analytics to find out why is the error
+        // then only implement the best corresponding measures
+
+
+      }
+    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+      @Override
+      public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+        Toast.makeText(getApplicationContext(), "Profile update successful!", Toast.LENGTH_LONG).show();
+        // Use analytics to calculate the success rate
+      }
+    });
+  }
 
 
   private void uploadFile() {
@@ -393,7 +418,12 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
        final StorageReference fileReference = merchantOfferStorageReference.child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"
               + "." + getFileExtension(filePath));
 
-       merchantOfferImageRefFromSto = fileReference;
+      final StorageReference descriptionReference =  merchantOfferStorageReference.child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("desc.txt");
+      merchantOfferImageRefFromSto = fileReference;
+
+
+
+       objToByteStreamUpload(offerDescription.getText().toString(),descriptionReference);
 
       mUploadTask = fileReference.putFile(filePath)
               .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -406,6 +436,13 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
                       mProgressBar.setProgress(0);
                       uploadProgressBarDialog.dismiss();
+                      Intent uploadOfferIntent = new Intent(MerchUploadOfferActivity.this, MoreImageUploadActivity.class);
+                      Bundle merchDetails = new Bundle();
+                      merchDetails.putString("merchantname", merchantCoName);
+                      merchDetails.putString("offertitle",offerTitle);
+                      uploadOfferIntent.putExtras(merchDetails);
+
+                      startActivity(uploadOfferIntent);
 
                     }
                   }, 500);
@@ -476,7 +513,10 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
 
 
-    offerlistDatabaseRef.child(offerTitle).setValue(merchantOfferData);
+    offerlistDatabaseRef.child("offer-waiting-approval/"+offerTitle).setValue(merchantOfferData);
+
+
+
                   String categoryString = offerCategory.getText().toString();
       Log.d(TAG, "setUpMerchantOffer: getText" + offerCategory.getText().toString() );
                   switch(categoryString) {

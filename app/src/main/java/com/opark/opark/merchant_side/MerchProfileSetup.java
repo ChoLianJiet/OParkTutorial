@@ -67,16 +67,10 @@ public class MerchProfileSetup extends AppCompatActivity {
         });
 
 
-
-
-
     }
 
 
-
-    private void collectMerchEntry(){
-
-
+    private void collectMerchEntry() {
 
 
         MerchProfileEntryEditText[0] = coName;
@@ -86,23 +80,23 @@ public class MerchProfileSetup extends AppCompatActivity {
         MerchProfileEntryEditText[4] = personSignUp;
 
         MerchProfilEntryString[0] = oParkMerchant.merchCoName = coName.getText().toString();
-        MerchProfilEntryString[1] = oParkMerchant.merchCoRegNumber= coRegNum.getText().toString();
+        MerchProfilEntryString[1] = oParkMerchant.merchCoRegNumber = coRegNum.getText().toString();
         MerchProfilEntryString[2] = oParkMerchant.merchContact = coPhone.getText().toString();
         MerchProfilEntryString[3] = oParkMerchant.merchCoAddress = coAddress.getText().toString();
-        MerchProfilEntryString[4] = oParkMerchant.merchSignUpPerson =personSignUp.getText().toString();
-        MerchProfilEntryString[5] = oParkMerchant.merchEmail = coEmail.getText().toString() ;
+        MerchProfilEntryString[4] = oParkMerchant.merchSignUpPerson = personSignUp.getText().toString();
+        MerchProfilEntryString[5] = oParkMerchant.merchEmail = coEmail.getText().toString();
 
 
     }
 
 
-    private boolean emptyCheck (String[] string, EditText[] editTexts , int size){
+    private boolean emptyCheck(String[] string, EditText[] editTexts, int size) {
 
-        boolean cancelSetup =false;
-        View focusView =null;
-        View focusView1 =null;
+        boolean cancelSetup = false;
+        View focusView = null;
+        View focusView1 = null;
 
-        for (int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             if ((string[i].isEmpty())) {
                 editTexts[i].setError(getString(R.string.error_field_required));
                 focusView = editTexts[i];
@@ -132,9 +126,7 @@ public class MerchProfileSetup extends AppCompatActivity {
     }
 
 
-
-
-    public void objToByteStreamUpload(Object obj, StorageReference destination){
+    public void objToByteStreamUpload(Object obj, StorageReference destination) {
 
         String objStr = new Gson().toJson(obj);
         InputStream in = new ByteArrayInputStream(objStr.getBytes(Charset.forName("UTF-8")));
@@ -164,30 +156,22 @@ public class MerchProfileSetup extends AppCompatActivity {
                 .setTitle("Oops")
 
                 .setMessage(message)
-                .setPositiveButton(android.R.string.ok,null)
+                .setPositiveButton(android.R.string.ok, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
 
 
-    private void bindviews(){
-        merchProfSubmitButton=findViewById(R.id.merch_profile_submit_button);
-        coName=findViewById(R.id.merch_co_name);
-        coRegNum=findViewById(R.id.merch_co_number);
+    private void bindviews() {
+        merchProfSubmitButton = findViewById(R.id.merch_profile_submit_button);
+        coName = findViewById(R.id.merch_co_name);
+        coRegNum = findViewById(R.id.merch_co_number);
         coPhone = findViewById(R.id.merch_co_phone_number);
         coAddress = findViewById(R.id.merch_co_address);
         personSignUp = findViewById(R.id.merch_sign_up_person);
         coEmail = findViewById(R.id.merch_email);
 
     }
-
-
-
-
-
-
-
-
 
 
     private void attemptProfileSetup(String merchantID) {
@@ -198,18 +182,13 @@ public class MerchProfileSetup extends AppCompatActivity {
         collectMerchEntry();
 
 
-
-
-        checkMerchEntrySetup= emptyCheck(MerchProfilEntryString,MerchProfileEntryEditText, 5);
+        checkMerchEntrySetup = emptyCheck(MerchProfilEntryString, MerchProfileEntryEditText, 5);
 
 
 // do empty check if returns true, break operation
-        if(checkMerchEntrySetup) {
+        if (checkMerchEntrySetup) {
             return;
-        }
-
-
-        else {
+        } else {
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
@@ -223,8 +202,8 @@ public class MerchProfileSetup extends AppCompatActivity {
 //            Intent intent = new Intent(MerchProfileSetup.this, LoginActivity.class);
 //            finish();
 //            startActivity(intent);}
+        }
     }
-}
 
 
 }

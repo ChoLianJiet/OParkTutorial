@@ -48,6 +48,7 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
 
     public class MerchantOfferAdapterViewHolder extends RecyclerView.ViewHolder {
 
+        TextView expiryDate;
         CardView merchantCardView;
         TextView merchantOfferTitle;
         TextView merchantName;
@@ -70,7 +71,7 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
             redeemCost = (TextView) itemView.findViewById(R.id.redeem_cost);
             merchantOfferImage = (ImageView) itemView.findViewById(R.id.merchant_offer_image);
             redeemButton = (Button) itemView.findViewById(R.id.redeem_button);
-
+            expiryDate = itemView.findViewById(R.id.expiry_date);
         }
 
 
@@ -118,6 +119,7 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
 
         holder.redeemCost.setText(merchantOfferList.get(i).getOfferCost());
 
+        holder.expiryDate.setText(merchantOfferList.get(i).getExpiryDate());
         holder.merchantNumber.setText(merchantOfferList.get(i).getMerchantContact());
 
 //

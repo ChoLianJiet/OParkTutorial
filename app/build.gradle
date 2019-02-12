@@ -92,7 +92,6 @@ android {
 
         implementation 'br.com.simplepass:loading-button-android:1.14.0'
 
-
         //code input
 
 //        implementation 'org.xdty.preference:color-picker:0.0.5'
@@ -110,7 +109,6 @@ android {
         implementation 'com.android.support:support-dynamic-animation:27.1.1'
 
 
-
     }
 
 
@@ -119,3 +117,6 @@ android {
 
 apply plugin: 'com.google.gms.google-services'
 
+dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:+'
+}
