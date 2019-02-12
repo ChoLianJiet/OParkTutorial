@@ -1,23 +1,47 @@
 package com.opark.opark;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.View;
 
-public class TabLayoutPagerAdapter  extends FragmentPagerAdapter {
+import com.opark.opark.rewards_redemption.AllOfferFragment;
 
-    private FragmentManager tablayoutfragman;
+public class TabLayoutPagerAdapter  extends FragmentPagerAdapter implements BrandsTitleAdapter.BrandsSelected {
+
+    public changePage changePage;
+
+
+
+
+
+    public interface changePage {
+        boolean changePage();
+
+
+    }
+
+    @Override
+    public void onBrandsSelected(View v, int position) {
+
+        Log.d("tabAdapt", "onBrandsSelected: ");
+
+    }
+
+
+
+
+    public static FragmentManager tablayoutfragman;
     private Context mContext;
     AllOfferFragment allOfferFragment;
     Fragment fragment;
 
     public TabLayoutPagerAdapter(FragmentManager fm) {
         super(fm);
+        tablayoutfragman= fm;
+
     }
 
     public TabLayoutPagerAdapter(FragmentManager fm, Context mContext) {
@@ -39,7 +63,13 @@ public class TabLayoutPagerAdapter  extends FragmentPagerAdapter {
 
                 return new CategoriesOfferFragment();
             case 2:
-                return new BrandsFragment();
+
+                return new BrandsOfferFragment();
+
+
+
+
+
             default:
                 return new AllOfferFragment();
         }

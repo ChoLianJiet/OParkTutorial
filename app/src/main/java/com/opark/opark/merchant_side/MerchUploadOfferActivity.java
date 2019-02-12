@@ -1,7 +1,11 @@
 package com.opark.opark.merchant_side;
 
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.UploadTask;
+import com.opark.opark.BrandsAlphabet;
 import com.opark.opark.CategoryDialog;
 
 import android.app.DatePickerDialog;
@@ -43,6 +47,7 @@ import com.google.gson.Gson;
 import com.opark.opark.R;
 import com.opark.opark.merchant_side.merchant_class.Merchant;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
+import com.opark.opark.merchant_side.merchant_offer.MerchantOfferAdapter;
 import com.opark.opark.rewards_redemption.ConfirmPreRedeem;
 import com.squareup.picasso.Picasso;
 
@@ -78,6 +83,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   private CategoryDialog categoryDialog;
   private  UploadProgressBarDialog uploadProgressBarDialog;
   private String yy,mm,dd;
+  public static MerchantOfferAdapter merchantOfferAdapter;
 
   private String merchantOfferExpiryDate;
   private String merchantCoName;
@@ -445,7 +451,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
   public void setUpMerchantOffer(Uri uri){
 
-    MerchantOffer merchantOfferData = new MerchantOffer();
+    final MerchantOffer merchantOfferData = new MerchantOffer();
                   merchantOfferData.setMerchantName(merchantCoName);
                   merchantOfferData.setMerchantOfferTitle(offerTitle);
                   merchantOfferData.setMerchantAddress(merchantCoAddress);
@@ -456,11 +462,21 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
                   merchantOfferData.setOfferCategories(offerCategory.getText().toString());
                   Log.d(TAG, "setFolderInDatabase: offer image" + offerImageForUpload);
 
+
+    Log.d("charat", "setUpMerchantOffer: " + merchantCoName.charAt(0));
+
+
+//    BrandsAlphabet brandsAlphabet = new BrandsAlphabet();
+//
+//    brandsAlphabet.setBrandsAlphabet(merchantCoName.charAt(0));
+//
+//    Log.d("brands", "setUpMerchantOffer: " + brandsAlphabet.getBrandsAlphabet());
 //                  offerlistDatabaseRef.child("merchantsName/"+merchantCoName ).child(offerTitle).setValue(offerTitle );
-                  offerlistDatabaseRef.child("merchantsName/"+merchantCoName ).push().setValue(offerTitle);
+                  offerlistDatabaseRef.child("merchantsName/" + merchantCoName ).push().setValue(offerTitle);
 
-                  offerlistDatabaseRef.child(offerTitle).setValue(merchantOfferData);
 
+
+    offerlistDatabaseRef.child(offerTitle).setValue(merchantOfferData);
                   String categoryString = offerCategory.getText().toString();
       Log.d(TAG, "setUpMerchantOffer: getText" + offerCategory.getText().toString() );
                   switch(categoryString) {

@@ -32,6 +32,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 //import android.app.FragmentManager;
 
@@ -39,6 +40,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -47,6 +50,7 @@ import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -94,6 +98,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.opark.opark.BrandsOfferFragment;
+import com.opark.opark.BrandsOfferFragment1;
 import com.opark.opark.CustomInfoWindowAdapter;
 import com.opark.opark.FinishUserPopUp;
 import com.opark.opark.LoadingScreen;
@@ -102,6 +109,7 @@ import com.opark.opark.PeterMap;
 import com.opark.opark.ProfileNavFragment;
 import com.opark.opark.dialogs.DecideWantToRemovePinDialog;
 import com.opark.opark.dialogs.PromptDetectedFFKDialogForKena;
+import com.opark.opark.ShowBrandOffer;
 import com.opark.opark.rewards_redemption.RewardsFragment;
 import com.opark.opark.rewards_redemption.RewardsPocketFragment;
 import com.opark.opark.feedback.FeedbackDialog;
@@ -124,6 +132,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import static com.opark.opark.rewards_redemption.RewardsFragment.merchantOfferAdapter;
 
 public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -197,9 +207,11 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     private ArrayList<String> getLastClickedMarkerUser = new ArrayList<>(1);
     public static LatLng peterParkerLocation;
     private LatLng kenaParkerLocation;
+    private String ownMarkerID;
     public static Location peterParker = new Location("");
     public static String foundUser;
     public ProgressBar loadingCircle;
+    private String adatemValue;
     public static UserPopUpFragment userPopUpFragment;
     public static UserPopUpFragment userPopUpFragment1;
     private PopupWindow popUpWindow;
@@ -224,7 +236,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
     //NavDrawer variables
     public static DrawerLayout mDrawer;
-    private Toolbar toolbar;
+    public static Toolbar toolbar;
     public static NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private MenuItem oldMenuItem;
@@ -283,6 +295,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         drawerToggle = setupDrawerToggle();
         mDrawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
+
 
 
         // Tie DrawerLayout events to the ActionBarToggle
@@ -426,107 +439,120 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
 
-    private void acquireUserProfileAndStoreLocal() {
 
-        StorageReference userRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
-        StorageReference userPointRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/points.txt");
+
+
+   private void acquireUserProfileAndStoreLocal(){
+
+       StorageReference userRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
+       StorageReference userPointRef =FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/points.txt");
         final DatabaseReference userPointDataRef = FirebaseDatabase.getInstance().getReference().child("users/userPoints/" + currentUserID);
 
 
-        final long ONE_MEGABYTE = 1024 * 1024;
-
-        userPointRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
 
 
-                try {
-                    userPoints = (new Gson().fromJson(new String(bytes, "UTF-8"), Integer.class));
-                    Log.d(TAG, "onSuccess: " + userPoints);
-                    userPointsTextView.setText(String.valueOf(userPoints));
+       final long ONE_MEGABYTE = 1024 * 1024;
+
+       userPointRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+           @Override
+           public void onSuccess(byte[] bytes) {
 
 
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+               try {
+
+                   try {
+                       userPoints = (new Gson().fromJson(new String(bytes, "UTF-8"), Integer.class));
+                       Log.d(TAG, "onSuccess: " + userPoints);
+                       userPointsTextView.setText(String.valueOf(userPoints));
 
 
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-
-                                    }
-                                }
-        );
+                   } catch (UnsupportedEncodingException e) {
+                       e.printStackTrace();
+                   }
+               }catch (JsonSyntaxException e){
+                   e.printStackTrace();
+               }
 
 
-        userPointDataRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange: inside value listener");
-                Log.d(TAG, "onDataChange: datasnapshot" + dataSnapshot.getKey());
-                Log.d(TAG, "onDataChange: datasnapshot value" + dataSnapshot.getValue());
+
+           }
+       }).addOnFailureListener(new OnFailureListener() {
+                                   @Override
+                                   public void onFailure(@NonNull Exception e) {
+
+                                   }
+                               }
+       );
 
 
-                try {
-                    userPoints = dataSnapshot.getValue(Integer.class);
+
+       userPointDataRef.addValueEventListener(new ValueEventListener() {
+           @Override
+           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+               Log.d(TAG, "onDataChange: inside value listener");
+               Log.d(TAG, "onDataChange: datasnapshot" + dataSnapshot.getKey());
+               Log.d(TAG, "onDataChange: datasnapshot value" + dataSnapshot.getValue());
+
+
+               try {
+                   userPoints = dataSnapshot.getValue(Integer.class);
 //                userPoints = Integer.parseInt(String.valueOf(dataSnapshot.getValue()));
-                    userPointsTextView.setText(String.valueOf(userPoints));
+                   userPointsTextView.setText(String.valueOf(userPoints));
 
 
-                    Log.d(TAG, "onDataChange: userPoints" + userPoints);
-                } catch (NullPointerException e) {
+                   Log.d(TAG, "onDataChange: userPoints" + userPoints);
+               } catch (NullPointerException e ){
 
-                    userPointDataRef.setValue(userPoints);
+                   userPointDataRef.setValue(userPoints);
 
-                }
+               }
 
-            }
+           }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+           @Override
+           public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                Log.d(TAG, "onCancelled: " + databaseError);
-            }
-        });
-
-
-        userRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-                Log.d("Byte", "getByte success");
+               Log.d(TAG, "onCancelled: " + databaseError);
+           }
+       });
 
 
-                try {
-                    userObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
-                    Log.d("Gson", "Gsonfrom json success");
+       userRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+           @Override
+           public void onSuccess(byte[] bytes) {
+               Log.d("Byte","getByte success");
 
 
-                    for (int i = 0; i < MapsMainActivity.userObjList.size(); i++) {
-                        Log.d("I", "Iteration success");
-                        Log.i("Hello", "heyhey" + MapsMainActivity.userObjList.get(i).getUserName().getFirstName());
+               try {
+                   userObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
+                   Log.d("Gson","Gsonfrom json success");
+
+
+                   for (int i = 0; i < MapsMainActivity.userObjList.size(); i++) {
+                       Log.d("I", "Iteration success");
+                       Log.i("Hello", "heyhey" + MapsMainActivity.userObjList.get(i).getUserName().getFirstName());
 //                            firstName.setText(userObjList.get(i).getUserName().getFirstName());
-                        lastName = (MapsMainActivity.userObjList.get(i).getUserName().getLastName());
-                        phoneNum = (MapsMainActivity.userObjList.get(i).getUserName().getPhoneNum());
-                        carColour = (MapsMainActivity.userObjList.get(i).getUserCar().getCarColour());
-                        carBrand = (MapsMainActivity.userObjList.get(i).getUserCar().getCarBrand());
-                        carModel = (MapsMainActivity.userObjList.get(i).getUserCar().getCarModel());
-                        carPlate = (MapsMainActivity.userObjList.get(i).getUserCar().getCarPlate());
-                        Log.d(TAG, "lastName variable is " + lastName);
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-            }
-        });
+                       lastName = (MapsMainActivity.userObjList.get(i).getUserName().getLastName());
+                       phoneNum = (MapsMainActivity.userObjList.get(i).getUserName().getPhoneNum());
+                       carColour =(MapsMainActivity.userObjList.get(i).getUserCar().getCarColour());
+                       carBrand = (MapsMainActivity.userObjList.get(i).getUserCar().getCarBrand());
+                       carModel = (MapsMainActivity.userObjList.get(i).getUserCar().getCarModel());
+                       carPlate= (MapsMainActivity.userObjList.get(i).getUserCar().getCarPlate());
+                       Log.d(TAG,"lastName variable is " + lastName);
+                   }
+               } catch (UnsupportedEncodingException e) {
+                   e.printStackTrace();
+               }
+           }
+       }).addOnFailureListener(new OnFailureListener() {
+           @Override
+           public void onFailure(@NonNull Exception exception) {
+               // Handle any errors
+           }
+       });
 
-    }
+   }
+
 
 
     @Override
@@ -557,36 +583,35 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 //                            }
 //                        });} catch (NullPointerException e ){Log.d(TAG, "OnBackStackChangedListener null execption catch");}
 
-                        if (menuItem == oldMenuItem) {
-                            Log.d(TAG, "menuitem is displayed already");
+                        if (menuItem == oldMenuItem){
+                            Log.d(TAG,"menuitem is displayed already");
 //                            Log.d("navmenuitem","menu item ischecked and return false");
                             return false;
-                        } else {
+                        }
+                        else {
 //                           backStackCount= navFragmentManager.getBackStackEntryCount();
 //                            Log.d(TAG, "onNavigationItemSelected: backstack count is " +backStackCount);
-                            Log.d(TAG, "menuitem is not displayed");
+                            Log.d(TAG,"menuitem is not displayed");
 //                            Log.d("navmenuitem","menu item isnotchecked and setChecked(false) and return true");
-                            try {
-                                try {
-                                    backStackCount = navFragmentManager.getBackStackEntryCount();
-                                    Log.d(TAG, "onNavigationItemSelected: backstack count is " + backStackCount);
-                                    if (backStackCount != 0) {
-                                        navFragmentManager.popBackStack();
+                            try{
+                                    try{
+                                backStackCount= navFragmentManager.getBackStackEntryCount();
+                                Log.d(TAG, "onNavigationItemSelected: backstack count is " +backStackCount);
+                                if( backStackCount !=0){
+                                navFragmentManager.popBackStack();}
+
+                               }
+                                    catch (NullPointerException e ){
+                                        Log.d(TAG, "onNavigationItemSelected: NullPoint");
                                     }
 
-                                } catch (NullPointerException e) {
-                                    Log.d(TAG, "onNavigationItemSelected: NullPoint");
-                                }
+                                } catch (IllegalStateException e ){Log.d(TAG,"first selected pop");}
 
-                            } catch (IllegalStateException e) {
-                                Log.d(TAG, "first selected pop");
-                            }
-
-                            selectDrawerItem(menuItem);
+                                selectDrawerItem(menuItem);
 
                             mDrawer.closeDrawer(GravityCompat.START);
 
-                            oldMenuItem = menuItem;
+                            oldMenuItem =menuItem;
                             return true;
 
                         }
@@ -598,8 +623,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     public void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the fragment to show based on nav item clicked
 
-        Class fragmentClass = null;
-        switch (menuItem.getItemId()) {
+        switch(menuItem.getItemId()) {
             case R.id.nav_first_fragment:
                 userProfilePage = new ProfileNavFragment();
                 fragment = userProfilePage;
@@ -610,7 +634,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 rewardsPageFrag = new RewardsFragment();
                 fragment = rewardsPageFrag;
                 executeFragmentTransaction(fragment);
-                break;
+                    break;
 
             case R.id.nav_third_fragment:
                 rewardsPockFrag = new RewardsPocketFragment();
@@ -620,7 +644,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
             default:
 //                fragmentClass = FirstFragment.class;
                 FeedbackDialog dialog = new FeedbackDialog();
-                Car car = new Car("Blue", "Toyota", "Harrier", "BJT 2883");
+                Car car = new Car("Blue","Toyota","Harrier","BJT 2883");
                 dialog.setArguments(dialog.setCarDetails(car));
                 dialog.show(getSupportFragmentManager(), "");
         }
@@ -639,22 +663,27 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
 
     private void executeFragmentTransaction(Fragment frag) {
-        if ((frag != null)) {
+        if ((frag != null) ) {
 
-            navFragmentManager = getSupportFragmentManager();
+            navFragmentManager= getSupportFragmentManager();
             navFragmentManager.beginTransaction()
-                    .replace(R.id.nav_view_selection_container, frag)
-                    .addToBackStack(null)
-                    .commit();
+                        .replace(R.id.nav_view_selection_container, frag)
+                        .addToBackStack(null)
+                         .commit();
             Log.d(TAG, "executing fragment transaction , added to backstack");
             mapContainer.setVisibility(View.GONE);
             currentFragment = frag;
             Log.d(TAG, "executeFragmentTransaction: currentFragment is " + currentFragment);
-        } else {
+        }
+        else{
             Log.d(TAG, "same fragment");
             return;
         }
     }
+
+
+
+
 
 
     @Override
@@ -675,7 +704,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     private ActionBarDrawerToggle setupDrawerToggle() {
         // NOTE: Make sure you pass in a valid toolbar reference.  ActionBarDrawToggle() does not require it
         // and will not render the hamburger icon without it.
-        return new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.drawer_open, R.string.drawer_close);
+        return new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);
     }
 
 
@@ -1764,22 +1793,25 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (mDrawer.isDrawerOpen(GravityCompat.START)) {
             mDrawer.closeDrawer(GravityCompat.START);
-        } else if (fragment != null) {
+        } else if (fragment != null ){
 
 
-            Log.d("backpress", "Back Pressed when fragment is profnav");
+            Log.d("backpress","Back Pressed when fragment is " + fragment  );
 //            navFragmentManager = getFragmentManager();
 //            ft = navFragmentManager.beginTransaction();
 
+
+
+//            Log.d(TAG, "onBackPressed: Showbrandoffervisibl " + BrandsOfferFragment1.showBrandOffer1.isVisible());
             navFragmentManager.popBackStack();
 
             mapContainer.setVisibility(View.VISIBLE);
             toolbar.setTitle("Map");
-            // Update your UI here.
+                            // Update your UI here.
 //                            ft.remove(userProfilePage);
 //                            ft.replace(R.id.map_page_container,null);
 //                            ft.commit();
-            fragment = null;
+            fragment=null;
             oldMenuItem = null;
 
 

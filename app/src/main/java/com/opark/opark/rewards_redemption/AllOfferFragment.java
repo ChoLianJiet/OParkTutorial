@@ -1,4 +1,4 @@
-package com.opark.opark;
+package com.opark.opark.rewards_redemption;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,6 +22,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.opark.opark.BrandsAlphabet;
+import com.opark.opark.BrandsName;
+import com.opark.opark.BrandsOfferFragment1;
+import com.opark.opark.R;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOfferAdapter;
 import com.opark.opark.rewards_redemption.ConfirmPreRedeem;
@@ -35,6 +39,7 @@ import static com.opark.opark.share_parking.MapsMainActivity.navFragmentManager;
 public class AllOfferFragment extends Fragment {
 
     private List<MerchantOffer> merchantOffer = new ArrayList<>();
+    public static List<MerchantOffer> merchantOfferForBrands = new ArrayList<>();
     MerchantOffer thisMerchantOffer = new MerchantOffer();
     private DatabaseReference offerlistDatabaseRef;
     public static RecyclerView allRecView;
@@ -108,6 +113,20 @@ public class AllOfferFragment extends Fragment {
                 if (!dataSnapshot.getKey().equals("merchantsName")) {
                     merchantOffer.add(dataSnapshot.getValue(MerchantOffer.class));
 
+
+                    /*For Brands Fragment*/
+//                    if (dataSnapshot.getValue(MerchantOffer.class).getMerchantName().charAt(0) == 'K'){
+//                        merchantOfferForBrands.add(dataSnapshot.getValue(MerchantOffer.class));
+//                        BrandsName brandsname = new BrandsName();
+//
+//                        brandsname.setBrandsName(dataSnapshot.getValue(MerchantOffer.class).getMerchantName());
+//
+//                        BrandsOfferFragment1.brandsNameListK.add(brandsname);
+//
+//
+//                        Log.d(TAG, "'K'");
+//                    }
+
                     Log.d("INITDATA", "Data added as class");
 
 
@@ -125,12 +144,17 @@ public class AllOfferFragment extends Fragment {
 
                                 Log.d("tab", "Rewards Fragment Button Clicked " + position);
 
-                            } catch (IllegalStateException e){
+                            } catch (IllegalStateException e) {
                                 e.printStackTrace();
                             }
                         }
 
 
+                    }, new MerchantOfferAdapter.CardClicked() {
+                        @Override
+                        public void onCardClicked(View v, int position) {
+
+                        }
                     });
 
                     allRecView.setAdapter(merchantOfferAdapter);

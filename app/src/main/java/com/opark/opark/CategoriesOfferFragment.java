@@ -27,6 +27,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
@@ -482,6 +483,8 @@ public class CategoriesOfferFragment extends Fragment {
 
 
 
+
+
         offerlistDatabaseRef.child(category).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -509,15 +512,19 @@ public class CategoriesOfferFragment extends Fragment {
                                 confirmPreRedeem.show(fragmentManager, "");
 
 
-
                                 Log.d("tab", "Rewards Fragment Button Clicked " + position);
 
-                            } catch (IllegalStateException e){
+                            } catch (IllegalStateException e) {
                                 e.printStackTrace();
                             }
                         }
 
 
+                    }, new MerchantOfferAdapter.CardClicked() {
+                        @Override
+                        public void onCardClicked(View v, int position) {
+
+                        }
                     });
 
 
