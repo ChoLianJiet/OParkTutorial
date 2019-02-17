@@ -4,7 +4,8 @@ public class MarkerTag {
 
 
     private String UID;
-    private String yesNoTag;
+    private String kenaParkerName;
+    private String kenaParkerCarDetails;
 
     public MarkerTag() {
 
@@ -18,11 +19,19 @@ public class MarkerTag {
         this.UID = UID;
     }
 
-    public String getYesNoTag() {
-        return yesNoTag;
+    public String getKenaParkerName() {
+        return kenaParkerName;
     }
 
-    public void setYesNoTag(String yesNoTag) {
-        this.yesNoTag = yesNoTag;
+    public void setKenaParkerName(String yesNoTag) {
+        this.kenaParkerName = kenaParkerName;
+    }
+
+    public String getKenaParkerCarDetails() {
+        return kenaParkerCarDetails;
+    }
+
+    public void setKenaParkerCarDetails(String yesNoTag) {
+        this.kenaParkerCarDetails = kenaParkerCarDetails;
     }
 }

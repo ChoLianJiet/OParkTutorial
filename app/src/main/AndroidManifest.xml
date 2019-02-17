@@ -11,11 +11,12 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission
         android:name="android.permission.LOCATION_HARDWARE"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
+        tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW"/>
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <!-- FACEBOOK META DATA ELEMENT -->
     <application
@@ -42,20 +43,29 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".card_swipe.MainActivityCardSwipe"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".motion_vehicle_tracker.Map" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".UserProfileSetup" />
+            android:theme="@style/AppTheme">
+        </activity>
+        <activity android:name=".motion_vehicle_tracker.Map">
+        </activity>
+        <activity android:name=".RegisterActivity"/>
+        <activity android:name=".UserProfileSetup">
+        </activity>
         <activity
             android:name=".UserPopUp"
-            android:theme="@style/AppTheme.CustomTheme" />
+            android:theme="@style/AppTheme.CustomTheme">
+        </activity>
         <activity
             android:name=".NoUserPopUp"
-            android:theme="@style/AppTheme.CustomTheme" />
+            android:theme="@style/AppTheme.CustomTheme">
+        </activity>
+        <activity
+            android:name=".FinishUserPopUp"
+            android:theme="@style/AppTheme.CustomTheme">
+        </activity>
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="Opark" />
+            android:label="Opark"/>
         <activity
             android:name="com.facebook.CustomTabActivity"
             android:exported="true">
@@ -78,13 +88,16 @@
             android:name=".KenaMap"
             android:configChanges="orientation"
             android:label="@string/title_activity_maps_main"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+        </activity>
         <activity
             android:name=".PeterMap"
             android:configChanges="orientation"
             android:label="@string/title_activity_maps_main"
-            android:screenOrientation="portrait" />
-        <activity android:name=".ProfileEdit" />
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".ProfileEdit">
+        </activity>
         <activity android:name=".splash_screen.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

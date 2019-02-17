@@ -177,6 +177,7 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         getFoundUserLocation();
+        setKenaDetailsOnBottomSheet();
 
         intentToGoogleMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
