@@ -127,8 +127,7 @@ public class MoreImageUploadActivity extends AppCompatActivity {
                     uploadFile(imgFilePath4,4);}
 
 
-                    Intent intentback = new Intent(MoreImageUploadActivity.this, MerchActivity.class);
-                    startActivity(intentback);
+
 
             }
         });
@@ -279,7 +278,8 @@ public class MoreImageUploadActivity extends AppCompatActivity {
 
                                     uploadProgressBarDialog.dismiss();
                                     mProgressBar.setProgress(0);
-
+                                    Intent intentback = new Intent(MoreImageUploadActivity.this, MerchActivity.class);
+                                    startActivity(intentback);
 
 
                                 }

@@ -99,7 +99,7 @@ public class AllOfferFragment extends Fragment {
 
 
 //        merchantOffer = new ArrayList<>();
-        offerlistDatabaseRef.addChildEventListener(new ChildEventListener() {
+        offerlistDatabaseRef.child("approved-offers").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Log.d("tab", "onChildAdded: datasnapshot key" + dataSnapshot.getKey());

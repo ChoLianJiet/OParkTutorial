@@ -1,6 +1,7 @@
 package com.opark.opark.merchant_side.merchant_offer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
@@ -26,22 +27,20 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdapter.MerchantOfferAdapterViewHolder> implements  Filterable {
+public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdapter.MerchantOfferAdapterViewHolder> implements Filterable {
     private Context context;
-    public  ButtonClicked mButtonClicked;
+    public ButtonClicked mButtonClicked;
     List<MerchantOffer> originalList;
     public CardClicked mCardClicked;
 
-    public interface ButtonClicked{
+    public interface ButtonClicked {
         void onButtonClicked(View v, int position);
-
 
 
     }
 
-    public interface CardClicked{
+    public interface CardClicked {
         void onCardClicked(View v, int position);
-
 
 
     }
@@ -75,13 +74,12 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
         }
 
 
-
     }
 
 
-
     List<MerchantOffer> merchantOfferList;
-    public MerchantOfferAdapter(List<MerchantOffer> merchantOfferList, ButtonClicked buttonClicked, CardClicked cardClicked){
+
+    public MerchantOfferAdapter(List<MerchantOffer> merchantOfferList, ButtonClicked buttonClicked, CardClicked cardClicked) {
         this.merchantOfferList = merchantOfferList;
         this.mButtonClicked = buttonClicked;
         this.originalList = new ArrayList<>(merchantOfferList);
@@ -89,7 +87,6 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
 
 
     }
-
 
 
     @Override
@@ -101,7 +98,7 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
     @NonNull
     @Override
     public MerchantOfferAdapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_rewards_fragment, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_rewards_fragment, parent, false);
         MerchantOfferAdapterViewHolder merchantOfferAdapterViewHolder = new MerchantOfferAdapterViewHolder(v);
 
 
@@ -116,9 +113,7 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
         holder.merchantOfferTitle.setText(merchantOfferList.get(i).getMerchantOfferTitle());
         holder.merchantName.setText(merchantOfferList.get(i).getMerchantName());
         holder.merchantAddress.setText(merchantOfferList.get(i).getMerchantAddress());
-
         holder.redeemCost.setText(merchantOfferList.get(i).getOfferCost());
-
         holder.expiryDate.setText(merchantOfferList.get(i).getExpiryDate());
         holder.merchantNumber.setText(merchantOfferList.get(i).getMerchantContact());
 
@@ -138,14 +133,13 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
         holder.redeemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ConfirmPreRedeem.redeemCost = Integer.valueOf( merchantOfferList.get(i).getOfferCost());
+                ConfirmPreRedeem.redeemCost = Integer.valueOf(merchantOfferList.get(i).getOfferCost());
                 ConfirmPreRedeem.merchantName = merchantOfferList.get(i).getMerchantName();
                 ConfirmPreRedeem.merchantOfferTitle = merchantOfferList.get(i).getMerchantOfferTitle();
                 ConfirmPreRedeem.rewardsMerchant = merchantOfferList.get(i).getMerchantName();
                 ConfirmPreRedeem.merchantAddress = merchantOfferList.get(i).getMerchantAddress();
                 ConfirmPreRedeem.merchantContact = merchantOfferList.get(i).getMerchantContact();
                 ConfirmPreRedeem.merchantOfferImageUrl = merchantOfferList.get(i).getOfferImage();
-
 
 
                 mButtonClicked.onButtonClicked(v, i);
@@ -162,9 +156,11 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
         holder.merchantCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCardClicked.onCardClicked(view,i);
+                mCardClicked.onCardClicked(view, i);
 
                 Log.d("cardclick", "onClick: " + view + "i " + i);
+
+
             }
         });
 
@@ -176,23 +172,20 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
     }
 
 
-    public Bitmap StringToBitMap(String encodedString){
-        try{
-            byte [] encodeByte= Base64.decode(encodedString,Base64.DEFAULT);
-            Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+    public Bitmap StringToBitMap(String encodedString) {
+        try {
+            byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
             return bitmap;
-        }catch(Exception e){
+        } catch (Exception e) {
             e.getMessage();
             return null;
         }
     }
 
 
-
-
-    public void setOnButtonClick(ButtonClicked listener)
-    {
-        this.mButtonClicked=listener;
+    public void setOnButtonClick(ButtonClicked listener) {
+        this.mButtonClicked = listener;
     }
 
 
@@ -208,10 +201,10 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
 
             if (constraint == null || constraint.length() == 0) {
                 filteredList.addAll(originalList);
-                Log.d("filter", "performFiltering: Constraints is null/0 "+ originalList);
+                Log.d("filter", "performFiltering: Constraints is null/0 " + originalList);
             } else {
 
-                Log.d("filter", "performFiltering: Constraints is not null "+ originalList);
+                Log.d("filter", "performFiltering: Constraints is not null " + originalList);
                 String filterPattern = constraint.toString().toLowerCase().trim();
 
                 Log.d("filter", "performFiltering: filterPattern " + filterPattern);
@@ -235,7 +228,7 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
         protected void publishResults(CharSequence constraint, FilterResults results) {
             Log.d("filter", "publishResults: +" + results.values);
             merchantOfferList.clear();
-            merchantOfferList.addAll( (List<MerchantOffer>) results.values);
+            merchantOfferList.addAll((List<MerchantOffer>) results.values);
             notifyDataSetChanged();
         }
     };

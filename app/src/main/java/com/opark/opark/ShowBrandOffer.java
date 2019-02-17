@@ -169,7 +169,7 @@ public class ShowBrandOffer extends Fragment  {
         });
 
 
-        final DatabaseReference offerlistDataRef = FirebaseDatabase.getInstance().getReference().child("offerlist");
+        final DatabaseReference offerlistDataRef = FirebaseDatabase.getInstance().getReference().child("offerlist/approved-offers");
 
         offerlistDataRef.addChildEventListener(new ChildEventListener() {
             @Override

@@ -253,14 +253,14 @@ public class BrandsOfferFragment1 extends Fragment implements BrandsTitleAdapter
 
 
 //        merchantOffer = new ArrayList<>();
-        offerlistDatabaseRef.addChildEventListener(new ChildEventListener() {
+        offerlistDatabaseRef.child("approved-offers").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Log.d("tab", "onChildAdded: datasnapshot key" + dataSnapshot.getKey());
-                Log.d("tab", "onChildAdded: datasnapshot children" + dataSnapshot.getChildren());
-                Log.d("tab", "onChildAdded: datasnapshot " +  String.valueOf(dataSnapshot.child("offerCost").getValue()));
-                Log.d("tab", "onChildAdded:  datasnapshot value " + dataSnapshot.getValue());
-                Log.d("tab", "onChildAdded: not adding " + dataSnapshot.hasChild("merchantsName"));
+                Log.d("brands", "onChildAdded: datasnapshot key" + dataSnapshot.getKey());
+                Log.d("brands", "onChildAdded: datasnapshot children" + dataSnapshot.getChildren());
+                Log.d("brands", "onChildAdded: datasnapshot " +  String.valueOf(dataSnapshot.child("offerCost").getValue()));
+                Log.d("brands", "onChildAdded:  datasnapshot value " + dataSnapshot.getValue());
+                Log.d("brands", "onChildAdded: not adding " + dataSnapshot.hasChild("merchantsName"));
 
 
 
@@ -268,146 +268,147 @@ public class BrandsOfferFragment1 extends Fragment implements BrandsTitleAdapter
 //                merchantOffer.add(new MerchantOffer(String.valueOf(dataSnapshot.child("merchantOfferTitle").getValue()) ,String.valueOf(dataSnapshot.child("merchantName").getValue()),String.valueOf(dataSnapshot.child("merchantAddress").getValue()),String.valueOf(dataSnapshot.child("merchantContact").getValue()),String.valueOf(dataSnapshot.child("offerCost").getValue())));
 
                 if (!dataSnapshot.getKey().equals("merchantsName") ) {
-                    merchantOffer.add(dataSnapshot.getValue(MerchantOffer.class));
 
+                    try {
 
-                    Character alphabet = dataSnapshot.getValue(MerchantOffer.class).getMerchantName().charAt(0);
-                    switch (alphabet){
+                        merchantOffer.add(dataSnapshot.getValue(MerchantOffer.class));
+                        Log.d("brands", "onChildAdded:  adding" + merchantOffer.get(0));
 
-                        case 'A':
-                            addMerchantsBrandName1(alphabet,dataSnapshot,recViewA,brandsNamesListA,brandsNameListStringA,brandsOfferA);
+                        Character alphabet = dataSnapshot.getValue(MerchantOffer.class).getMerchantName().charAt(0);
+                        switch (alphabet) {
 
-                            break;
-                        case 'B':
-                            addMerchantsBrandName1(alphabet,dataSnapshot,recViewB,brandsNamesListB,brandsNameListStringB,brandsOfferB);
+                            case 'A':
+                                addMerchantsBrandName1(alphabet, dataSnapshot, recViewA, brandsNamesListA, brandsNameListStringA, brandsOfferA);
 
-                            break;
-                        case 'C':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewC);
+                                break;
+                            case 'B':
+                                addMerchantsBrandName1(alphabet, dataSnapshot, recViewB, brandsNamesListB, brandsNameListStringB, brandsOfferB);
 
-                            break;
-                        case 'D':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewD);
+                                break;
+                            case 'C':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewC);
 
-                            break;
-                        case 'E':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewE);
+                                break;
+                            case 'D':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewD);
 
-                            break;
-                        case 'F':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewF);
+                                break;
+                            case 'E':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewE);
 
-                            break;
-                        case 'G':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewG);
+                                break;
+                            case 'F':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewF);
 
-                            break;
-                        case 'H':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewH);
+                                break;
+                            case 'G':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewG);
 
-                            break;
-                        case 'I':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewI);
+                                break;
+                            case 'H':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewH);
 
-                            break;
-                        case 'J':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewJ);
+                                break;
+                            case 'I':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewI);
 
-                            break;
+                                break;
+                            case 'J':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewJ);
 
-                        case 'K':
+                                break;
 
-                            addMerchantsBrandName1(alphabet,dataSnapshot,recViewK,brandsNamesListK,brandsNameListStringK,brandsOfferK);
+                            case 'K':
+
+                                addMerchantsBrandName1(alphabet, dataSnapshot, recViewK, brandsNamesListK, brandsNameListStringK, brandsOfferK);
 
 
                                 break;
 
-                        case 'L':
-                            addMerchantsBrandName1(alphabet,dataSnapshot,recViewL,brandsNamesListL,brandsNameListStringL,brandsOfferL);
+                            case 'L':
+                                addMerchantsBrandName1(alphabet, dataSnapshot, recViewL, brandsNamesListL, brandsNameListStringL, brandsOfferL);
 
-                            break;
+                                break;
 
-                        case 'M':
-                            addMerchantsBrandName1(alphabet,dataSnapshot,recViewM,brandsNamesListM,brandsNameListStringM,brandsOfferM);
+                            case 'M':
+                                addMerchantsBrandName1(alphabet, dataSnapshot, recViewM, brandsNamesListM, brandsNameListStringM, brandsOfferM);
 
-                            break;
+                                break;
 
-                        case 'm':
-                            addMerchantsBrandName1(alphabet,dataSnapshot,recViewM,brandsNamesListM,brandsNameListStringM,brandsOfferM);
+                            case 'm':
+                                addMerchantsBrandName1(alphabet, dataSnapshot, recViewM, brandsNamesListM, brandsNameListStringM, brandsOfferM);
 
-                            break;
-                        case 'N':
+                                break;
+                            case 'N':
 
 
-                            Log.d("brands", "in m: " + alphabet);
+                                Log.d("brands", "in m: " + alphabet);
 //                            Log.d("brands", "in m: " + dataSnapshot.getValue(MerchantOffer.class).getMerchantName().charAt(0));
 
 
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewN);
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewN);
 
 
-                            break;
+                                break;
 
 
+                            case 'O':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewO);
 
-                        case 'O':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewO);
+                                break;
+                            case 'P':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewP);
 
-                            break;
-                        case 'P':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewP);
+                                break;
+                            case 'Q':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewQ);
 
-                            break;
-                        case 'Q':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewQ);
+                                break;
+                            case 'R':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewR);
 
-                            break;
-                        case 'R':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewR);
+                                break;
+                            case 'S':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewS);
 
-                            break;
-                        case 'S':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewS);
+                                break;
+                            case 'T':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewT);
 
-                            break;
-                        case 'T':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewT);
+                                break;
+                            case 'U':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewU);
 
-                            break;
-                        case 'U':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewU);
+                                break;
+                            case 'V':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewV);
 
-                            break;
-                        case 'V':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewV);
+                                break;
+                            case 'W':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewW);
 
-                            break;
-                        case 'W':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewW);
+                                break;
+                            case 'X':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewX);
 
-                            break;
-                        case 'X':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewX);
+                                break;
+                            case 'Y':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewY);
 
-                            break;
-                        case 'Y':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewY);
+                                break;
+                            case 'Z':
+                                addMerchantsBrandName(alphabet, dataSnapshot, recViewZ);
 
-                            break;
-                        case 'Z':
-                            addMerchantsBrandName(alphabet,dataSnapshot,recViewZ);
-
-                            break;
-
+                                break;
 
 
+                            default:
 
+                        }
 
-                        default:
+                    } catch (NullPointerException e ){
 
                     }
-
-
 
                 }
 

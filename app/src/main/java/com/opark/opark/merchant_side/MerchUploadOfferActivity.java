@@ -490,6 +490,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
     final MerchantOffer merchantOfferData = new MerchantOffer();
                   merchantOfferData.setMerchantName(merchantCoName);
+                  merchantOfferData.setMerchantEmail(currentMerchantEmail);
                   merchantOfferData.setMerchantOfferTitle(offerTitle);
                   merchantOfferData.setMerchantAddress(merchantCoAddress);
                   merchantOfferData.setMerchantContact(merchantCoPhone);
