@@ -198,6 +198,8 @@ public class EmailLogin extends Fragment {
 
                         handleFacebookAccessToken(loginResult.getAccessToken());
                         FirebaseUser user = mAuth.getCurrentUser();
+
+
                         updateUI(user);
                     }
 
@@ -235,11 +237,7 @@ public class EmailLogin extends Fragment {
                 Log.d("EmailLogin", "updateUI: currentUserID" + currentUserID);
                 currentMerchantEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
-                if (FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("oparkadmin1@admin.com")){
-                    Intent adminIntent = new Intent(getActivity(),AdminActivity.class);
-                    getActivity().finish();
-                    startActivity(adminIntent);
-                }
+
 
 
                 checkIsMerchantOrUser(currentUserID);
@@ -487,8 +485,14 @@ public class EmailLogin extends Fragment {
                 } else {
                     FirebaseUser currentUser = mAuth.getCurrentUser();
 
-                    updateUI(currentUser);
 
+                    if (FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("oparkadmin1@admin.com")){
+                        Intent adminIntent = new Intent(getActivity(),AdminActivity.class);
+                        getActivity().finish();
+                        startActivity(adminIntent);
+                    }else {
+                        updateUI(currentUser);
+                    }
                 }
             }
         });

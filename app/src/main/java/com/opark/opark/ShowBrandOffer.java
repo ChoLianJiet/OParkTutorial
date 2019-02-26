@@ -1,12 +1,12 @@
 package com.opark.opark;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,265 +15,60 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.opark.opark.merchant_side.merchant_class.Merchant;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOfferAdapter;
+import com.opark.opark.merchant_side.merchant_offer.OfferDetailsActivity;
 import com.opark.opark.rewards_redemption.ConfirmPreRedeem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShowBrandOffer extends Fragment  {
+public class ShowBrandOffer extends Fragment {
 
     private static final String TAG = "ShowBrandOffer";
 
-    private RecyclerView brandsOfferRecview;
+    public static RecyclerView brandsOfferRecview;
     private TextView ShowBrandOfferTitle;
-
+    final TaskCompletionSource<Task<List<String>>> source = new TaskCompletionSource<>();
     ConfirmPreRedeem confirmPreRedeem;
     private List<MerchantOffer> merchantOfferListFromShowBrandOffer = new ArrayList<>();
-     final private List<String> offerTitleByBrands = new ArrayList<>();
-     List<MerchantOffer> merchantOfferChecktitleList = new ArrayList<>();
-
+     public static List<String> offerTitleByBrands = new ArrayList<>();
+     public static List<MerchantOffer> merchantOfferChecktitleList = new ArrayList<>();
+     boolean listenfirst = false;
+    public static FragmentManager fragmentManager;
+    public static Task<List<String>> task;
+    final Bundle detailsBundle = new Bundle();
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
        View view = inflater.inflate(R.layout.show_brand_offer,container,false);
 
-        Log.d(TAG, "Show brand offer oncreateView");
             bindviews(view);
 
-
-            ShowBrandOfferTitle.setText(BrandsOfferFragment1.unityName);
+            fragmentManager = getFragmentManager();
+            ShowBrandOfferTitle.setText(BrandsOfferFragment.unityName);
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         brandsOfferRecview.setLayoutManager(llm);
         brandsOfferRecview.setHasFixedSize(true);
 
-        Log.d(TAG, "onCreateView: " + BrandsOfferFragment1.unityName);
-        DatabaseReference listenBrandSelected = FirebaseDatabase.getInstance().getReference().child("offerlist/merchantsName/" + BrandsOfferFragment1.unityName);
+        Log.d(TAG, "onCreateView: " + BrandsOfferFragment.unityName);
+
+
+        retrieveOffersOfThisBrand();
+//        Tasks.call(new OfferByThisBrand());
+        /**THIS IS WHERE THE TWO LISTENERS ARE **/
 
 
 
-
-
-
-
-
-        listenBrandSelected.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot1, @Nullable String s) {
-                Log.d(TAG, "onChildAdded: " + dataSnapshot1.getValue().toString());
-
-
-
-                offerTitleByBrands.add(dataSnapshot1.getValue().toString());
-                Log.d(TAG, "offertitlebybrands: " + offerTitleByBrands.size());
-
-
-
-//                offerlistDataRef.addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                        Log.d(TAG, "datasnapshot value event listener: merchant name" + dataSnapshot.getValue());
-//
-//
-//                        Log.d(TAG, "datasnapshot value event listener: merchant name" + dataSnapshot.getValue(MerchantOffer.class));
-//                        Log.d(TAG, "datasnapshot value event listener: 0th in the offerarray" + offerTitleByBrands.get(0));
-//
-//
-//
-//                        if ( offerTitleByBrands.contains(dataSnapshot.getValue(MerchantOffer.class).getMerchantOfferTitle()) && !merchantOfferChecktitleList.contains(dataSnapshot.getValue(MerchantOffer.class))  )
-//                            merchantOfferChecktitleList.add(dataSnapshot.getValue(MerchantOffer.class));
-//
-//                        Log.d("testaddin", "onDataChange: check title list " +  merchantOfferChecktitleList.size());
-//
-//
-//                        brandsOfferRecview.setAdapter( new MerchantOfferAdapter(merchantOfferChecktitleList, new MerchantOfferAdapter.ButtonClicked() {
-//                            @Override
-//                            public void onButtonClicked(View v, int position) {
-//
-//                            }
-//                        }));
-////                        Log.d(TAG, "datasnapshot value event listener: 0th in the offerarray" + offerTitleByBrands.get(0));
-////
-////
-////                        merchantOfferChecktitleList.add(dataSnapshot.getValue(MerchantOffer.class));
-////
-////                        Log.d(TAG, "onDataChange: check title list " +  merchantOfferChecktitleList.get(0).getMerchantOfferTitle().toString());
-//
-//
-////                        for (int i = 0; i < offerTitleByBrands.size(); i++) {
-////
-////                            Log.d(TAG, "onDataChange:  For loop"+ offerTitleByBrands.get(i) + " i is now " + i);
-////                            if (dataSnapshot.getValue(MerchantOffer.class).getMerchantOfferTitle().equals(offerTitleByBrands.get(i).toString())){
-////
-////                                Log.d(TAG, "onDataChange:  DataSnapshot Name Tally");
-////                                merchantOfferListFromShowBrandOffer.add(dataSnapshot.getValue(MerchantOffer.class));
-////
-////                                Log.d(TAG, "merchantOfferLIstFromshowbrandoffer" + merchantOfferListFromShowBrandOffer.size());
-//////                                MerchantOfferAdapter moaFromShowBrandOffer = new MerchantOfferAdapter(merchantOfferListFromShowBrandOffer, new MerchantOfferAdapter.ButtonClicked() {
-//////                                    @Override
-//////                                    public void onButtonClicked(View v, int position) {
-//////
-//////                                    }
-//////                                });
-////
-////
-////                                brandsOfferRecview.setAdapter( new MerchantOfferAdapter(merchantOfferListFromShowBrandOffer, new MerchantOfferAdapter.ButtonClicked() {
-////                                    @Override
-////                                    public void onButtonClicked(View v, int position) {
-////
-////                                    }
-////                                }));
-//////                                brandsOfferRecview.setAdapter( moaFromShowBrandOffer);
-////
-////                            }
-////                        }
-//
-//                    }
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                    }
-//                });
-
-
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
-        final DatabaseReference offerlistDataRef = FirebaseDatabase.getInstance().getReference().child("offerlist/approved-offers");
-
-        offerlistDataRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                Log.d(TAG, "merchant name" + dataSnapshot.getValue(MerchantOffer.class).getMerchantOfferTitle());
-                Log.d(TAG, "offer title :  \n" + dataSnapshot.getKey());
-                Log.d(TAG, "offertitlebybrands  \n" + offerTitleByBrands);
-                Log.d(TAG, "merchantofferlist  \n"  + merchantOfferChecktitleList);
-
-//
-//                        for(int i =0 ; i < offerTitleByBrands.size(); i ++ ){
-//                            if (!merchantOfferChecktitleList.get(i).getMerchantOfferTitle().equals(dataSnapshot.getKey())){
-//                                merchantOfferChecktitleList.add(dataSnapshot.getValue(MerchantOffer.class));
-//                            }
-//
-//
-//                        }
-
-
-//                        merchantOfferChecktitleList =   new ArrayList<>(offerTitleByBrands.size());
-
-
-//                        if ( offerTitleByBrands.contains(dataSnapshot.getValue(MerchantOffer.class).getMerchantOfferTitle()) && !merchantOfferChecktitleList.contains(dataSnapshot.getValue(MerchantOffer.class))  )
-//                        {  merchantOfferChecktitleList.add(dataSnapshot.getValue(MerchantOffer.class));}
-
-
-//                        for ( int i = 0 ; i< merchantOfferChecktitleList.size(); i++) {
-
-
-                if (offerTitleByBrands.contains(dataSnapshot.getKey()) && !merchantOfferChecktitleList.contains(dataSnapshot.getValue(MerchantOffer.class))) {
-
-
-//                            if (merchantOfferChecktitleList.get(i).getMerchantOfferTitle().equals(dataSnapshot.getKey()))
-                    merchantOfferChecktitleList.add(dataSnapshot.getValue(MerchantOffer.class));
-
-                    Log.d(TAG, " \n\t\t offertitlebybrands contains key & check title list added datasnapshot :  ");
-
-
-                }
-
-//                        }
-
-
-
-
-                Log.d(TAG, " check title list \n" +  merchantOfferChecktitleList.size());
-
-
-                brandsOfferRecview.setAdapter( new MerchantOfferAdapter(merchantOfferChecktitleList, new MerchantOfferAdapter.ButtonClicked() {
-                    @Override
-                    public void onButtonClicked(View v, int position) {
-                        try {
-                            Log.d("", "onButtonClicked:  ");
-                            FragmentManager fragmentManager = getFragmentManager();
-                            confirmPreRedeem = new ConfirmPreRedeem();
-                            confirmPreRedeem.show(fragmentManager, "");
-//                            confirmPreRedeem.getDialog().setCancelable(false);
-                            //                            deductPointsForRedemption();
-
-
-                            Log.d("tab", "Rewards Fragment Button Clicked " + position);
-
-                        } catch (IllegalStateException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new MerchantOfferAdapter.CardClicked() {
-                    @Override
-                    public void onCardClicked(View v, int position) {
-
-                    }
-                }));
-
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-//
-//        brandsOfferRecview.setAdapter( new MerchantOfferAdapter(BrandsOfferFragment1.brandsOfferList, new MerchantOfferAdapter.ButtonClicked() {
-//            @Override
-//            public void onButtonClicked(View v, int position) {
-//
-//            }
-//        }));
 
         ShowBrandOfferTitle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -282,17 +77,16 @@ public class ShowBrandOffer extends Fragment  {
 
 //                FragmentManager fm = getParentFragment().getFragmentManager();
                 offerTitleByBrands.clear();
-                        merchantOfferChecktitleList.clear();
-                Fragment fragment = BrandsOfferFragment.brandsOfferFragMan.findFragmentByTag("showingbrand");
-                Fragment fragment1 = BrandsOfferFragment.brandsOfferFragment1;
+                merchantOfferChecktitleList.clear();
+                Fragment fragment = BrandsOfferFragmentHost.brandsOfferFragMan.findFragmentByTag("showingbrand");
+                Fragment fragment1 = BrandsOfferFragmentHost.brandsOfferFragment;
                 Log.d(TAG, "onClick:  fragment is " +  fragment + " Fragment 1 "  +  fragment1);
 
 
-//                BrandsOfferFragment.brandsOfferFragMan.beginTransaction().remove(fragment)
-                BrandsOfferFragment.brandsOfferFragMan.beginTransaction().replace(R.id.frame_container,fragment1)
-//                        .re(R.id.frame_container,BrandsOfferFragment.brandsOfferFragMan.findFragmentByTag("try"))
-
-//                BrandsOfferFragment.brandsOfferFragMan.popBackStackImmediate("showingBrand",0);
+//                BrandsOfferFragmentHost.brandsOfferFragMan.beginTransaction().remove(fragment)
+                BrandsOfferFragmentHost.brandsOfferFragMan.beginTransaction().replace(R.id.frame_container,fragment1)
+//                        .re(R.id.frame_container,BrandsOfferFragmentHost.brandsOfferFragMan.findFragmentByTag("try"))
+//                BrandsOfferFragmentHost.brandsOfferFragMan.popBackStackImmediate("showingBrand",0);
                         .commit();
 
 
@@ -338,11 +132,114 @@ public class ShowBrandOffer extends Fragment  {
     public static void clearArrayList(){
 
 
-        BrandsOfferFragment1.brandsNameListStringK.clear();
-        BrandsOfferFragment1.brandsNamesListK.clear();
-        BrandsOfferFragment1.brandsOfferK.clear();
-        BrandsOfferFragment1.brandsNameListStringM.clear();
-        BrandsOfferFragment1.brandsNamesListM.clear();
-        BrandsOfferFragment1.brandsOfferM.clear();
+        BrandsOfferFragment.brandsNameListStringK.clear();
+        BrandsOfferFragment.brandsNamesListK.clear();
+        BrandsOfferFragment.brandsOfferK.clear();
+        BrandsOfferFragment.brandsNameListStringM.clear();
+        BrandsOfferFragment.brandsNamesListM.clear();
+        BrandsOfferFragment.brandsOfferM.clear();
+    }
+
+
+
+
+
+    public void retrieveOffersOfThisBrand(){
+
+        final DatabaseReference offerlistDataRef = FirebaseDatabase.getInstance().getReference().child("offerlist/approved-offers");
+
+        offerlistDataRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull final DataSnapshot dataSnapshot, @Nullable String s) {
+
+                Log.d(TAG, "\t 1 offertitlebybrands  \n" + offerTitleByBrands);
+                Log.d(TAG, "\t 2 checklist before  \n" + merchantOfferChecktitleList);
+
+
+                if ( dataSnapshot.getValue(MerchantOffer.class).getMerchantName().equals(BrandsOfferFragment.unityName)/*thisBrandsOffer.contains(dataSnapshot.getKey()) */&& !merchantOfferChecktitleList.contains(dataSnapshot.getValue(MerchantOffer.class))) {
+
+
+//                            if (merchantOfferChecktitleList.get(i).getMerchantOfferTitle().equals(dataSnapshot.getKey()))
+                    merchantOfferChecktitleList.add(dataSnapshot.getValue(MerchantOffer.class));
+
+
+                    Log.d(TAG, "\t 3 checklist after  \n" + merchantOfferChecktitleList);
+
+                }
+
+
+                brandsOfferRecview.setAdapter(new MerchantOfferAdapter(merchantOfferChecktitleList, new MerchantOfferAdapter.ButtonClicked() {
+                    @Override
+                    public void onButtonClicked(View v, int position) {
+                        try {
+                            Log.d("", "onButtonClicked:  ");
+
+                            confirmPreRedeem = new ConfirmPreRedeem();
+                            confirmPreRedeem.show(fragmentManager, "");
+
+
+                            Log.d("tab", "Rewards Fragment Button Clicked " + position);
+
+                        } catch (IllegalStateException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new MerchantOfferAdapter.CardClicked() {
+                    @Override
+                    public void onCardClicked(View v, int position) {
+
+                        String landingImgUrl = merchantOfferChecktitleList.get(position).getOfferImage();
+                        final Intent offerDetailsIntent = new Intent(getActivity(), OfferDetailsActivity.class);
+
+                        detailsBundle.putString("offertitle",merchantOfferChecktitleList.get(position).getMerchantOfferTitle());
+                        Log.d("cardclick", "title:  " + detailsBundle.getString("offertitle"));
+                        detailsBundle.putString("merchantconame",merchantOfferChecktitleList.get(position).getMerchantName());
+                        detailsBundle.putString("merchantemail",merchantOfferChecktitleList.get(position).getMerchantEmail());
+                        detailsBundle.putString("merchantcontact",merchantOfferChecktitleList.get(position).getMerchantContact());
+                        detailsBundle.putString("offercost",merchantOfferChecktitleList.get(position).getOfferCost());
+                        detailsBundle.putString("landingImgUrl",landingImgUrl);
+                        detailsBundle.putString("expirydate",merchantOfferChecktitleList.get(position).getExpiryDate());
+                        detailsBundle.putString("merchantfirst", merchantOfferChecktitleList.get(position).getMerchantAddress().getFirstline());
+                        detailsBundle.putString("merchantsecond", merchantOfferChecktitleList.get(position).getMerchantAddress().getSecondline());
+                        detailsBundle.putString("merchantcity", merchantOfferChecktitleList.get(position).getMerchantAddress().getCity());
+                        detailsBundle.putString("merchantstate", merchantOfferChecktitleList.get(position).getMerchantAddress().getCountryState());
+                        detailsBundle.putString("merchantpostcode", merchantOfferChecktitleList.get(position).getMerchantAddress().getPostcode());
+                        detailsBundle.putString("firstline",merchantOfferChecktitleList.get(position).getMerchantAddress().getFirstline());
+                        detailsBundle.putString("secondline",merchantOfferChecktitleList.get(position).getMerchantAddress().getSecondline());
+                        detailsBundle.putString("city",merchantOfferChecktitleList.get(position).getMerchantAddress().getCity());
+                        detailsBundle.putString("state",merchantOfferChecktitleList.get(position).getMerchantAddress().getCountryState());
+                        detailsBundle.putString("postcode",merchantOfferChecktitleList.get(position).getMerchantAddress().getPostcode());
+
+                        offerDetailsIntent.putExtras(detailsBundle);
+                        startActivity(offerDetailsIntent);
+
+
+
+
+                    }
+                }));
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

@@ -36,6 +36,10 @@
                     app:srcCompat="@drawable/maintenance_squareboi"
                     />
             </LinearLayout>
+
+
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -53,25 +57,82 @@
                     android:text="Offer Title"
                     android:textSize="25sp"
                     />
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/address_linlay"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/r_merchant_name"
-                    android:text="Merchant Name"
-                    />
+                    android:layout_below="@+id/redeem_cost"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/r_merchant_address"
-                    android:text="Merchant Address"
-                    />
+
+                    <TextView
+                        android:id="@+id/r_merchant_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Merchant Name"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/merchant_first"
+                        android:text="Merchant First"
+                        android:layout_below="@+id/merchant_name"
+                        android:layout_marginTop="10dp"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/merchant_second"
+                        android:text="Merchant Second"
+                        android:layout_below="@+id/merchant_first"
+                        />
+
+                    <LinearLayout
+                        android:id="@+id/citystatepostcode_linlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/merchant_second">
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/merchant_city"
+                            android:text=" City"
+                            android:layout_below="@+id/merchant_second"
+                            />
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/merchant_postcode"
+                            android:text="Postcode"
+                            android:layout_marginStart="8dp"
+                            android:layout_below="@+id/merchant_name"
+                            />
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/merchant_state"
+                            android:text="State"
+                            android:layout_marginStart="8dp"
+
+                            android:layout_below="@+id/merchant_name"
+                            />
+                    </LinearLayout>
+                </LinearLayout>
+
+
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/r_merchant_number"
+                    android:layout_marginTop="10dp"
                     android:text="Merchant Number"
                     />
 

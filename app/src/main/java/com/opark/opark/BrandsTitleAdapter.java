@@ -1,8 +1,6 @@
 package com.opark.opark;
 
-import android.app.FragmentManager;
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -72,7 +70,7 @@ public class BrandsTitleAdapter extends RecyclerView.Adapter<BrandsTitleAdapter.
             public void onClick(View view) {
                 Log.d("selected", "ori class brandsselect interface :   " +  holder.brandsTitle.getText().toString());
                 brandsSelected.onBrandsSelected(view,position);
-                BrandsOfferFragment1.unityName= holder.brandsTitle.getText().toString();
+                BrandsOfferFragment.unityName= holder.brandsTitle.getText().toString();
 
 
 

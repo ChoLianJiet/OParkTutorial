@@ -1,16 +1,12 @@
 package com.opark.opark;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.opark.opark.R;
 import com.opark.opark.rewards_redemption.RewardsFragment;
 
 public class BrandContainerFragment extends Fragment {
@@ -31,7 +27,7 @@ public class BrandContainerFragment extends Fragment {
         Log.d(TAG, "fragman:  " + RewardsFragment.rewardsFragmentManager);
 
 
-        BrandsOfferFragment1 brand = new BrandsOfferFragment1();
+        BrandsOfferFragment brand = new BrandsOfferFragment();
 
         if (getChildFragmentManager() !=null ) {
 

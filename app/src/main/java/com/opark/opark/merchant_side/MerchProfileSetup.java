@@ -1,6 +1,7 @@
 package com.opark.opark.merchant_side;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.opark.opark.R;
+import com.opark.opark.login_auth.MerchWaitingApproval;
 import com.opark.opark.merchant_side.merchant_class.Merchant;
 
 import java.io.ByteArrayInputStream;
@@ -37,10 +39,16 @@ public class MerchProfileSetup extends AppCompatActivity {
     EditText coRegNum;
     EditText personSignUp;
     EditText coPhone;
-    EditText coAddress;
+    EditText coAddressFirstLine;
+    EditText coAddressSecondLine;
+    EditText coAddressCity;
+    EditText coAddressPostcode;
+    EditText coAddressState;
+
+
     TextView coEmail;
-    EditText[] MerchProfileEntryEditText = new EditText[5];
-    String[] MerchProfilEntryString = new String[6];
+    EditText[] MerchProfileEntryEditText = new EditText[9];
+    String[] MerchProfilEntryString = new String[10];
 
 
     @Override
@@ -76,15 +84,24 @@ public class MerchProfileSetup extends AppCompatActivity {
         MerchProfileEntryEditText[0] = coName;
         MerchProfileEntryEditText[1] = coRegNum;
         MerchProfileEntryEditText[2] = coPhone;
-        MerchProfileEntryEditText[3] = coAddress;
-        MerchProfileEntryEditText[4] = personSignUp;
+        MerchProfileEntryEditText[3] = coAddressFirstLine;
+        MerchProfileEntryEditText[4] = coAddressSecondLine;
+        MerchProfileEntryEditText[5] = coAddressPostcode;
+        MerchProfileEntryEditText[6]= coAddressCity;
+        MerchProfileEntryEditText[7]=coAddressState;
+        MerchProfileEntryEditText[8] = personSignUp;
 
         MerchProfilEntryString[0] = oParkMerchant.merchCoName = coName.getText().toString();
         MerchProfilEntryString[1] = oParkMerchant.merchCoRegNumber = coRegNum.getText().toString();
         MerchProfilEntryString[2] = oParkMerchant.merchContact = coPhone.getText().toString();
-        MerchProfilEntryString[3] = oParkMerchant.merchCoAddress = coAddress.getText().toString();
-        MerchProfilEntryString[4] = oParkMerchant.merchSignUpPerson = personSignUp.getText().toString();
-        MerchProfilEntryString[5] = oParkMerchant.merchEmail = coEmail.getText().toString();
+        MerchProfilEntryString[3] = oParkMerchant.merchAddress.firstline = coAddressFirstLine.getText().toString();
+        MerchProfilEntryString[4] = oParkMerchant.merchAddress.secondline = coAddressSecondLine.getText().toString();
+        MerchProfilEntryString[5] = oParkMerchant.merchAddress.postcode = coAddressPostcode.getText().toString();
+        MerchProfilEntryString[6] = oParkMerchant.merchAddress.city = coAddressCity.getText().toString();
+        MerchProfilEntryString[7] = oParkMerchant.merchAddress.countryState = coAddressState.getText().toString();
+        MerchProfilEntryString[8] = oParkMerchant.merchSignUpPerson = personSignUp.getText().toString();
+        MerchProfilEntryString[9] = oParkMerchant.merchEmail = coEmail.getText().toString();
+
 
 
     }
@@ -167,7 +184,11 @@ public class MerchProfileSetup extends AppCompatActivity {
         coName = findViewById(R.id.merch_co_name);
         coRegNum = findViewById(R.id.merch_co_number);
         coPhone = findViewById(R.id.merch_co_phone_number);
-        coAddress = findViewById(R.id.merch_co_address);
+        coAddressFirstLine = findViewById(R.id.merch_co_address_first);
+        coAddressSecondLine= findViewById(R.id.merch_co_address_second);
+        coAddressCity = findViewById(R.id.merch_co_address_city);
+        coAddressState = findViewById(R.id.merch_co_address_city_state);
+        coAddressPostcode = findViewById(R.id.merch_co_address_city_postcode);
         personSignUp = findViewById(R.id.merch_sign_up_person);
         coEmail = findViewById(R.id.merch_email);
 
@@ -182,7 +203,7 @@ public class MerchProfileSetup extends AppCompatActivity {
         collectMerchEntry();
 
 
-        checkMerchEntrySetup = emptyCheck(MerchProfilEntryString, MerchProfileEntryEditText, 5);
+        checkMerchEntrySetup = emptyCheck(MerchProfilEntryString, MerchProfileEntryEditText, 8);
 
 
 // do empty check if returns true, break operation
@@ -199,9 +220,9 @@ public class MerchProfileSetup extends AppCompatActivity {
             Log.d(TAG, "attemptProfileSetup: uploaded to storage");
 
             //TODO intent to card swipe or other page ? maybe upload prof pic ?
-//            Intent intent = new Intent(MerchProfileSetup.this, LoginActivity.class);
-//            finish();
-//            startActivity(intent);}
+            Intent intent = new Intent(MerchProfileSetup.this, MerchWaitingApproval.class);
+            finish();
+            startActivity(intent);
         }
     }
 

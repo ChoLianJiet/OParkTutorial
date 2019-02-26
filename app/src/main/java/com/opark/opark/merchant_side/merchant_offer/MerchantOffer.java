@@ -1,12 +1,15 @@
 package com.opark.opark.merchant_side.merchant_offer;
 
+import com.opark.opark.model.Address;
+
 public class MerchantOffer {
-  private String merchantOfferTitle, merchantName, merchantAddress, merchantContact, offerCost, merchantEmail;
+  private String merchantOfferTitle, merchantName, merchantContact, offerCost, merchantEmail;
+  private Address merchantAddress;
   private String  offerImage, expiryDate, offerCategories;
   public MerchantOffer() {
   }
 
-  public MerchantOffer(String merchantOfferTitle, String merchantName, String merchantAddress, String merchantContact, String offerCost, String merchantEmail, String offerImage, String expiryDate, String offerCategories) {
+  public MerchantOffer(String merchantOfferTitle, String merchantName, Address merchantAddress, String merchantContact, String offerCost, String merchantEmail, String offerImage, String expiryDate, String offerCategories) {
     this.merchantOfferTitle = merchantOfferTitle;
     this.merchantName = merchantName;
     this.merchantAddress = merchantAddress;
@@ -18,7 +21,7 @@ public class MerchantOffer {
     this.offerCategories = offerCategories;
   }
 
-  public MerchantOffer(String merchantOfferTitle, String merchantName, String merchantAddress, String merchantContact, String offerCost, String offerImage, String expiryDate, String offerCategories) {
+  public MerchantOffer(String merchantOfferTitle, String merchantName, Address merchantAddress, String merchantContact, String offerCost, String offerImage, String expiryDate, String offerCategories) {
         this.merchantOfferTitle = merchantOfferTitle;
         this.merchantName = merchantName;
         this.merchantAddress = merchantAddress;
@@ -29,7 +32,7 @@ public class MerchantOffer {
         this.offerCategories = offerCategories;
     }
 
-    public MerchantOffer(String merchantOfferTitle, String merchantName, String merchantAddress, String merchantContact, String offerCost ) {
+    public MerchantOffer(String merchantOfferTitle, String merchantName, Address merchantAddress, String merchantContact, String offerCost ) {
     this.merchantOfferTitle = merchantOfferTitle;
     this.merchantName = merchantName;
     this.merchantAddress = merchantAddress;
@@ -61,11 +64,11 @@ public class MerchantOffer {
     this.merchantName = merchantName;
   }
 
-  public String getMerchantAddress() {
+  public Address getMerchantAddress() {
     return merchantAddress;
   }
 
-  public void setMerchantAddress(String merchantAddress) {
+  public void setMerchantAddress(Address merchantAddress) {
     this.merchantAddress = merchantAddress;
   }
 

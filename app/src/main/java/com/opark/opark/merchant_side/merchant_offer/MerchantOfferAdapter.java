@@ -33,6 +33,7 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
     List<MerchantOffer> originalList;
     public CardClicked mCardClicked;
 
+    private static final String TAG = "MerchantOfferAdapter";
     public interface ButtonClicked {
         void onButtonClicked(View v, int position);
 
@@ -52,7 +53,7 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
         TextView merchantOfferTitle;
         TextView merchantName;
         TextView merchantNumber;
-        TextView merchantAddress;
+        TextView merchantFirst,merchantSecond,merchantCity,merchantState,merchantPostcode;
         TextView redeemCost;
         Button redeemButton;
         ImageView merchantOfferImage;
@@ -66,7 +67,11 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
             merchantOfferTitle = (TextView) itemView.findViewById(R.id.merchant_offer_title);
             merchantName = (TextView) itemView.findViewById(R.id.merchant_name);
             merchantNumber = (TextView) itemView.findViewById(R.id.merchant_number);
-            merchantAddress = (TextView) itemView.findViewById(R.id.merchant_address);
+            merchantFirst = (TextView) itemView.findViewById(R.id.merchant_first);
+            merchantSecond = itemView.findViewById(R.id.merchant_second);
+            merchantCity=itemView.findViewById(R.id.merchant_city);
+            merchantState = itemView.findViewById(R.id.merchant_state);
+            merchantPostcode= itemView.findViewById(R.id.merchant_postcode);
             redeemCost = (TextView) itemView.findViewById(R.id.redeem_cost);
             merchantOfferImage = (ImageView) itemView.findViewById(R.id.merchant_offer_image);
             redeemButton = (Button) itemView.findViewById(R.id.redeem_button);
@@ -78,7 +83,6 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
 
 
     List<MerchantOffer> merchantOfferList;
-
     public MerchantOfferAdapter(List<MerchantOffer> merchantOfferList, ButtonClicked buttonClicked, CardClicked cardClicked) {
         this.merchantOfferList = merchantOfferList;
         this.mButtonClicked = buttonClicked;
@@ -109,10 +113,18 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
     @Override
     public void onBindViewHolder(@NonNull final MerchantOfferAdapterViewHolder holder, final int i) {
 
+        Log.d(TAG, "onBindViewHolder:  " + holder.merchantFirst);
 
         holder.merchantOfferTitle.setText(merchantOfferList.get(i).getMerchantOfferTitle());
         holder.merchantName.setText(merchantOfferList.get(i).getMerchantName());
-        holder.merchantAddress.setText(merchantOfferList.get(i).getMerchantAddress());
+
+
+        holder.merchantFirst.setText(merchantOfferList.get(i).getMerchantAddress().getFirstline());
+        holder.merchantSecond.setText(merchantOfferList.get(i).getMerchantAddress().getSecondline());
+        holder.merchantCity.setText(merchantOfferList.get(i).getMerchantAddress().getCity());
+        holder.merchantState.setText(merchantOfferList.get(i).getMerchantAddress().getCountryState());
+        holder.merchantPostcode.setText(merchantOfferList.get(i).getMerchantAddress().getPostcode());
+
         holder.redeemCost.setText(merchantOfferList.get(i).getOfferCost());
         holder.expiryDate.setText(merchantOfferList.get(i).getExpiryDate());
         holder.merchantNumber.setText(merchantOfferList.get(i).getMerchantContact());

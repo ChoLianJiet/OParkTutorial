@@ -48,6 +48,7 @@ import com.opark.opark.R;
 import com.opark.opark.merchant_side.merchant_class.Merchant;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOfferAdapter;
+import com.opark.opark.model.Address;
 import com.opark.opark.rewards_redemption.ConfirmPreRedeem;
 import com.squareup.picasso.Picasso;
 
@@ -92,7 +93,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   private String merchantOfferExpiryDate;
   private String merchantCoName;
   private String merchantCoPhone;
-  private String merchantCoAddress;
+  private Address merchantCoAddress;
   public Context mContext;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +150,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     uploadButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
+
         uploadFile();
 
 //        setFolderInDatabase();
@@ -311,6 +313,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   }
 
 
+/*
   private void setFolderInDatabase() {
 
     Merchant thisMerchant = new Merchant(merchantCoName , merchantCoPhone,  currentMerchantEmail, merchantCoAddress);
@@ -332,6 +335,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     offerlistDatabaseRef.child(offerTitle).setValue(merchantOfferData);
     offerlistDatabaseRef.child(offerTitle).child("redeemCount").setValue(0);
   }
+*/
 
 
 
@@ -356,8 +360,9 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
             merchantCoName = (merchObjList.get(i).getMerchCoName());
             Log.d(TAG, "onSuccess: merch Name" + merchantCoName);
             merchantCoPhone = (merchObjList.get(i).getMerchContact());
-            merchantCoAddress =(merchObjList.get(i).getMerchCoAddress());
+            merchantCoAddress =(merchObjList.get(i).getMerchAddress());
             Log.d(TAG, "Iteration success" + i);
+            Log.d(TAG, "onSuccess:  " + merchObjList.get(i).getMerchAddress());
 
 
           }
@@ -444,6 +449,8 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
                       startActivity(uploadOfferIntent);
 
+                      finish();
+
                     }
                   }, 500);
 
@@ -501,6 +508,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
                   Log.d(TAG, "setFolderInDatabase: offer image" + offerImageForUpload);
 
 
+    Log.d(TAG, "setUpMerchantOffer:  " + merchantOfferData.getMerchantAddress().getFirstline());
     Log.d("charat", "setUpMerchantOffer: " + merchantCoName.charAt(0));
 
 
@@ -565,9 +573,11 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   private void setUpCategory(String catString, MerchantOffer merchOffer){
 
       Log.d(TAG, "setUpCategory: ");
-      DatabaseReference categoryDataRef = FirebaseDatabase.getInstance().getReference().child("offercategory/" + catString );
+      DatabaseReference categoryDataRef = FirebaseDatabase.getInstance().getReference().child("offerlist/offercategory/" + catString );
 
-      categoryDataRef.child(merchOffer.getMerchantOfferTitle()).setValue(merchOffer);
+
+    categoryDataRef.push().setValue(merchOffer.getMerchantOfferTitle());
+//      categoryDataRef.child(merchOffer.getMerchantOfferTitle()).setValue(merchOffer);
       Log.d(TAG, "setUpCategory: merchOffer Image " + merchOffer.getOfferImage());
 
 

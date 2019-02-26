@@ -11,6 +11,25 @@
         android:layout_height="wrap_content">
 
 
+        <android.support.v4.view.ViewPager
+            android:id="@+id/all_image_vp"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+
+
+
+            />
+
+        <LinearLayout
+            android:layout_alignBottom="@id/all_image_vp"
+            android:layout_marginBottom="4dp"
+            android:id="@+id/SliderDots"
+            android:orientation="horizontal"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
         <FrameLayout
             android:elevation="10dp"
             android:layout_centerInParent="true"
@@ -30,6 +49,7 @@
         </FrameLayout>
 
 <LinearLayout
+    android:layout_below="@id/SliderDots"
     android:id="@+id/offer_detail_linearlayout"
     android:visibility="invisible"
     android:orientation="vertical"
@@ -38,21 +58,16 @@
     tools:context=".merchant_side.merchant_offer.OfferDetailsActivity">
 
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/all_image_vp"
-        android:layout_width="match_parent"
-        android:layout_height="182dp"
-        android:layout_marginStart="7dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="7dp" />
+
 
 
     <LinearLayout
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginBottom="8dp"
         android:orientation="vertical"
 
@@ -73,6 +88,7 @@
 
 
             <LinearLayout
+                android:layout_below="@id/offer_title"
                 android:layout_marginTop="10dp"
                 android:layout_alignParentEnd="true"
                 android:layout_width="wrap_content"
@@ -196,6 +212,7 @@
                     android:textSize="15sp" />
 
                 <TextView
+                    android:id="@+id/merchant_first_line"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
@@ -204,6 +221,8 @@
                     android:textSize="15sp" />
 
                 <TextView
+                    android:id="@+id/merchant_second_line"
+
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
@@ -217,6 +236,8 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/merchant_city"
+
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
@@ -224,6 +245,8 @@
                         android:textSize="15sp" />
 
                     <TextView
+                        android:id="@+id/merchant_postcode"
+
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
@@ -231,6 +254,8 @@
                         android:textSize="15sp" />
 
                     <TextView
+                        android:id="@+id/merchant_state"
+
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"

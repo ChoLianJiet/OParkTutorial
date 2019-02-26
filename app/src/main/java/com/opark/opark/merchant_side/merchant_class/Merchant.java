@@ -1,13 +1,25 @@
 package com.opark.opark.merchant_side.merchant_class;
 
+import com.opark.opark.model.Address;
+
 public class Merchant {
    //TODO add merchant objects
    public String merchSignUpPerson, merchCoRegNumber, merchCoName, merchContact, merchEmail, merchCoAddress;
-
+   public Address merchAddress = new Address();
 
 
 
     public Merchant() {
+    }
+
+
+    public Merchant(String merchSignUpPerson, String merchCoRegNumber, String merchCoName, String merchContact, String merchEmail, Address merchAddress) {
+        this.merchSignUpPerson = merchSignUpPerson;
+        this.merchCoRegNumber = merchCoRegNumber;
+        this.merchCoName = merchCoName;
+        this.merchContact = merchContact;
+        this.merchEmail = merchEmail;
+        this.merchAddress = merchAddress;
     }
 
     public Merchant(String merchSignUpName, String merchCoRegNumber, String merchCoName, String merchContact, String merchEmail, String merchCoAddress) {
@@ -19,11 +31,11 @@ public class Merchant {
         this.merchCoAddress = merchCoAddress;
     }
 
-    public Merchant(String merchCoName , String merchContact,  String merchEmail, String merchCoAddress){
+    public Merchant(String merchCoName , String merchContact,  String merchEmail, Address merchAddress){
         this.merchCoName = merchCoName;
         this.merchContact = merchContact;
         this.merchEmail = merchEmail;
-        this.merchCoAddress = merchCoAddress;
+        this.merchAddress = merchAddress;
     }
 
     public String getMerchSignUpPerson() {
@@ -83,4 +95,14 @@ public class Merchant {
     public void setMerchCoAddress(String merchCoAddress) {
         this.merchCoAddress = merchCoAddress;
     }
+
+    public Address getMerchAddress() {
+        return merchAddress;
+    }
+
+    public void setMerchAddress(Address merchAddress) {
+        this.merchAddress = merchAddress;
+    }
+
+
 }

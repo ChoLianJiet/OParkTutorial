@@ -1,142 +1,210 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/scroll_view_"
-            android:theme="@style/AppTheme"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:fillViewport="true"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-
-
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:theme="@style/AppTheme"
-    tools:context="com.opark.opark.UserProfileSetup"
-    android:paddingBottom="50dp">
+    android:id="@+id/scroll_view_"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true"
+    android:theme="@style/AppTheme">
 
 
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="31dp"
-        app:srcCompat="@drawable/maintenance_squareboi"/>
-
-
-<android.support.design.widget.TextInputLayout
-    android:id="@+id/co_name_inputlayout"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_below="@+id/imageView4"
-    android:layout_marginTop="30dp"
-    android:layout_centerHorizontal="true"
-    android:hint="Company Name">
-    <EditText
-        android:id="@+id/merch_co_name"
-        android:layout_width="260dp"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:lines="1"
-        />
-</android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/co_number_inputlayout"
-        android:layout_width="wrap_content"
-        android:layout_below="@id/co_name_inputlayout"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/activity_vertical_margin">
-    <EditText
-        android:id="@+id/merch_co_number"
-        android:layout_width="260dp"
-        android:layout_height="wrap_content"
-        android:lines="1"
-
-        android:hint="Company Registration Number"/>
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/sign_up_person_inputlayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/co_number_inputlayout"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/activity_vertical_margin">
-    <EditText
-        android:id="@+id/merch_sign_up_person"
-        android:layout_width="260dp"
-        android:layout_height="wrap_content"
-        android:lines="1"
-        android:hint="Your Name"/>
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/co_phone_number_inputlayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/sign_up_person_inputlayout"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/activity_vertical_margin">
-    <EditText
-        android:id="@+id/merch_co_phone_number"
-        android:layout_width="260dp"
-        android:layout_height="wrap_content"
-
-        android:ems="10"
-        android:hint="Contact Number"
-        android:inputType="number"/>
-    </android.support.design.widget.TextInputLayout>
+        android:paddingBottom="50dp"
+        android:theme="@style/AppTheme"
+        tools:context="com.opark.opark.UserProfileSetup">
 
 
-    <TextView
-        android:id="@+id/merch_email"
-        android:layout_width="260dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/co_phone_number_inputlayout"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="Email"
-        android:focusableInTouchMode="true"
-        android:focusable="true"
-        android:textSize="20sp"/>
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/merc_address_inputlayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/merch_email"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="31dp"
+            app:srcCompat="@drawable/maintenance_squareboi" />
 
 
-        >
-    <EditText
-        android:id="@+id/merch_co_address"
-        android:layout_width="260dp"
-        android:layout_height="wrap_content"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/co_name_inputlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageView4"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:hint="Company Name">
 
-        android:hint="Company Address"/>
-    </android.support.design.widget.TextInputLayout>
+            <EditText
+                android:id="@+id/merch_co_name"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:lines="1" />
+        </android.support.design.widget.TextInputLayout>
 
-    <Button
-        android:id="@+id/merch_profile_submit_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Submit Merchant Profile"
-        android:background="@drawable/rounded_layout_background"
-        android:layout_below="@id/merc_address_inputlayout"
-        android:layout_marginTop="50dp"
-        android:layout_centerHorizontal="true"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/co_number_inputlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/co_name_inputlayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/activity_vertical_margin">
 
-        />
-</RelativeLayout>
+            <EditText
+                android:id="@+id/merch_co_number"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:hint="Company Registration Number"
+
+                android:lines="1" />
+        </android.support.design.widget.TextInputLayout>
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/sign_up_person_inputlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/co_number_inputlayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/activity_vertical_margin">
+
+            <EditText
+                android:id="@+id/merch_sign_up_person"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:hint="Your Name"
+                android:lines="1" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/co_phone_number_inputlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/sign_up_person_inputlayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/activity_vertical_margin">
+
+            <EditText
+                android:id="@+id/merch_co_phone_number"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+
+                android:ems="10"
+                android:hint="Contact Number"
+                android:inputType="number" />
+        </android.support.design.widget.TextInputLayout>
+
+
+        <TextView
+            android:id="@+id/merch_email"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/co_phone_number_inputlayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="Email"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:id="@+id/address_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/merch_email"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/merc_address_inputlayout_first"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/merch_co_address_first"
+                    android:layout_width="260dp"
+                    android:layout_height="wrap_content"
+                    android:hint="First Line" />
+
+
+            </android.support.design.widget.TextInputLayout>
+
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/merc_address_inputlayout_second"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/merch_co_address_second"
+                    android:layout_width="260dp"
+                    android:layout_height="wrap_content"
+                    android:hint="Second Line" />
+
+
+            </android.support.design.widget.TextInputLayout>
+
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/merc_address_inputlayout_city"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                >
+                <EditText
+                    android:id="@+id/merch_co_address_city"
+                    android:layout_width="260dp"
+                    android:layout_height="wrap_content"
+
+                    android:hint="City" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/merc_address_inputlayout_postcode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+
+                <EditText
+                    android:id="@+id/merch_co_address_city_postcode"
+                    android:layout_width="260dp"
+                    android:layout_height="wrap_content"
+
+                    android:hint="Postcode" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/merc_address_inputlayout_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+
+                <EditText
+                    android:id="@+id/merch_co_address_city_state"
+                    android:layout_width="260dp"
+                    android:layout_height="wrap_content"
+
+                    android:hint="State" />
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/merch_profile_submit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/address_layout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/rounded_layout_background"
+            android:text="Submit Merchant Profile"
+
+            />
+    </RelativeLayout>
 
 
 </ScrollView>

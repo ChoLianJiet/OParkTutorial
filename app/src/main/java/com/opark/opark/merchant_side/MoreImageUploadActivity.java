@@ -19,8 +19,11 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -35,7 +38,14 @@ import com.opark.opark.R;
 import com.opark.opark.merchant_side.merchant_class.Merchant;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
+import io.reactivex.Observable;
 
 
 public class MoreImageUploadActivity extends AppCompatActivity {
@@ -54,6 +64,9 @@ public class MoreImageUploadActivity extends AppCompatActivity {
     private Uri imgFilePath3;
     private Uri imgFilePath4;
 
+
+    private List<String>  imgUrlsArray = new ArrayList<>();
+
     private String currentMerchantEmail;
     private FirebaseUser currentMerchantFirebaseUser;
     private ProgressBar mProgressBar;
@@ -65,6 +78,7 @@ public class MoreImageUploadActivity extends AppCompatActivity {
     private int imgButtonRef;
     private Intent thisIntent;
 
+    private static final String TAG = "MoreImageUploadActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +92,7 @@ public class MoreImageUploadActivity extends AppCompatActivity {
         currentMerchantEmail = currentMerchantFirebaseUser.getEmail();
 
         offerlistDatabaseRef = FirebaseDatabase.getInstance().getReference().child("offerlist");
+
 
 
         merchantOfferStorage = FirebaseStorage.getInstance();
@@ -119,12 +134,73 @@ public class MoreImageUploadActivity extends AppCompatActivity {
             public void onClick(View view) {
 
 
-                if(imgFilePath2!=null){
-                uploadFile(imgFilePath2,2);}
-                if(imgFilePath3!=null){
-                    uploadFile(imgFilePath3,3);}
-                if(imgFilePath4!=null){
-                    uploadFile(imgFilePath4,4);}
+                Bundle merchDetails = thisIntent.getExtras();
+                String merchantCoName =  merchDetails.getString("merchantname");
+                String offerTitle = merchDetails.getString("offertitle");
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                uploadProgressBarDialog = new UploadProgressBarDialog();
+                uploadProgressBarDialog.show(fragmentManager, "");
+
+                uploadImgPaths();
+
+//                if(imgFilePath2!=null){
+//
+//                    Log.d(TAG, "onClick:2 ");
+//                    StorageReference filereference2= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+//                            2 + "." + getFileExtension(imgFilePath2));
+//                     task2 = filereference2.putFile(imgFilePath2);
+//
+//
+//                    if(imgFilePath3!=null){
+//                        Log.d(TAG, "onClick:3 ");
+//
+//                        StorageReference filereference3= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+//                                3 + "." + getFileExtension(imgFilePath3));
+//                         task3 = filereference3.putFile(imgFilePath3);
+//
+//
+//
+//
+//                        if(imgFilePath4!=null){
+//                            Log.d(TAG, "onClick:4 ");
+//
+//                            StorageReference filereference4= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+//                                    4 + "." + getFileExtension(imgFilePath4));
+//                             task4 = filereference4.putFile(imgFilePath4);
+//
+//                            Tasks.whenAll(task2,task3,task4).addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<Void> task) {
+//                                    uploadProgressBarDialog.dismiss();
+//                                    mProgressBar.setProgress(0);
+//
+//                                    Intent allUploadCompleteIntent = new Intent(getApplicationContext(),MerchUploadOfferActivity.class);
+//                                    finish();
+//                                    startActivity(allUploadCompleteIntent);
+//                                }
+//                            });
+//
+//                        }
+//                    }
+//
+//
+//                }
+
+
+
+
+
+
+//
+//
+//                if(imgFilePath2!=null){
+//                uploadFile(imgFilePath2,2);}
+//                if(imgFilePath3!=null){
+//                    uploadFile(imgFilePath3,3);}
+//                if(imgFilePath4!=null){
+//                    uploadFile(imgFilePath4,4);}
+
 
 
 
@@ -166,12 +242,15 @@ public class MoreImageUploadActivity extends AppCompatActivity {
         String offerTitle = merchDetails.getString("offertitle");
 
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        uploadProgressBarDialog = new UploadProgressBarDialog();
-        uploadProgressBarDialog.show(fragmentManager, "");
+
+             uploadAllImg(imgFilePath,imgNum,merchantCoName,offerTitle);
 
 
-        uploadAllImg(imgFilePath,imgNum,merchantCoName,offerTitle);
+
+
+
+        Log.d(TAG, "uploadFile:  " +imgUrlsArray);
+
 
 
 
@@ -256,7 +335,7 @@ public class MoreImageUploadActivity extends AppCompatActivity {
     }
 
 
-    private void uploadAllImg ( Uri imgFilePath,int imgNo, String merchantCoName, String offerTitle ){
+    private void uploadAllImg (Uri imgFilePath, int imgNo, final String merchantCoName, final String offerTitle ) {
 
         if (imgFilePath != null) {
             final StorageReference fileReference = merchantOfferStorageReference.child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
@@ -278,8 +357,7 @@ public class MoreImageUploadActivity extends AppCompatActivity {
 
                                     uploadProgressBarDialog.dismiss();
                                     mProgressBar.setProgress(0);
-                                    Intent intentback = new Intent(MoreImageUploadActivity.this, MerchActivity.class);
-                                    startActivity(intentback);
+
 
 
                                 }
@@ -292,7 +370,13 @@ public class MoreImageUploadActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Uri uri) {
 
-                                    Log.d("URI", "onSuccess: " + uri.toString());
+                                    Log.d(TAG, "onSuccess: " + uri.toString());
+                                    imgUrlsArray.add(uri.toString());
+                                    Log.d(TAG, "onSuccess: ImgUrls: " + imgUrlsArray);
+                                    StorageReference imgUrls = FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("imgUrls.txt");
+
+                                    objToByteStreamUpload(imgUrlsArray,imgUrls);
+
 
 
                                 }
@@ -321,8 +405,239 @@ public class MoreImageUploadActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
         }
+
+
+
+
+
+    }
+
+    public void objToByteStreamUpload(Object obj, StorageReference destination) {
+
+        String objStr = new Gson().toJson(obj);
+        InputStream in = new ByteArrayInputStream(objStr.getBytes(Charset.forName("UTF-8")));
+        UploadTask uploadTask = destination.putStream(in);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(getApplicationContext(), "Profile update successful!", Toast.LENGTH_LONG).show();
+                Log.i("Hello", "Profile update successful!");
+            }
+        });
     }
 
 
+
+
+    private void uploadImgPaths(){
+        Bundle merchDetails = thisIntent.getExtras();
+        String merchantCoName =  merchDetails.getString("merchantname");
+        String offerTitle = merchDetails.getString("offertitle");
+
+
+        if(imgFilePath2!=null && imgFilePath3!=null && imgFilePath4!=null){
+
+            StorageReference filereference2= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    2 + "." + getFileExtension(imgFilePath2));
+            Task task2 = filereference2.putFile(imgFilePath2);
+            StorageReference filereference3= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    3 + "." + getFileExtension(imgFilePath3));
+            Task task3 = filereference3.putFile(imgFilePath3);
+            StorageReference filereference4= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    4 + "." + getFileExtension(imgFilePath4));
+            Task task4 = filereference4.putFile(imgFilePath4);
+
+
+            Tasks.whenAll(task2,task3,task4).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    uploadProgressBarDialog.dismiss();
+                    mProgressBar.setProgress(0);
+
+                    Intent allUploadCompleteIntent = new Intent(getApplicationContext(),MerchUploadOfferActivity.class);
+                    finish();
+                    startActivity(allUploadCompleteIntent);
+                }
+            });
+
+
+
+
+
+
+        }
+
+        else if(imgFilePath2!=null && imgFilePath3!=null){
+
+            StorageReference filereference2= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    2 + "." + getFileExtension(imgFilePath2));
+            Task task2 = filereference2.putFile(imgFilePath2);
+            StorageReference filereference3= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    3 + "." + getFileExtension(imgFilePath3));
+            Task task3 = filereference3.putFile(imgFilePath3);
+
+
+
+            Tasks.whenAll(task2,task3).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    uploadProgressBarDialog.dismiss();
+                    mProgressBar.setProgress(0);
+
+                    Intent allUploadCompleteIntent = new Intent(getApplicationContext(),MerchUploadOfferActivity.class);
+                    finish();
+                    startActivity(allUploadCompleteIntent);
+                }
+            });
+
+
+
+
+
+
+        } else   if(imgFilePath2!=null &&  imgFilePath4!=null){
+
+            StorageReference filereference2= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    2 + "." + getFileExtension(imgFilePath2));
+            Task task2 = filereference2.putFile(imgFilePath2);
+
+            StorageReference filereference4= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    4 + "." + getFileExtension(imgFilePath4));
+            Task task4 = filereference4.putFile(imgFilePath4);
+
+
+            Tasks.whenAll(task2,
+                    task4).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    uploadProgressBarDialog.dismiss();
+                    mProgressBar.setProgress(0);
+
+                    Intent allUploadCompleteIntent = new Intent(getApplicationContext(),MerchUploadOfferActivity.class);
+                    finish();
+                    startActivity(allUploadCompleteIntent);
+                }
+            });
+
+
+
+
+
+
+        }else if(imgFilePath2!=null ){
+
+            StorageReference filereference2= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    2 + "." + getFileExtension(imgFilePath2));
+            Task task2 = filereference2.putFile(imgFilePath2);
+
+
+
+            Tasks.whenAll(task2).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    uploadProgressBarDialog.dismiss();
+                    mProgressBar.setProgress(0);
+
+                    Intent allUploadCompleteIntent = new Intent(getApplicationContext(),MerchUploadOfferActivity.class);
+                    finish();
+                    startActivity(allUploadCompleteIntent);
+                }
+            });
+
+
+        } else if( imgFilePath3!=null && imgFilePath4!=null){
+
+
+            StorageReference filereference3= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    3 + "." + getFileExtension(imgFilePath3));
+            Task task3 = filereference3.putFile(imgFilePath3);
+            StorageReference filereference4= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    4 + "." + getFileExtension(imgFilePath4));
+            Task task4 = filereference4.putFile(imgFilePath4);
+
+
+            Tasks.whenAll(task3,task4).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    uploadProgressBarDialog.dismiss();
+                    mProgressBar.setProgress(0);
+
+                    Intent allUploadCompleteIntent = new Intent(getApplicationContext(),MerchUploadOfferActivity.class);
+                    finish();
+                    startActivity(allUploadCompleteIntent);
+                }
+            });
+
+
+
+
+
+
+        }
+        else if( imgFilePath3!=null ){
+
+
+            StorageReference filereference3= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    3 + "." + getFileExtension(imgFilePath3));
+            Task task3 = filereference3.putFile(imgFilePath3);
+
+
+            Tasks.whenAll(task3).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    uploadProgressBarDialog.dismiss();
+                    mProgressBar.setProgress(0);
+
+                    Intent allUploadCompleteIntent = new Intent(getApplicationContext(),MerchUploadOfferActivity.class);
+                    finish();
+                    startActivity(allUploadCompleteIntent);
+                }
+            });
+
+
+
+
+
+
+        }
+        else if(  imgFilePath4!=null){
+
+
+
+            StorageReference filereference4= FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"+
+                    4 + "." + getFileExtension(imgFilePath4));
+            Task task4 = filereference4.putFile(imgFilePath4);
+
+
+            Tasks.whenAll(task4).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    uploadProgressBarDialog.dismiss();
+                    mProgressBar.setProgress(0);
+
+                    Intent allUploadCompleteIntent = new Intent(getApplicationContext(),MerchUploadOfferActivity.class);
+                    finish();
+                    startActivity(allUploadCompleteIntent);
+                }
+            });
+
+
+
+
+
+
+        }
+
+        else {
+                Toast.makeText(this,"No Img",Toast.LENGTH_SHORT).show();
+            uploadProgressBarDialog.dismiss();
+            mProgressBar.setProgress(0);
+        }
+    }
 
 }

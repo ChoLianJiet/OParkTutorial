@@ -3,21 +3,16 @@ package com.opark.opark.share_parking;
 import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.media.Image;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
-import android.location.LocationManager;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -26,34 +21,25 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 //import android.app.Fragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 //import android.app.FragmentManager;
 
 
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.TranslateAnimation;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -68,9 +54,6 @@ import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -99,8 +82,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.opark.opark.BrandsOfferFragment;
-import com.opark.opark.BrandsOfferFragment1;
 import com.opark.opark.CustomInfoWindowAdapter;
 import com.opark.opark.FinishUserPopUp;
 import com.opark.opark.LoadingScreen;
@@ -108,8 +89,6 @@ import com.opark.opark.MarkerTag;
 import com.opark.opark.PeterMap;
 import com.opark.opark.ProfileNavFragment;
 import com.opark.opark.dialogs.DecideWantToRemovePinDialog;
-import com.opark.opark.dialogs.PromptDetectedFFKDialogForKena;
-import com.opark.opark.ShowBrandOffer;
 import com.opark.opark.rewards_redemption.RewardsFragment;
 import com.opark.opark.rewards_redemption.RewardsPocketFragment;
 import com.opark.opark.feedback.FeedbackDialog;
@@ -124,16 +103,11 @@ import com.opark.opark.model.Car;
 import com.opark.opark.model.User;
 
 
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-
-import static com.opark.opark.rewards_redemption.RewardsFragment.merchantOfferAdapter;
 
 public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -1147,7 +1121,140 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(final String key, final GeoLocation location) {
+                final MarkerTag yourMarkerTag = new MarkerTag();
+                yourMarkerTag.setUID(key);
+//                        yourMarkerTag.setKenaParkerName(kenaUserObjList.get(key).getUserName() + " " + kenaUserObjList.get(key).getUserName().getLastName());
+//                        yourMarkerTag.setKenaParkerCarDetails(kenaCarColor + " " + kenaCarModel + " (" + kenaCarPlateNumber + ") ");
 
+                if (!key.equals(currentUserID)) {
+                    matchmakingRef.child(key).child("adatem").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            try {
+                                String adatemValue = dataSnapshot.getValue().toString();
+                                if (adatemValue.equals(ADATEM0)) {
+                                    Marker marker = mMap.addMarker(new MarkerOptions()
+                                            .position(new LatLng(location.latitude, location.longitude))
+                                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+
+                                    mStringMarkerMap.put(key, marker);
+                                    marker.setTag(yourMarkerTag);
+                                    kenaMarkerArrayList.add(marker);
+                                    for (int i = 0; i < kenaMarkerArrayList.size(); i++)
+                                        if (!mStringMarkerMap.containsValue(kenaMarkerArrayList.get(i))) {
+                                            kenaMarkerArrayList.get(i).remove();
+                                            kenaMarkerArrayList.remove(i);
+                                        }
+
+                                    // For Search Button To Search
+                                    if (!oldArrayList.contains(key)) {
+                                        newArrayList.add(key);
+                                        newHashSet.addAll(newArrayList);
+                                        newArrayList.clear();
+                                        newArrayList.addAll(newHashSet);
+                                        newHashSet.clear();
+                                        Log.d(TAG, "newArrayList consist of " + newArrayList);
+                                    }
+
+                                } else if (!adatemValue.equals(ADATEM0)) {
+
+                                    if (adatemValue.equals(ADATEM1)) {
+                                        matchmakingRef.child(key).child("peterParker").addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                try {
+                                                    String peterParkerValue = dataSnapshot.getValue().toString();
+                                                    if (peterParkerValue.equals(currentUserID)) {
+//                                                            Marker marker = mMap.addMarker(new MarkerOptions()
+//                                                                    .position(new LatLng(location.latitude, location.longitude))
+//                                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+//                                                            marker.showInfoWindow();
+//                                                            mStringMarkerMap.put(key, marker);
+//                                                            marker.setTag(yourMarkerTag);
+//                                                            kenaMarkerArrayList.add(marker);
+//                                                            for (int i = 0; i < kenaMarkerArrayList.size(); i++)
+//                                                                if (!mStringMarkerMap.containsValue(kenaMarkerArrayList.get(i))) {
+//                                                                    kenaMarkerArrayList.get(i).remove();
+//                                                                    kenaMarkerArrayList.remove(i);
+//                                                                }
+                                                    } else {
+                                                        Marker marker = mStringMarkerMap.get(key);
+                                                        if (marker != null) {
+                                                            marker.remove();
+                                                            mStringMarkerMap.remove(key);
+                                                            Log.d(TAG, "onDataChange: marker has been removed " + marker);
+                                                        }
+                                                        if (newArrayList.contains(key)) {
+                                                            // For Search Button To Search
+                                                            newArrayList.remove(key);
+                                                            newHashSet.addAll(newArrayList);
+                                                            newArrayList.clear();
+                                                            newArrayList.addAll(newHashSet);
+                                                            newHashSet.clear();
+                                                            Log.d(TAG, "newArrayList consist of " + newArrayList);
+                                                        }
+
+                                                        if (oldArrayList.contains(key)) {
+                                                            oldArrayList.remove(key);
+                                                            oldHashSet.addAll(oldArrayList);
+                                                            oldArrayList.clear();
+                                                            oldArrayList.addAll(oldHashSet);
+                                                            oldHashSet.clear();
+                                                            Log.d(TAG, "oldArrayList consist of " + oldArrayList);
+                                                        }
+                                                    }
+                                                } catch (NullPointerException e) {
+
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
+                                    } else {
+                                        Marker marker = mStringMarkerMap.get(key);
+                                        if (marker != null) {
+                                            marker.remove();
+                                            mStringMarkerMap.remove(key);
+                                            Log.d(TAG, "onDataChange: marker has been removed " + marker);
+                                        }
+
+                                        if (newArrayList.contains(key)) {
+                                            // For Search Button To Search
+                                            newArrayList.remove(key);
+                                            newHashSet.addAll(newArrayList);
+                                            newArrayList.clear();
+                                            newArrayList.addAll(newHashSet);
+                                            newHashSet.clear();
+                                            Log.d(TAG, "newArrayList consist of " + newArrayList);
+                                        }
+
+                                        if (oldArrayList.contains(key)) {
+                                            oldArrayList.remove(key);
+                                            oldHashSet.addAll(oldArrayList);
+                                            oldArrayList.clear();
+                                            oldArrayList.addAll(oldHashSet);
+                                            oldHashSet.clear();
+                                            Log.d(TAG, "oldArrayList consist of " + oldArrayList);
+                                        }
+                                    }
+                                }
+                            } catch (NullPointerException e) {
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+                }
+
+                /*
                 final StorageReference getKenaProfileRef = storageRef.child("users/" + key + "/profile.txt");
                 getKenaProfileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                     @Override
@@ -1155,7 +1262,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
                         try {
                             kenaUserObjList.put(key, new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
-                            Log.d(TAG, "Gsonfrom json success");
+                            Log.d(TAG, "findOtherUserLocation Gson From Json");
                             for (int i = 0; i < kenaUserObjList.size(); i++) {
 //                                kenaParkerName = kenaUserObjList.get(i).getUserName().getFirstName() + kenaUserObjList.get(i).getUserName().getLastName();
 //                                kenaCarModel = kenaUserObjList.get(i).getUserCar().getCarBrand() + kenaUserObjList.get(i).getUserCar().getCarModel();
@@ -1308,7 +1415,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
                         }
                     }
-                });
+                });*/
 
 
 //                if (!key.equals(currentUserID)) {
@@ -1802,8 +1909,8 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
 
 
-//            Log.d(TAG, "onBackPressed: Showbrandoffervisibl " + BrandsOfferFragment1.showBrandOffer1.isVisible());
-            navFragmentManager.popBackStack();
+//            Log.d(TAG, "onBackPressed: Showbrandoffervisibl " + BrandsOfferFragment.showBrandOffer1.isVisible());
+//            navFragmentManager.popBackStack();
 
             mapContainer.setVisibility(View.VISIBLE);
             toolbar.setTitle("Map");

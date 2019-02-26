@@ -56,7 +56,7 @@ public class CategoriesOfferFragment extends Fragment {
     private CardView entertainmentCategory;
     private RecyclerView shoppingRecView;
     private CardView shoppingCategory;
-
+    private  DatabaseReference offerlistDatabaseRef1;
     private DatabaseReference offerlistDatabaseRef;
     private FirebaseAuth mAuth;
     private FirebaseUser thisUser;
@@ -68,6 +68,7 @@ public class CategoriesOfferFragment extends Fragment {
     public int expandedHeight;
     private LinearLayout catParent;
     private CarryForwardNestedScrollView categoryScrollView;
+    public static String selectedCategory;
 
 
 
@@ -80,6 +81,7 @@ public class CategoriesOfferFragment extends Fragment {
         bindViews(view);
 
         offerlistDatabaseRef = FirebaseDatabase.getInstance().getReference().child("offercategory");
+        offerlistDatabaseRef1 = FirebaseDatabase.getInstance().getReference().child("offerlist/approved-offers");
 
         mAuth = FirebaseAuth.getInstance();
         thisUser = mAuth.getCurrentUser();
@@ -90,7 +92,7 @@ public class CategoriesOfferFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-
+                selectedCategory="Health & Beauty";
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                 hnbRecView.setHasFixedSize(true);
                 hnbRecView.setLayoutManager(linearLayoutManager);
@@ -109,7 +111,7 @@ public class CategoriesOfferFragment extends Fragment {
                     Log.d("category", "CategoryCard Click: should expand  ");
 
 
-                    initializeData(hnbRecView, "Health & Beauty", linearLayoutManager);
+                    initializeData1(hnbRecView, "Health & Beauty", linearLayoutManager);
 
                     setViewGoneWithFadeOut(fnbRecView,fnbCategory);
                     setViewGoneWithFadeOut(travelRecView,travelCategory);
@@ -128,7 +130,7 @@ public class CategoriesOfferFragment extends Fragment {
         fnbCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                selectedCategory="Food & Beverages";
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                 fnbRecView.setHasFixedSize(true);
                 fnbRecView.setLayoutManager(linearLayoutManager);
@@ -147,7 +149,7 @@ public class CategoriesOfferFragment extends Fragment {
                     Log.d("category", "CategoryCard Click: should expand  ");
 
 
-                    initializeData(fnbRecView, "Food & Beverages", linearLayoutManager);
+                    initializeData1(fnbRecView, "Food & Beverages", linearLayoutManager);
 
                     setViewGoneWithFadeOut(hnbRecView,hnbCategory);
                     setViewGoneWithFadeOut(travelRecView,travelCategory);
@@ -169,6 +171,8 @@ public class CategoriesOfferFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
+                selectedCategory="Travel";
+
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                 travelRecView.setHasFixedSize(true);
                 travelRecView.setLayoutManager(linearLayoutManager);
@@ -187,7 +191,7 @@ public class CategoriesOfferFragment extends Fragment {
                     Log.d("category", "CategoryCard Click: should expand  ");
 
 
-                    initializeData(travelRecView, "Travel", linearLayoutManager);
+                    initializeData1(travelRecView, "Travel", linearLayoutManager);
 
                     setViewGoneWithFadeOut(hnbRecView,hnbCategory);
                     setViewGoneWithFadeOut(fnbRecView,fnbCategory);
@@ -206,6 +210,7 @@ public class CategoriesOfferFragment extends Fragment {
         servicesCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                selectedCategory="Services";
 
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                 servicesRecView.setHasFixedSize(true);
@@ -225,7 +230,7 @@ public class CategoriesOfferFragment extends Fragment {
                     Log.d("category", "CategoryCard Click: should expand  ");
 
 
-                    initializeData(servicesRecView, "Services", linearLayoutManager);
+                    initializeData1(servicesRecView, "Services", linearLayoutManager);
 
                     setViewGoneWithFadeOut(hnbRecView,hnbCategory);
                     setViewGoneWithFadeOut(travelRecView,travelCategory);
@@ -245,6 +250,7 @@ public class CategoriesOfferFragment extends Fragment {
         entertainmentCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                selectedCategory="Entertainment";
 
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                 entertainmentRecView.setHasFixedSize(true);
@@ -264,7 +270,7 @@ public class CategoriesOfferFragment extends Fragment {
                     Log.d("category", "CategoryCard Click: should expand  ");
 
 
-                    initializeData(entertainmentRecView, "Entertainment", linearLayoutManager);
+                    initializeData1(entertainmentRecView, "Entertainment", linearLayoutManager);
 
                     setViewGoneWithFadeOut(hnbRecView,hnbCategory);
                     setViewGoneWithFadeOut(travelRecView,travelCategory);
@@ -282,6 +288,7 @@ public class CategoriesOfferFragment extends Fragment {
         shoppingCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                selectedCategory="Shopping";
 
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                 shoppingRecView.setHasFixedSize(true);
@@ -301,7 +308,7 @@ public class CategoriesOfferFragment extends Fragment {
                     Log.d("category", "CategoryCard Click: should expand  ");
 
 
-                    initializeData(shoppingRecView, "Shopping", linearLayoutManager);
+                    initializeData1(shoppingRecView, "Shopping", linearLayoutManager);
 
                     setViewGoneWithFadeOut(hnbRecView,hnbCategory);
                     setViewGoneWithFadeOut(travelRecView,travelCategory);
@@ -582,6 +589,96 @@ public class CategoriesOfferFragment extends Fragment {
 
     }
 
+    private void initializeData1(final RecyclerView recview, String category, final LinearLayoutManager linearLayoutManager){
+
+        Log.d("INITDATA", "initializeData: initialising data");
+
+
+
+
+
+        offerlistDatabaseRef1.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+
+                if ( dataSnapshot.getValue(MerchantOffer.class).getOfferCategories().equals(selectedCategory)&& !merchantOffer.contains(dataSnapshot.getValue(MerchantOffer.class))) {
+                    merchantOffer.add(dataSnapshot.getValue(MerchantOffer.class));
+
+                    Log.d("category", "Data added as class " + merchantOffer);
+
+
+                    merchantOfferAdapter = new MerchantOfferAdapter(merchantOffer, new MerchantOfferAdapter.ButtonClicked() {
+                        @Override
+                        public void onButtonClicked(View v, int position) {
+                            try {
+                                Log.d("", "onButtonClicked:  ");
+                                FragmentManager fragmentManager = getFragmentManager();
+                                confirmPreRedeem = new ConfirmPreRedeem();
+                                confirmPreRedeem.show(fragmentManager, "");
+
+
+                                Log.d("tab", "Rewards Fragment Button Clicked " + position);
+
+                            } catch (IllegalStateException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+
+                    }, new MerchantOfferAdapter.CardClicked() {
+                        @Override
+                        public void onCardClicked(View v, int position) {
+
+                        }
+                    });
+
+
+//                    if(!isExpanded){
+//                        Log.d("category", "expanding recview:  ");
+
+
+                    Log.d("category","recview child    + "+ recview.getChildCount());
+
+                    recview.setAdapter(merchantOfferAdapter);
+
+
+//
+                    Log.d("measure", "LLM height: " + linearLayoutManager.getHeight());
+
+                    Log.d("measure", "onChildAdded: first item height  " + linearLayoutManager.findFirstVisibleItemPosition());
+//                                        recview.measure(RecyclerView.MeasureSpec.makeMeasureSpec(0,RecyclerView.MeasureSpec.EXACTLY),RecyclerView.MeasureSpec.makeMeasureSpec(recview.getHeight(), View.MeasureSpec.EXACTLY));
+                    expandRecView(recview, linearLayoutManager.getHeight()+720);
+
+                    RewardsFragment.appBarLayout.setExpanded(false);
+
+                }
+
+            }
+
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
 
 
 }

@@ -27,6 +27,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.opark.opark.InsufficientPointsDialog;
 import com.opark.opark.R;
+import com.opark.opark.model.Address;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -51,7 +52,7 @@ public class ConfirmPreRedeem extends DialogFragment {
     private static String redeemUid;
     public static String merchantName;
     public static String merchantOfferTitle;
-    public static String merchantAddress;
+    public static Address merchantAddress;
     public static String merchantOfferImageUrl;
     public static String merchantContact;
     public static String rewardsMerchant;

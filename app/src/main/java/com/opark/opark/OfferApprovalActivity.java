@@ -156,6 +156,8 @@ public class OfferApprovalActivity extends AppCompatActivity {
 
 
 
+
+
                             detailsBundle.putString("offertitle",merchantOfferList.get(position).getMerchantOfferTitle());
                             Log.d("cardclick", "title:  " + detailsBundle.getString("offertitle"));
                             detailsBundle.putString("merchantconame",merchantOfferList.get(position).getMerchantName());
@@ -163,7 +165,15 @@ public class OfferApprovalActivity extends AppCompatActivity {
                             detailsBundle.putString("merchantcontact",merchantOfferList.get(position).getMerchantContact());
                             detailsBundle.putString("offercost",merchantOfferList.get(position).getOfferCost());
                             detailsBundle.putString("expirydate",merchantOfferList.get(position).getExpiryDate());
+                            String landingImgUrl = merchantOfferList.get(position).getOfferImage();
+                            detailsBundle.putString("firstline",merchantOfferList.get(position).getMerchantAddress().getFirstline());
+                            detailsBundle.putString("secondline",merchantOfferList.get(position).getMerchantAddress().getSecondline());
+                            detailsBundle.putString("city",merchantOfferList.get(position).getMerchantAddress().getCity());
+                            detailsBundle.putString("state",merchantOfferList.get(position).getMerchantAddress().getCountryState());
+                            detailsBundle.putString("postcode",merchantOfferList.get(position).getMerchantAddress().getPostcode());
 
+
+                            detailsBundle.putString("landingImgUrl",landingImgUrl);
                             offerDetailsIntent.putExtras(detailsBundle);
 
                             startActivity(offerDetailsIntent);
