@@ -23,7 +23,7 @@ public class MarkerTag {
         return kenaParkerName;
     }
 
-    public void setKenaParkerName(String yesNoTag) {
+    public void setKenaParkerName(String kenaParkerName) {
         this.kenaParkerName = kenaParkerName;
     }
 
@@ -31,7 +31,7 @@ public class MarkerTag {
         return kenaParkerCarDetails;
     }
 
-    public void setKenaParkerCarDetails(String yesNoTag) {
+    public void setKenaParkerCarDetails(String kenaParkerCarDetails) {
         this.kenaParkerCarDetails = kenaParkerCarDetails;
     }
 }

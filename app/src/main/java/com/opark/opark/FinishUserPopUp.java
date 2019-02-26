@@ -24,6 +24,8 @@ public class FinishUserPopUp extends Activity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                MapsMainActivity.mMap.getUiSettings().setScrollGesturesEnabled(true);
+                MapsMainActivity.mMap.getUiSettings().setZoomGesturesEnabled(true);
                 returnToMainDrawerAndResearch();
             }
         });

@@ -696,6 +696,7 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
 
     private void EndSession(){
         Log.d(TAG,"EndSession is called");
+        MapsMainActivity.foundUser = null;
         mChronometer.stop();
         user.userName.firstName = kenaParkerName.toString();
         user.userCar = new Car(kenaCarColor.getText().toString(),kenaCarBrand,kenaCarModel,kenaCarPlateNumber.getText().toString());
@@ -721,7 +722,6 @@ public class PeterMap extends FragmentActivity implements OnMapReadyCallback,Goo
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-
             }
         });
     }

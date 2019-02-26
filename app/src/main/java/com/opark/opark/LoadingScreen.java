@@ -283,8 +283,7 @@ public class LoadingScreen extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        matchmakingRef.child(currentUserID).child("adatem").setValue("Not Available");
-        finish();
+
     }
 
     public void recordMatchMaking() {
