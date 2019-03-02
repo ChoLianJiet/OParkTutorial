@@ -818,7 +818,7 @@ public class Map extends FragmentActivity implements OnMapReadyCallback,
 
                         marker.setPosition(newPosition);
 
-                        //marker.setRotation(computeRotation(v, startRotation, destination.getBearing()));
+//                        marker.setRotation(computeRotation(v, startRotation, destination.getBearing()));
                     } catch (Exception ex) {
                         // I don't care atm..
                     }

@@ -39,7 +39,9 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     private Context mContext;
     private Button acceptButton;
     public static String foundUser;
-    public static TextView tvUserIDView;
+    private TextView tvUserIDView;
+    private TextView tvTitle;
+    private TextView tvSnippit;
     private DatabaseReference matchmakingRef = FirebaseDatabase.getInstance().getReference().child("matchmaking");
     private DatabaseReference togetherRef = FirebaseDatabase.getInstance().getReference().child("together");
     FirebaseStorage firebaseStorage;
@@ -62,81 +64,15 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
         firebaseStorage = FirebaseStorage.getInstance();
         storageRef = firebaseStorage.getReference();
-        String title = marker.getTitle();
-        final TextView tvTitle = (TextView) view.findViewById(R.id.title);
-        String snippit = marker.getSnippet();
-        final TextView tvSnippit = (TextView) view.findViewById(R.id.snippit);
+        tvTitle = (TextView) view.findViewById(R.id.title_id_view);
+        tvSnippit = (TextView) view.findViewById(R.id.snippit_id_view);
         acceptButton = (Button) view.findViewById(R.id.info_window_accept);
         tvUserIDView = (TextView) view.findViewById(R.id.user_id_view);
         try {
-//        tvUserIDView.setText(((MarkerTag) marker.getTag()).getUID());
+
             tvUserIDView.setText(((MarkerTag) marker.getTag()).getUID());
-        String foundUser =tvUserIDView.getText().toString();
-
-//            final StorageReference getKenaProfileRef = storageRef.child("users/" + foundUser + "/profile.txt");
-//            getKenaProfileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-//                @Override
-//                public void onSuccess(byte[] bytes) {
-//
-//                    try {
-//                        kenaUserObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
-//                        Log.d(TAG, "Gsonfrom json success");
-//                        for (int i = 0; i < kenaUserObjList.size(); i++) {
-//                            kenaParkerName = kenaUserObjList.get(i).getUserName().getFirstName() + kenaUserObjList.get(i).getUserName().getLastName();
-//                            kenaCarModel = kenaUserObjList.get(i).getUserCar().getCarBrand() + kenaUserObjList.get(i).getUserCar().getCarModel();
-//                            kenaCarPlateNumber = kenaUserObjList.get(i).getUserCar().getCarPlate();
-//                            kenaCarColor = kenaUserObjList.get(i).getUserCar().getCarColour();
-//                        }
-//
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }).addOnFailureListener(new OnFailureListener() {
-//                @Override
-//                public void onFailure(@NonNull Exception exception) {
-//                    Log.d(TAG, "fragment is not created, exception: " + exception);
-//                }
-//            }).addOnCompleteListener(new OnCompleteListener<byte[]>() {
-//                @Override
-//                public void onComplete(@NonNull Task<byte[]> task) {
-                    tvTitle.setText(((MarkerTag) marker.getTag()).getKenaParkerName());
-                    tvSnippit.setText(((MarkerTag) marker.getTag()).getKenaParkerCarDetails());
-//                }
-//            });
-
-
-//            if (((MarkerTag) marker.getTag()).getYesNoTag().equals("yes")) {
-//                acceptButton.setVisibility(View.VISIBLE);
-//
-//                view.setOnLongClickListener(new View.OnLongClickListener() {
-//                    @Override
-//                    public boolean onLongClick(View v) {
-//                        Log.d("LONG", "CLICKED long and fndUser is " + fndUser);
-//
-//                            foundUser = fndUser;
-//                            Log.d(TAG, "onInfoWindowLongClick: entry foundUser is " + foundUser);
-//
-//
-//                        matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM2);
-//                        togetherRef.child(foundUser).child("peter").setValue(MapsMainActivity.currentUserID);
-//                        Intent intent = new Intent(view.getContext(),PeterMap.class);
-//                        view.getContext().startActivity(intent);
-//                        return true;
-//                    }
-//                });
-//
-//            }
-//            else if (((MarkerTag) marker.getTag()).getYesNoTag().equals("no")) {
-//                acceptButton.setVisibility(View.INVISIBLE);
-//                view.setClickable(false);
-//                view.setLongClickable(false);
-//                view.setOnClickListener(null);
-//                view.setOnLongClickListener(null);
-//                tvTitle.setText(null);
-//
-//                tvUserIDView.setText(null);
-//            }
+            tvTitle.setText(((MarkerTag) marker.getTag()).getKenaParkerName());
+            tvSnippit.setText(((MarkerTag) marker.getTag()).getKenaParkerCarDetails());
 
         } catch (NullPointerException e){
             Log.d(TAG,"Error " + e);

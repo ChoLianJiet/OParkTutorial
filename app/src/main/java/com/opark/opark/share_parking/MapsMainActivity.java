@@ -3,16 +3,24 @@ package com.opark.opark.share_parking;
 import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
+import android.graphics.Color;
+import android.media.Image;
+import android.os.AsyncTask;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.location.LocationManager;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -21,25 +29,34 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 //import android.app.Fragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 //import android.app.FragmentManager;
 
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -54,9 +71,13 @@ import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -65,8 +86,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -81,14 +105,28 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import com.opark.opark.BrandsOfferFragment;
+import com.opark.opark.BrandsOfferFragment1;
 import com.opark.opark.CustomInfoWindowAdapter;
+import com.opark.opark.DirectionsParser;
 import com.opark.opark.FinishUserPopUp;
 import com.opark.opark.LoadingScreen;
 import com.opark.opark.MarkerTag;
 import com.opark.opark.PeterMap;
 import com.opark.opark.ProfileNavFragment;
+import com.opark.opark.RoadsParser;
+import com.opark.opark.TaskRequestMarkerDirections;
 import com.opark.opark.dialogs.DecideWantToRemovePinDialog;
+import com.opark.opark.dialogs.PromptDetectedFFKDialogForKena;
+import com.opark.opark.ShowBrandOffer;
 import com.opark.opark.rewards_redemption.RewardsFragment;
 import com.opark.opark.rewards_redemption.RewardsPocketFragment;
 import com.opark.opark.feedback.FeedbackDialog;
@@ -103,11 +141,27 @@ import com.opark.opark.model.Car;
 import com.opark.opark.model.User;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.FileDescriptor;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+
+import static com.opark.opark.rewards_redemption.RewardsFragment.merchantOfferAdapter;
 
 public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -139,13 +193,13 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
 
     //MEMBER VARIALBLE
-
+    public static View mapGroup;
     private BottomSheetBehavior mBottomSheetBehavior;
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
     public static Location mLastLocation;
     public static Location mCurrentLocation;
-    private static GoogleMap mMap;
+    public static GoogleMap mMap;
     private MapView mMapView;
     public static Button shareParkingButton;
     public static Button findParkingButton;
@@ -186,6 +240,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     public static String foundUser;
     public ProgressBar loadingCircle;
     private String adatemValue;
+    private FragmentManager fragManager;
     public static UserPopUpFragment userPopUpFragment;
     public static UserPopUpFragment userPopUpFragment1;
     private PopupWindow popUpWindow;
@@ -234,6 +289,10 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     //Feedback Model object
     public FeedbackModel feedbackObj;
 
+    //Draw line on Google Map
+    public static Polyline line;
+
+    @SuppressLint("CutPasteId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -243,7 +302,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         getSupportFragmentManager();
-
+        acquireUserProfileAndStoreLocal();
         getLocationPermission();
 
         shareParkingButton = (Button) findViewById(R.id.share_parking_button);
@@ -251,6 +310,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         mapContainer = (RelativeLayout) findViewById(R.id.map_page_container);
         cancelButton = (Button) findViewById(R.id.cancel_map_main_button);
         cancelButton.setVisibility(View.INVISIBLE);
+        mapGroup = findViewById(R.id.map);
 
         //INVISIBLE PARKINGBUTTON
 //        shareParkingButton.setVisibility(View.INVISIBLE);
@@ -269,7 +329,6 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         drawerToggle = setupDrawerToggle();
         mDrawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
-
 
 
         // Tie DrawerLayout events to the ActionBarToggle
@@ -369,6 +428,8 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         findParkingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                markerInMiddle = false;
+                recenterButton.setVisibility(View.INVISIBLE);
                 showLoading();
                 searchMarkerForKenaOneByOne();
             }
@@ -381,6 +442,13 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 markerInMiddle = true;
                 LatLng latlong = new LatLng(peterParkerLocation.latitude, peterParkerLocation.longitude);
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlong, DEFAULT_ZOOM));
+                CameraPosition cam = CameraPosition.builder()
+                        .target(mk.getPosition())
+                        .zoom(DEFAULT_ZOOM)
+                        .bearing(floatBearing)
+                        .tilt(DEFAULT_TILT)
+                        .build();
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cam));
                 Log.d(TAG, "markerInMiddle is " + markerInMiddle);
                 setRecenterButton();
             }
@@ -396,7 +464,10 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MapsMainActivity.mMap.getUiSettings().setScrollGesturesEnabled(true);
+                MapsMainActivity.mMap.getUiSettings().setZoomGesturesEnabled(true);
                 markerInMiddle = true;
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(peterParkerLocation, DEFAULT_ZOOM));
                 setRecenterButton();
                 cancelButton.setVisibility(View.GONE);
                 cancelUser();
@@ -413,120 +484,112 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
 
+    private void acquireUserProfileAndStoreLocal() {
 
-
-
-   private void acquireUserProfileAndStoreLocal(){
-
-       StorageReference userRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
-       StorageReference userPointRef =FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/points.txt");
+        StorageReference userRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/profile.txt");
+        StorageReference userPointRef = FirebaseStorage.getInstance().getReference().child("users/" + currentUserID + "/points.txt");
         final DatabaseReference userPointDataRef = FirebaseDatabase.getInstance().getReference().child("users/userPoints/" + currentUserID);
 
 
+        final long ONE_MEGABYTE = 1024 * 1024;
+
+        userPointRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
 
 
-       final long ONE_MEGABYTE = 1024 * 1024;
+                try {
 
-       userPointRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-           @Override
-           public void onSuccess(byte[] bytes) {
-
-
-               try {
-
-                   try {
-                       userPoints = (new Gson().fromJson(new String(bytes, "UTF-8"), Integer.class));
-                       Log.d(TAG, "onSuccess: " + userPoints);
-                       userPointsTextView.setText(String.valueOf(userPoints));
+                    try {
+                        userPoints = (new Gson().fromJson(new String(bytes, "UTF-8"), Integer.class));
+                        Log.d(TAG, "onSuccess: " + userPoints);
+                        userPointsTextView.setText(String.valueOf(userPoints));
 
 
-                   } catch (UnsupportedEncodingException e) {
-                       e.printStackTrace();
-                   }
-               }catch (JsonSyntaxException e){
-                   e.printStackTrace();
-               }
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                } catch (JsonSyntaxException e) {
+                    e.printStackTrace();
+                }
 
 
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
 
-           }
-       }).addOnFailureListener(new OnFailureListener() {
-                                   @Override
-                                   public void onFailure(@NonNull Exception e) {
-
-                                   }
-                               }
-       );
-
+                                    }
+                                }
+        );
 
 
-       userPointDataRef.addValueEventListener(new ValueEventListener() {
-           @Override
-           public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-               Log.d(TAG, "onDataChange: inside value listener");
-               Log.d(TAG, "onDataChange: datasnapshot" + dataSnapshot.getKey());
-               Log.d(TAG, "onDataChange: datasnapshot value" + dataSnapshot.getValue());
+        userPointDataRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange: inside value listener");
+                Log.d(TAG, "onDataChange: datasnapshot" + dataSnapshot.getKey());
+                Log.d(TAG, "onDataChange: datasnapshot value" + dataSnapshot.getValue());
 
 
-               try {
-                   userPoints = dataSnapshot.getValue(Integer.class);
+                try {
+                    userPoints = dataSnapshot.getValue(Integer.class);
 //                userPoints = Integer.parseInt(String.valueOf(dataSnapshot.getValue()));
-                   userPointsTextView.setText(String.valueOf(userPoints));
+                    userPointsTextView.setText(String.valueOf(userPoints));
 
 
-                   Log.d(TAG, "onDataChange: userPoints" + userPoints);
-               } catch (NullPointerException e ){
+                    Log.d(TAG, "onDataChange: userPoints" + userPoints);
+                } catch (NullPointerException e) {
 
-                   userPointDataRef.setValue(userPoints);
+                    userPointDataRef.setValue(userPoints);
 
-               }
+                }
 
-           }
+            }
 
-           @Override
-           public void onCancelled(@NonNull DatabaseError databaseError) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-               Log.d(TAG, "onCancelled: " + databaseError);
-           }
-       });
-
-
-       userRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-           @Override
-           public void onSuccess(byte[] bytes) {
-               Log.d("Byte","getByte success");
+                Log.d(TAG, "onCancelled: " + databaseError);
+            }
+        });
 
 
-               try {
-                   userObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
-                   Log.d("Gson","Gsonfrom json success");
+        userRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Log.d("Byte", "getByte success");
 
 
-                   for (int i = 0; i < MapsMainActivity.userObjList.size(); i++) {
-                       Log.d("I", "Iteration success");
-                       Log.i("Hello", "heyhey" + MapsMainActivity.userObjList.get(i).getUserName().getFirstName());
+                try {
+                    userObjList.add(new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
+                    Log.d("Gson", "Gsonfrom json success");
+
+
+                    for (int i = 0; i < MapsMainActivity.userObjList.size(); i++) {
+                        Log.d("I", "Iteration success");
+                        Log.i("Hello", "heyhey" + MapsMainActivity.userObjList.get(i).getUserName().getFirstName());
 //                            firstName.setText(userObjList.get(i).getUserName().getFirstName());
-                       lastName = (MapsMainActivity.userObjList.get(i).getUserName().getLastName());
-                       phoneNum = (MapsMainActivity.userObjList.get(i).getUserName().getPhoneNum());
-                       carColour =(MapsMainActivity.userObjList.get(i).getUserCar().getCarColour());
-                       carBrand = (MapsMainActivity.userObjList.get(i).getUserCar().getCarBrand());
-                       carModel = (MapsMainActivity.userObjList.get(i).getUserCar().getCarModel());
-                       carPlate= (MapsMainActivity.userObjList.get(i).getUserCar().getCarPlate());
-                       Log.d(TAG,"lastName variable is " + lastName);
-                   }
-               } catch (UnsupportedEncodingException e) {
-                   e.printStackTrace();
-               }
-           }
-       }).addOnFailureListener(new OnFailureListener() {
-           @Override
-           public void onFailure(@NonNull Exception exception) {
-               // Handle any errors
-           }
-       });
+                        lastName = (MapsMainActivity.userObjList.get(i).getUserName().getLastName());
+                        phoneNum = (MapsMainActivity.userObjList.get(i).getUserName().getPhoneNum());
+                        carColour = (MapsMainActivity.userObjList.get(i).getUserCar().getCarColour());
+                        carBrand = (MapsMainActivity.userObjList.get(i).getUserCar().getCarBrand());
+                        carModel = (MapsMainActivity.userObjList.get(i).getUserCar().getCarModel());
+                        carPlate = (MapsMainActivity.userObjList.get(i).getUserCar().getCarPlate());
+                        Log.d(TAG, "lastName variable is " + lastName);
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+            }
+        });
 
-   }
-
+    }
 
 
     @Override
@@ -557,35 +620,36 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 //                            }
 //                        });} catch (NullPointerException e ){Log.d(TAG, "OnBackStackChangedListener null execption catch");}
 
-                        if (menuItem == oldMenuItem){
-                            Log.d(TAG,"menuitem is displayed already");
+                        if (menuItem == oldMenuItem) {
+                            Log.d(TAG, "menuitem is displayed already");
 //                            Log.d("navmenuitem","menu item ischecked and return false");
                             return false;
-                        }
-                        else {
+                        } else {
 //                           backStackCount= navFragmentManager.getBackStackEntryCount();
 //                            Log.d(TAG, "onNavigationItemSelected: backstack count is " +backStackCount);
-                            Log.d(TAG,"menuitem is not displayed");
+                            Log.d(TAG, "menuitem is not displayed");
 //                            Log.d("navmenuitem","menu item isnotchecked and setChecked(false) and return true");
-                            try{
-                                    try{
-                                backStackCount= navFragmentManager.getBackStackEntryCount();
-                                Log.d(TAG, "onNavigationItemSelected: backstack count is " +backStackCount);
-                                if( backStackCount !=0){
-                                navFragmentManager.popBackStack();}
-
-                               }
-                                    catch (NullPointerException e ){
-                                        Log.d(TAG, "onNavigationItemSelected: NullPoint");
+                            try {
+                                try {
+                                    backStackCount = navFragmentManager.getBackStackEntryCount();
+                                    Log.d(TAG, "onNavigationItemSelected: backstack count is " + backStackCount);
+                                    if (backStackCount != 0) {
+                                        navFragmentManager.popBackStack();
                                     }
 
-                                } catch (IllegalStateException e ){Log.d(TAG,"first selected pop");}
+                                } catch (NullPointerException e) {
+                                    Log.d(TAG, "onNavigationItemSelected: NullPoint");
+                                }
 
-                                selectDrawerItem(menuItem);
+                            } catch (IllegalStateException e) {
+                                Log.d(TAG, "first selected pop");
+                            }
+
+                            selectDrawerItem(menuItem);
 
                             mDrawer.closeDrawer(GravityCompat.START);
 
-                            oldMenuItem =menuItem;
+                            oldMenuItem = menuItem;
                             return true;
 
                         }
@@ -597,7 +661,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     public void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the fragment to show based on nav item clicked
 
-        switch(menuItem.getItemId()) {
+        switch (menuItem.getItemId()) {
             case R.id.nav_first_fragment:
                 userProfilePage = new ProfileNavFragment();
                 fragment = userProfilePage;
@@ -608,7 +672,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 rewardsPageFrag = new RewardsFragment();
                 fragment = rewardsPageFrag;
                 executeFragmentTransaction(fragment);
-                    break;
+                break;
 
             case R.id.nav_third_fragment:
                 rewardsPockFrag = new RewardsPocketFragment();
@@ -618,7 +682,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
             default:
 //                fragmentClass = FirstFragment.class;
                 FeedbackDialog dialog = new FeedbackDialog();
-                Car car = new Car("Blue","Toyota","Harrier","BJT 2883");
+                Car car = new Car("Blue", "Toyota", "Harrier", "BJT 2883");
                 dialog.setArguments(dialog.setCarDetails(car));
                 dialog.show(getSupportFragmentManager(), "");
         }
@@ -637,27 +701,22 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
 
     private void executeFragmentTransaction(Fragment frag) {
-        if ((frag != null) ) {
+        if ((frag != null)) {
 
-            navFragmentManager= getSupportFragmentManager();
+            navFragmentManager = getSupportFragmentManager();
             navFragmentManager.beginTransaction()
-                        .replace(R.id.nav_view_selection_container, frag)
-                        .addToBackStack(null)
-                         .commit();
+                    .replace(R.id.nav_view_selection_container, frag)
+                    .addToBackStack(null)
+                    .commit();
             Log.d(TAG, "executing fragment transaction , added to backstack");
             mapContainer.setVisibility(View.GONE);
             currentFragment = frag;
             Log.d(TAG, "executeFragmentTransaction: currentFragment is " + currentFragment);
-        }
-        else{
+        } else {
             Log.d(TAG, "same fragment");
             return;
         }
     }
-
-
-
-
 
 
     @Override
@@ -678,7 +737,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     private ActionBarDrawerToggle setupDrawerToggle() {
         // NOTE: Make sure you pass in a valid toolbar reference.  ActionBarDrawToggle() does not require it
         // and will not render the hamburger icon without it.
-        return new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);
+        return new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.drawer_open, R.string.drawer_close);
     }
 
 
@@ -778,8 +837,8 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     private void displayLocation() {
 
         if (mLastLocation != null) {
-            latitude = mLastLocation.getLatitude();
-            longitude = mLastLocation.getLongitude();
+//            latitude = mLastLocation.getLatitude();
+//            longitude = mLastLocation.getLongitude();
 
 
             liveUsersGeoFire.setLocation(currentUserID, new GeoLocation(latitude, longitude), new GeoFire.CompletionListener() {
@@ -790,7 +849,6 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                     } else {
                         System.out.println("Location saved on server successfully on liveUsersRef as lat[" + latitude + "], lon[" + longitude + "]!");
                         loadLocationForThisUser();
-                        acquireUserProfileAndStoreLocal();
                     }
                 }
             });
@@ -880,27 +938,40 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onLocationChanged(Location location) {
         if (isBetterLocation(location, mLastLocation)) {
+            Log.d(TAG, "onLocationChanged: is triggered");
             mLastLocation = location;
             if (mLastLocation.hasAccuracy() && mLastLocation.getAccuracy() <= 100) {
+                Log.d(TAG, "onLocationChanged: is triggered, mLastLocation has Accuracy");
                 latitude = mLastLocation.getLatitude();
                 longitude = mLastLocation.getLongitude();
+                if (markerInMiddle) {
+                    updateCameraBearing(mMap, peterParkerLocation.latitude, peterParkerLocation.longitude, new LatLng(latitude, longitude));
+                }
                 displayLocation();
             }
         } else {
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
+            Log.d(TAG, "onLocationChanged: is triggered, mLastLocation cannot be relied");
+            latitude = mLastLocation.getLatitude();
+            longitude = mLastLocation.getLongitude();
+            if (markerInMiddle) {
+                updateCameraBearing(mMap, peterParkerLocation.latitude, peterParkerLocation.longitude, new LatLng(latitude, longitude));
+            }
             displayLocation();
         }
     }
 
     protected boolean isBetterLocation(Location location, Location currentBestLocation) {
         if (currentBestLocation == null) {
+            Log.d(TAG, "isBetterLocation: currentBestLocation is null, return true");
             // A new location is always better than no location
             return true;
         }
 
         // Check whether the new location fix is newer or older
         long timeDelta = location.getTime() - currentBestLocation.getTime();
+        Log.d(TAG, "isBetterLocation: location.getTime is " + location.getTime());
+        Log.d(TAG, "isBetterLocation: currentBestLocation.getTime is " + currentBestLocation.getTime());
+        Log.d(TAG, "isBetterLocation: timeDelta is " + timeDelta);
         boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
         boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
         boolean isNewer = timeDelta > 0;
@@ -908,14 +979,19 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         // If it's been more than two minutes since the current location, use the new location
         // because the user has likely moved
         if (isSignificantlyNewer) {
+            Log.d(TAG, "isBetterLocation: isSignificantyNewer, return true");
             return true;
             // If the new location is more than two minutes older, it must be worse
         } else if (isSignificantlyOlder) {
+            Log.d(TAG, "isBetterLocation: isSignificantyOlder, return false");
             return false;
         }
 
         // Check whether the new location fix is more or less accurate
         int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
+        Log.d(TAG, "isBetterLocation: location.getAccuracy is " + location.getAccuracy());
+        Log.d(TAG, "isBetterLocation: currentBestLocation.getAccuracy is " + currentBestLocation.getAccuracy());
+        Log.d(TAG, "isBetterLocation: accuracyDelta is " + accuracyDelta);
         boolean isLessAccurate = accuracyDelta > 0;
         boolean isMoreAccurate = accuracyDelta < 0;
         boolean isSignificantlyLessAccurate = accuracyDelta > 200;
@@ -923,13 +999,17 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         // Check if the old and new location are from the same provider
         boolean isFromSameProvider = isSameProvider(location.getProvider(),
                 currentBestLocation.getProvider());
+        Log.d(TAG, "isBetterLocation: is it from same provider? It is " + isFromSameProvider);
 
         // Determine location quality using a combination of timeliness and accuracy
         if (isMoreAccurate) {
+            Log.d(TAG, "isBetterLocation: isMoreAccurate, return true");
             return true;
         } else if (isNewer && !isLessAccurate) {
+            Log.d(TAG, "isBetterLocation: isNewer and !isLessAccurate, return true");
             return true;
         } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+            Log.d(TAG, "isBetterLocation: isNewer and !isSignifivantlyLessAccurate and isFromSameProvider, return true");
             return true;
         }
         return false;
@@ -1094,6 +1174,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     private void setMatchkingFolderInDatabse() {
 
         matchmakingRef.child(currentUserID + "/sessionKey").setValue(currentUserID);
+        matchmakingRef.child(currentUserID + "/peterParker").setValue("NotOccupiedByAnyoneYet");
         matchmakingRef.child(currentUserID + "/adatem").setValue(ADATEM0);
 //        matchmakingRef.child(currentUserID + "/sessionKey").addValueEventListener(new ValueEventListener() {
 //            @Override
@@ -1121,270 +1202,69 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(final String key, final GeoLocation location) {
-                final MarkerTag yourMarkerTag = new MarkerTag();
-                yourMarkerTag.setUID(key);
-//                        yourMarkerTag.setKenaParkerName(kenaUserObjList.get(key).getUserName() + " " + kenaUserObjList.get(key).getUserName().getLastName());
-//                        yourMarkerTag.setKenaParkerCarDetails(kenaCarColor + " " + kenaCarModel + " (" + kenaCarPlateNumber + ") ");
-
-                if (!key.equals(currentUserID)) {
-                    matchmakingRef.child(key).child("adatem").addValueEventListener(new ValueEventListener() {
+                try {
+                    final StorageReference getKenaProfileRef = storageRef.child("users/" + key + "/profile.txt");
+                    getKenaProfileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        public void onSuccess(byte[] bytes) {
+
                             try {
-                                String adatemValue = dataSnapshot.getValue().toString();
-                                if (adatemValue.equals(ADATEM0)) {
-                                    Marker marker = mMap.addMarker(new MarkerOptions()
-                                            .position(new LatLng(location.latitude, location.longitude))
-                                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                                kenaUserObjList.put(key, new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
+                                Log.d(TAG, "Gsonfrom json success");
+                                Log.d(TAG, "onSuccess: kenaUserObjList has " + kenaUserObjList);
 
-                                    mStringMarkerMap.put(key, marker);
-                                    marker.setTag(yourMarkerTag);
-                                    kenaMarkerArrayList.add(marker);
-                                    for (int i = 0; i < kenaMarkerArrayList.size(); i++)
-                                        if (!mStringMarkerMap.containsValue(kenaMarkerArrayList.get(i))) {
-                                            kenaMarkerArrayList.get(i).remove();
-                                            kenaMarkerArrayList.remove(i);
-                                        }
+                                kenaParkerName = kenaUserObjList.get(key).getUserName().getFirstName() + kenaUserObjList.get(key).getUserName().getLastName();
+                                kenaCarModel = kenaUserObjList.get(key).getUserCar().getCarBrand() + kenaUserObjList.get(key).getUserCar().getCarModel();
+                                kenaCarPlateNumber = kenaUserObjList.get(key).getUserCar().getCarPlate();
+                                kenaCarColor = kenaUserObjList.get(key).getUserCar().getCarColour();
 
-                                    // For Search Button To Search
-                                    if (!oldArrayList.contains(key)) {
-                                        newArrayList.add(key);
-                                        newHashSet.addAll(newArrayList);
-                                        newArrayList.clear();
-                                        newArrayList.addAll(newHashSet);
-                                        newHashSet.clear();
-                                        Log.d(TAG, "newArrayList consist of " + newArrayList);
-                                    }
+                                Log.d(TAG, "onSuccess: kenaParkerName is " + kenaParkerName);
+                                Log.d(TAG, "onSuccess: kenaCarDetails is " + kenaCarColor + " " + kenaCarModel + " (" + kenaCarPlateNumber + ") ");
 
-                                } else if (!adatemValue.equals(ADATEM0)) {
 
-                                    if (adatemValue.equals(ADATEM1)) {
-                                        matchmakingRef.child(key).child("peterParker").addValueEventListener(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                try {
-                                                    String peterParkerValue = dataSnapshot.getValue().toString();
-                                                    if (peterParkerValue.equals(currentUserID)) {
-//                                                            Marker marker = mMap.addMarker(new MarkerOptions()
-//                                                                    .position(new LatLng(location.latitude, location.longitude))
-//                                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-//                                                            marker.showInfoWindow();
-//                                                            mStringMarkerMap.put(key, marker);
-//                                                            marker.setTag(yourMarkerTag);
-//                                                            kenaMarkerArrayList.add(marker);
-//                                                            for (int i = 0; i < kenaMarkerArrayList.size(); i++)
-//                                                                if (!mStringMarkerMap.containsValue(kenaMarkerArrayList.get(i))) {
-//                                                                    kenaMarkerArrayList.get(i).remove();
-//                                                                    kenaMarkerArrayList.remove(i);
-//                                                                }
-                                                    } else {
-                                                        Marker marker = mStringMarkerMap.get(key);
-                                                        if (marker != null) {
-                                                            marker.remove();
-                                                            mStringMarkerMap.remove(key);
-                                                            Log.d(TAG, "onDataChange: marker has been removed " + marker);
-                                                        }
-                                                        if (newArrayList.contains(key)) {
-                                                            // For Search Button To Search
-                                                            newArrayList.remove(key);
-                                                            newHashSet.addAll(newArrayList);
-                                                            newArrayList.clear();
-                                                            newArrayList.addAll(newHashSet);
-                                                            newHashSet.clear();
-                                                            Log.d(TAG, "newArrayList consist of " + newArrayList);
-                                                        }
-
-                                                        if (oldArrayList.contains(key)) {
-                                                            oldArrayList.remove(key);
-                                                            oldHashSet.addAll(oldArrayList);
-                                                            oldArrayList.clear();
-                                                            oldArrayList.addAll(oldHashSet);
-                                                            oldHashSet.clear();
-                                                            Log.d(TAG, "oldArrayList consist of " + oldArrayList);
-                                                        }
-                                                    }
-                                                } catch (NullPointerException e) {
-
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-                                    } else {
-                                        Marker marker = mStringMarkerMap.get(key);
-                                        if (marker != null) {
-                                            marker.remove();
-                                            mStringMarkerMap.remove(key);
-                                            Log.d(TAG, "onDataChange: marker has been removed " + marker);
-                                        }
-
-                                        if (newArrayList.contains(key)) {
-                                            // For Search Button To Search
-                                            newArrayList.remove(key);
-                                            newHashSet.addAll(newArrayList);
-                                            newArrayList.clear();
-                                            newArrayList.addAll(newHashSet);
-                                            newHashSet.clear();
-                                            Log.d(TAG, "newArrayList consist of " + newArrayList);
-                                        }
-
-                                        if (oldArrayList.contains(key)) {
-                                            oldArrayList.remove(key);
-                                            oldHashSet.addAll(oldArrayList);
-                                            oldArrayList.clear();
-                                            oldArrayList.addAll(oldHashSet);
-                                            oldHashSet.clear();
-                                            Log.d(TAG, "oldArrayList consist of " + oldArrayList);
-                                        }
-                                    }
-                                }
-                            } catch (NullPointerException e) {
-
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
                             }
                         }
-
+                    }).addOnFailureListener(new OnFailureListener() {
                         @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                        public void onFailure(@NonNull Exception exception) {
+                            Log.d(TAG, "fragment is not created, exception: " + exception);
                         }
-                    });
-
-                }
-
-                /*
-                final StorageReference getKenaProfileRef = storageRef.child("users/" + key + "/profile.txt");
-                getKenaProfileRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                    @Override
-                    public void onSuccess(byte[] bytes) {
-
-                        try {
-                            kenaUserObjList.put(key, new Gson().fromJson(new String(bytes, "UTF-8"), User.class));
-                            Log.d(TAG, "findOtherUserLocation Gson From Json");
-                            for (int i = 0; i < kenaUserObjList.size(); i++) {
-//                                kenaParkerName = kenaUserObjList.get(i).getUserName().getFirstName() + kenaUserObjList.get(i).getUserName().getLastName();
-//                                kenaCarModel = kenaUserObjList.get(i).getUserCar().getCarBrand() + kenaUserObjList.get(i).getUserCar().getCarModel();
-//                                kenaCarPlateNumber = kenaUserObjList.get(i).getUserCar().getCarPlate();
-//                                kenaCarColor = kenaUserObjList.get(i).getUserCar().getCarColour();
+                    }).addOnCompleteListener(new OnCompleteListener<byte[]>() {
+                        @Override
+                        public void onComplete(@NonNull Task<byte[]> task) {
+                            final MarkerTag yourMarkerTag = new MarkerTag();
+                            yourMarkerTag.setUID(key);
+                            if (!kenaParkerName.equals("")) {
+                                yourMarkerTag.setKenaParkerName(kenaParkerName);
                             }
+                            if (!kenaCarColor.equals("") || !kenaCarModel.equals("") || !kenaCarPlateNumber.equals(""))
+                                yourMarkerTag.setKenaParkerCarDetails(kenaCarColor + " " + kenaCarModel + " (" + kenaCarPlateNumber + ") ");
 
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Log.d(TAG, "fragment is not created, exception: " + exception);
-                    }
-                }).addOnCompleteListener(new OnCompleteListener<byte[]>() {
-                    @Override
-                    public void onComplete(@NonNull Task<byte[]> task) {
-                        final MarkerTag yourMarkerTag = new MarkerTag();
-                        yourMarkerTag.setUID(key);
-//                        yourMarkerTag.setKenaParkerName(kenaUserObjList.get(key).getUserName() + " " + kenaUserObjList.get(key).getUserName().getLastName());
-//                        yourMarkerTag.setKenaParkerCarDetails(kenaCarColor + " " + kenaCarModel + " (" + kenaCarPlateNumber + ") ");
+                            if (!key.equals(currentUserID)) {
+                                matchmakingRef.child(key).child("adatem").addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        try {
+                                            String adatemValue = dataSnapshot.getValue().toString();
+                                            if (adatemValue.equals(ADATEM0)) {
+                                                Marker marker = mMap.addMarker(new MarkerOptions()
+                                                        .position(new LatLng(location.latitude, location.longitude))
+                                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 
-                        if (!key.equals(currentUserID)) {
-                            matchmakingRef.child(key).child("adatem").addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    try {
-                                        String adatemValue = dataSnapshot.getValue().toString();
-                                        if (adatemValue.equals(ADATEM0)) {
-                                            Marker marker = mMap.addMarker(new MarkerOptions()
-                                                    .position(new LatLng(location.latitude, location.longitude))
-                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-
-                                            mStringMarkerMap.put(key, marker);
-                                            marker.setTag(yourMarkerTag);
-                                            kenaMarkerArrayList.add(marker);
-                                            for (int i = 0; i < kenaMarkerArrayList.size(); i++)
-                                                if (!mStringMarkerMap.containsValue(kenaMarkerArrayList.get(i))) {
-                                                    kenaMarkerArrayList.get(i).remove();
-                                                    kenaMarkerArrayList.remove(i);
-                                                }
-
-                                            // For Search Button To Search
-                                            if (!oldArrayList.contains(key)) {
-                                                newArrayList.add(key);
-                                                newHashSet.addAll(newArrayList);
-                                                newArrayList.clear();
-                                                newArrayList.addAll(newHashSet);
-                                                newHashSet.clear();
-                                                Log.d(TAG, "newArrayList consist of " + newArrayList);
-                                            }
-
-                                        } else if (!adatemValue.equals(ADATEM0)) {
-
-                                            if (adatemValue.equals(ADATEM1)) {
-                                                matchmakingRef.child(key).child("peterParker").addValueEventListener(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        try {
-                                                            String peterParkerValue = dataSnapshot.getValue().toString();
-                                                            if (peterParkerValue.equals(currentUserID)) {
-//                                                            Marker marker = mMap.addMarker(new MarkerOptions()
-//                                                                    .position(new LatLng(location.latitude, location.longitude))
-//                                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-//                                                            marker.showInfoWindow();
-//                                                            mStringMarkerMap.put(key, marker);
-//                                                            marker.setTag(yourMarkerTag);
-//                                                            kenaMarkerArrayList.add(marker);
-//                                                            for (int i = 0; i < kenaMarkerArrayList.size(); i++)
-//                                                                if (!mStringMarkerMap.containsValue(kenaMarkerArrayList.get(i))) {
-//                                                                    kenaMarkerArrayList.get(i).remove();
-//                                                                    kenaMarkerArrayList.remove(i);
-//                                                                }
-                                                            } else {
-                                                                Marker marker = mStringMarkerMap.get(key);
-                                                                if (marker != null) {
-                                                                    marker.remove();
-                                                                    mStringMarkerMap.remove(key);
-                                                                    Log.d(TAG, "onDataChange: marker has been removed " + marker);
-                                                                }
-                                                                if (newArrayList.contains(key)) {
-                                                                    // For Search Button To Search
-                                                                    newArrayList.remove(key);
-                                                                    newHashSet.addAll(newArrayList);
-                                                                    newArrayList.clear();
-                                                                    newArrayList.addAll(newHashSet);
-                                                                    newHashSet.clear();
-                                                                    Log.d(TAG, "newArrayList consist of " + newArrayList);
-                                                                }
-
-                                                                if (oldArrayList.contains(key)) {
-                                                                    oldArrayList.remove(key);
-                                                                    oldHashSet.addAll(oldArrayList);
-                                                                    oldArrayList.clear();
-                                                                    oldArrayList.addAll(oldHashSet);
-                                                                    oldHashSet.clear();
-                                                                    Log.d(TAG, "oldArrayList consist of " + oldArrayList);
-                                                                }
-                                                            }
-                                                        } catch (NullPointerException e) {
-
-                                                        }
+                                                mStringMarkerMap.put(key, marker);
+                                                marker.setTag(yourMarkerTag);
+                                                kenaMarkerArrayList.add(marker);
+                                                for (int i = 0; i < kenaMarkerArrayList.size(); i++)
+                                                    if (!mStringMarkerMap.containsValue(kenaMarkerArrayList.get(i))) {
+                                                        kenaMarkerArrayList.get(i).remove();
+                                                        kenaMarkerArrayList.remove(i);
                                                     }
 
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                    }
-                                                });
-                                            } else {
-                                                Marker marker = mStringMarkerMap.get(key);
-                                                if (marker != null) {
-                                                    marker.remove();
-                                                    mStringMarkerMap.remove(key);
-                                                    Log.d(TAG, "onDataChange: marker has been removed " + marker);
-                                                }
-
-                                                if (newArrayList.contains(key)) {
-                                                    // For Search Button To Search
-                                                    newArrayList.remove(key);
+                                                // For Search Button To Search
+                                                if (!oldArrayList.contains(key)) {
+                                                    newArrayList.add(key);
                                                     newHashSet.addAll(newArrayList);
                                                     newArrayList.clear();
                                                     newArrayList.addAll(newHashSet);
@@ -1392,155 +1272,108 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                                                     Log.d(TAG, "newArrayList consist of " + newArrayList);
                                                 }
 
-                                                if (oldArrayList.contains(key)) {
-                                                    oldArrayList.remove(key);
-                                                    oldHashSet.addAll(oldArrayList);
-                                                    oldArrayList.clear();
-                                                    oldArrayList.addAll(oldHashSet);
-                                                    oldHashSet.clear();
-                                                    Log.d(TAG, "oldArrayList consist of " + oldArrayList);
+                                            } else if (!adatemValue.equals(ADATEM0)) {
+
+                                                if (adatemValue.equals(ADATEM1)) {
+                                                    matchmakingRef.child(key).child("peterParker").addValueEventListener(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                            try {
+                                                                String peterParkerValue = dataSnapshot.getValue().toString();
+                                                                if (peterParkerValue.equals(currentUserID)) {
+//                                                            Marker marker = mMap.addMarker(new MarkerOptions()
+//                                                                    .position(new LatLng(location.latitude, location.longitude))
+//                                                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+//                                                            marker.showInfoWindow();
+//                                                            mStringMarkerMap.put(key, marker);
+//                                                            marker.setTag(yourMarkerTag);
+//                                                            kenaMarkerArrayList.add(marker);
+//                                                            for (int i = 0; i < kenaMarkerArrayList.size(); i++)
+//                                                                if (!mStringMarkerMap.containsValue(kenaMarkerArrayList.get(i))) {
+//                                                                    kenaMarkerArrayList.get(i).remove();
+//                                                                    kenaMarkerArrayList.remove(i);
+//                                                                }
+                                                                } else {
+                                                                    Marker marker = mStringMarkerMap.get(key);
+                                                                    if (marker != null) {
+                                                                        marker.remove();
+                                                                        mStringMarkerMap.remove(key);
+                                                                        Log.d(TAG, "onDataChange: marker has been removed " + marker);
+                                                                    }
+                                                                    if (newArrayList.contains(key)) {
+                                                                        // For Search Button To Search
+                                                                        newArrayList.remove(key);
+                                                                        newHashSet.addAll(newArrayList);
+                                                                        newArrayList.clear();
+                                                                        newArrayList.addAll(newHashSet);
+                                                                        newHashSet.clear();
+                                                                        Log.d(TAG, "newArrayList consist of " + newArrayList);
+                                                                    }
+
+                                                                    if (oldArrayList.contains(key)) {
+                                                                        oldArrayList.remove(key);
+                                                                        oldHashSet.addAll(oldArrayList);
+                                                                        oldArrayList.clear();
+                                                                        oldArrayList.addAll(oldHashSet);
+                                                                        oldHashSet.clear();
+                                                                        Log.d(TAG, "oldArrayList consist of " + oldArrayList);
+                                                                    }
+                                                                }
+                                                            } catch (NullPointerException e) {
+
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                        }
+                                                    });
+                                                } else {
+                                                    Marker marker = mStringMarkerMap.get(key);
+                                                    if (marker != null) {
+                                                        marker.remove();
+                                                        mStringMarkerMap.remove(key);
+                                                        Log.d(TAG, "onDataChange: marker has been removed " + marker);
+                                                    }
+
+                                                    if (newArrayList.contains(key)) {
+                                                        // For Search Button To Search
+                                                        newArrayList.remove(key);
+                                                        newHashSet.addAll(newArrayList);
+                                                        newArrayList.clear();
+                                                        newArrayList.addAll(newHashSet);
+                                                        newHashSet.clear();
+                                                        Log.d(TAG, "newArrayList consist of " + newArrayList);
+                                                    }
+
+                                                    if (oldArrayList.contains(key)) {
+                                                        oldArrayList.remove(key);
+                                                        oldHashSet.addAll(oldArrayList);
+                                                        oldArrayList.clear();
+                                                        oldArrayList.addAll(oldHashSet);
+                                                        oldHashSet.clear();
+                                                        Log.d(TAG, "oldArrayList consist of " + oldArrayList);
+                                                    }
                                                 }
                                             }
+                                        } catch (NullPointerException e) {
+
                                         }
-                                    } catch (NullPointerException e) {
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                     }
-                                }
+                                });
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-
+                            }
                         }
-                    }
-                });*/
+                    });
+                } catch (NullPointerException e) {
 
-
-//                if (!key.equals(currentUserID)) {
-//                    matchmakingRef.child(key).child("adatem").addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                            try {
-//                                adatemValue = dataSnapshot.getValue().toString();
-//
-//                                if (oldArrayList.contains(key)) {
-//                                    //do nothing
-//                                    if (!adatemValue.equals(ADATEM0)) {
-//                                        oldArrayList.remove(key);
-//                                        Log.d(TAG, key + " has been removed due to becoming not 0, oldArrayList consist of " + oldArrayList);
-//                                    }
-//                                } else if (adatemValue.equals(ADATEM0)) {
-//
-//                                    setKenaMarkers(new LatLng(location.latitude, location.longitude), key, ADATEM0);
-//
-//                                    if (!oldArrayList.contains(key)) {
-//                                        newArrayList.add(key);
-//                                        newHashSet.addAll(newArrayList);
-//                                        newArrayList.clear();
-//                                        newArrayList.addAll(newHashSet);
-//                                        newHashSet.clear();
-//
-//                                        Log.d(TAG, "newArrayList consist of " + newArrayList);
-//                                    }
-//
-//                                } else if (!adatemValue.equals(ADATEM0)) {
-//
-//                                    Log.d(TAG, key + " adatem has become not 0, removed from newArrayList");
-//
-//                                    newArrayList.remove(key);
-//                                    newHashSet.addAll(newArrayList);
-//                                    newArrayList.clear();
-//                                    newArrayList.addAll(newHashSet);
-//                                    newHashSet.clear();
-//                                    if (adatemValue.equals(ADATEM1)) {
-//                                        matchmakingRef.child(key).child("peterParker").addValueEventListener(new ValueEventListener() {
-//                                            @Override
-//                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                                try {
-//                                                    String selfPeterParkerA = dataSnapshot.getValue().toString();
-//
-//                                                    if (selfPeterParkerA.equals(currentUserID)) {
-//                                                        LatLng locationA = new LatLng(location.latitude, location.longitude);
-//                                                        final MarkerTag yourMarkerTag = new MarkerTag();
-//                                                        yourMarkerTag.setUID(key);
-//                                                        kenaMarker = mMap.addMarker(new MarkerOptions()
-//                                                                .position(locationA)
-//                                                                .snippet(kenaCarColor + " " + kenaCarModel + " (" + kenaCarPlateNumber + ") ")
-//                                                                .title(kenaParkerName)
-//                                                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-//
-//                                                        yourMarkerTag.setYesNoTag("yes");
-//                                                        kenaMarker.setTag(yourMarkerTag);
-//                                                        hasMapMarker.put(key, kenaMarker);
-//
-//                                                        kenaMarker.showInfoWindow();
-//
-//                                                        try {
-//                                                            foundUser = ((MarkerTag) kenaMarker.getTag()).getUID();
-//                                                            Log.d(TAG, "foundUser MarkerTag getUID is " + foundUser);
-//                                                        } catch (NullPointerException e) {
-//
-//                                                        }
-//
-//                                                        hasMapMarker.put(key, kenaMarker);
-//                                                        try {
-//                                                            onPressWhenRedHueIsPresent();
-//                                                        } catch (NullPointerException e) {
-//
-//                                                        }
-//                                                    } else {
-//                                                        removeKenaMarkers(key);
-//                                                    }
-//
-//                                                    kenaMarkerArrayList.add(kenaMarker);
-//                                                    for (int i = 0; i < kenaMarkerArrayList.size(); i++)
-//                                                        if (!hasMapMarker.containsValue(kenaMarkerArrayList.get(i))) {
-//                                                            kenaMarkerArrayList.get(i).remove();
-//                                                            kenaMarkerArrayList.remove(i);
-//                                                            Log.d(TAG, "onDataChange: marker of " + kenaMarkerArrayList.get(i) + " has been removed");
-//                                                            Log.d(TAG, "onDataChange: after remove, kenaMarkerArrayList contains " + kenaMarkerArrayList);
-//                                                        } else {
-//
-//                                                        }
-//
-//                                                } catch (NullPointerException e) {
-//
-//                                                }
-//                                            }
-//
-//                                            @Override
-//                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                                            }
-//                                        });
-//                                    } else {
-//                                        removeKenaMarkers(key);
-//                                    }
-//
-//                                    Log.d(TAG, "newArrayList consist of " + newArrayList);
-//
-//                                } else {
-//                                    Log.d(TAG, "nothing is triggered, newArrayList is not used");
-//                                    //do nothing
-//                                }
-//                            } catch (NullPointerException e) {
-//                                System.out.println(e);
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(DatabaseError databaseError) {
-//
-//                        }
-//                    });
-//                } else {
-//                    //do nothing
-//                    Log.d(TAG, "key is currentUserId, which is " + key + ", so no need to put in newArrrayList");
-//                }
-
+                }
             }
 
 
@@ -1594,36 +1427,41 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
 
     private void searchMarkerForKenaOneByOne() {
-        FragmentManager manager = getSupportFragmentManager();
+        fragManager = getSupportFragmentManager();
         try {
             if (!newArrayList.isEmpty()) {
-                exchangeButtons(shareParkingButton, findParkingButton);
-                markerInMiddle = false;
                 foundUser = newArrayList.get(0);
-                Marker marker = mStringMarkerMap.get(foundUser);
-                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                Log.d(TAG, "searchMarkerForKenaOneByOne: foundUser is " + foundUser);
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), DEFAULT_ZOOM));
-                matchmakingRef.child(foundUser).child("peterParker").setValue(currentUserID);
-                matchmakingRef.child(foundUser).child("adatem").setValue(ADATEM1);
+                matchmakingRef.child(foundUser).child("peterParker").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        String a = dataSnapshot.getValue().toString();
+                        if (a.equals("NotOccupiedByAnyoneYet")) {
+                            markerInMiddle = false;
+                            Marker marker = mStringMarkerMap.get(foundUser);
+                            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                            Log.d(TAG, "searchMarkerForKenaOneByOne: foundUser is " + foundUser);
+//                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), DEFAULT_ZOOM));
+                            matchmakingRef.child(foundUser).child("peterParker").setValue(currentUserID);
+                            matchmakingRef.child(foundUser).child("adatem").setValue(ADATEM1);
+                            String url = getRequestUrl(mk.getPosition(), marker.getPosition());
+                            TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
+                            taskRequestDirections.execute(url);
+                        } else {
+                            newArrayList.remove(foundUser);
+                            searchMarkerForKenaOneByOne();
+                        }
+                    }
 
-                if (userPopUpFragment instanceof UserPopUpFragment) {
-                    userPopUpFragment = new UserPopUpFragment();
-                } else {
-                    userPopUpFragment = new UserPopUpFragment();
-                }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                manager.beginTransaction()
-                        .replace(R.id.popupuser, userPopUpFragment, "userPopUpFragment")
-                        .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-                        .show(userPopUpFragment)
-                        .commit();
+                    }
+                });
 
-                dismissLoading();
             } else if (newArrayList.isEmpty() && !oldArrayList.isEmpty()) {
                 dismissLoading();
                 try {
-                    manager.beginTransaction()
+                    fragManager.beginTransaction()
                             .remove(userPopUpFragment)
                             .commit();
                 } catch (NullPointerException e) {
@@ -1640,6 +1478,208 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
         }
 
+    }
+
+    private String getRequestUrl(LatLng origin, LatLng dest) {
+        //Value of origin
+        String str_org = "origin=" + origin.latitude + "," + origin.longitude;
+        //Value of dest
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+        //Google API key
+        String key = "key=" + getString(R.string.map_api_key);
+        //Build the full param
+        String param = str_org + "&" + str_dest + "&" + key;
+        //Output format
+        String output = "json";
+        //Create url to request
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + param;
+        Log.d(TAG, "getRequestUrl: Direction API url is: " + url);
+        return url;
+    }
+
+    private String requestDirection(String reqUrl) throws IOException {
+        String responseString = "";
+        InputStream inputStream = null;
+        HttpURLConnection httpURLConnection = null;
+        try {
+            URL url = new URL(reqUrl);
+            httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.connect();
+
+            //Get the response result
+            inputStream = httpURLConnection.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            StringBuffer stringBuffer = new StringBuffer();
+            String line = "";
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuffer.append(line);
+            }
+
+            responseString = stringBuffer.toString();
+            bufferedReader.close();
+            inputStreamReader.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            httpURLConnection.disconnect();
+        }
+        return responseString;
+    }
+
+    public class TaskRequestDirections extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String responseString = "";
+            try {
+                responseString = requestDirection(strings[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return responseString;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            //Parse json here
+            TaskParser taskParser = new TaskParser();
+            taskParser.execute(s);
+
+        }
+    }
+
+    public class TaskParser extends AsyncTask<String, Void, List<List<HashMap<String, String>>>> {
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... strings) {
+            JSONObject jsonObject = null;
+            List<List<HashMap<String, String>>> routes = null;
+            try {
+                jsonObject = new JSONObject(strings[0]);
+                DirectionsParser directionsParser = new DirectionsParser();
+                routes = directionsParser.parse(jsonObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> lists) {
+            //Get list route and display it into the map
+
+            ArrayList points = null;
+            PolylineOptions polylineOptions = null;
+
+            for (List<HashMap<String, String>> path : lists) {
+                points = new ArrayList();
+                polylineOptions = new PolylineOptions();
+
+                for (HashMap<String, String> point : path) {
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lon = Double.parseDouble(point.get("lon"));
+
+                    points.add(new LatLng(lat, lon));
+                }
+
+                polylineOptions.addAll(points);
+                polylineOptions.width(15);
+                polylineOptions.color(Color.BLUE);
+                polylineOptions.geodesic(true);
+            }
+
+            if (polylineOptions != null) {
+                line = mMap.addPolyline(polylineOptions);
+                LatLng firstLatLngPoly = (LatLng) points.get(0);
+                LatLng lastLatLngPoly = (LatLng) points.get(points.size() - 1);
+
+                double latDelta = firstLatLngPoly.latitude - lastLatLngPoly.latitude;
+                double lonDelta = firstLatLngPoly.longitude - lastLatLngPoly.longitude;
+
+                double updatedFirstLat;
+                double updatedFirstLon;
+                double updatedLastLat;
+                double updatedLastLon;
+
+                LatLng updatedFirstLatLngPoly;
+                LatLng updatedLastLatLngPoly;
+
+                if (latDelta >= 0 && lonDelta >= 0) {
+                    Log.d(TAG, "onPostExecute: first quadrant");
+                    updatedFirstLat = firstLatLngPoly.latitude + 0.019;
+                    updatedFirstLon = firstLatLngPoly.longitude + 0.005;
+                    updatedLastLat = lastLatLngPoly.latitude - 0.001;
+                    updatedLastLon = lastLatLngPoly.longitude - 0.005;
+                    updatedFirstLatLngPoly = new LatLng(updatedFirstLat, updatedFirstLon);
+                    updatedLastLatLngPoly = new LatLng(updatedLastLat, updatedLastLon);
+                    executeFindParkers(updatedFirstLatLngPoly, updatedLastLatLngPoly);
+                } else if (latDelta < 0 && lonDelta >= 0) {
+                    Log.d(TAG, "onPostExecute: second quadrant");
+                    updatedFirstLat = firstLatLngPoly.latitude + 0.015;
+                    updatedFirstLon = firstLatLngPoly.longitude + 0.005;
+                    updatedLastLat = lastLatLngPoly.latitude - 0.005;
+                    updatedLastLon = lastLatLngPoly.longitude - 0.005;
+                    updatedFirstLatLngPoly = new LatLng(updatedFirstLat, updatedFirstLon);
+                    updatedLastLatLngPoly = new LatLng(updatedLastLat, updatedLastLon);
+                    executeFindParkers(updatedFirstLatLngPoly, updatedLastLatLngPoly);
+                } else if (latDelta < 0 && lonDelta < 0) {
+                    Log.d(TAG, "onPostExecute: third quadrant");
+                    updatedFirstLat = firstLatLngPoly.latitude - 0.005;
+                    updatedFirstLon = firstLatLngPoly.longitude - 0.005;
+                    updatedLastLat = lastLatLngPoly.latitude + 0.015;
+                    updatedLastLon = lastLatLngPoly.longitude + 0.005;
+                    updatedFirstLatLngPoly = new LatLng(updatedFirstLat, updatedFirstLon);
+                    updatedLastLatLngPoly = new LatLng(updatedLastLat, updatedLastLon);
+                    executeFindParkers(updatedFirstLatLngPoly, updatedLastLatLngPoly);
+                } else if (latDelta >= 0 && lonDelta < 0) {
+                    Log.d(TAG, "onPostExecute: four quadrant");
+                    updatedFirstLat = firstLatLngPoly.latitude + 0.05;
+                    updatedFirstLon = firstLatLngPoly.longitude - 0.005;
+                    updatedLastLat = lastLatLngPoly.latitude + 0.03;
+                    updatedLastLon = lastLatLngPoly.longitude + 0.005;
+                    updatedFirstLatLngPoly = new LatLng(updatedFirstLat, updatedFirstLon);
+                    updatedLastLatLngPoly = new LatLng(updatedLastLat, updatedLastLon);
+                    executeFindParkers(updatedFirstLatLngPoly, updatedLastLatLngPoly);
+                }
+
+            } else {
+                Log.d(TAG, "onPostExecute: polylineOptions Directions not found! ");
+            }
+
+        }
+    }
+
+    private void executeFindParkers(LatLng org, LatLng dest) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(org);
+        builder.include(dest);
+        // Add your locations to bounds using builder.include, maybe in a loop
+        LatLngBounds bounds = builder.build();
+        //Then construct a cameraUpdate
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 0);
+        //Then move the camera
+        mMap.animateCamera(cameraUpdate);
+//                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom((LatLng)points.get(points.size()/2),DEFAULT_ZOOM+10f));
+        exchangeButtons(shareParkingButton, findParkingButton);
+        if (userPopUpFragment instanceof UserPopUpFragment) {
+            userPopUpFragment = new UserPopUpFragment();
+        } else {
+            userPopUpFragment = new UserPopUpFragment();
+        }
+
+        fragManager.beginTransaction()
+                .replace(R.id.popupuser, userPopUpFragment, "userPopUpFragment")
+                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                .show(userPopUpFragment)
+                .commit();
+
+        dismissLoading();
     }
 
     private void setKenaMarker(LatLng thisLocation) {
@@ -1679,34 +1719,32 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         return (deg * Math.PI / 180.0);
     }
 
-    int markerCount = 0;
-    private Marker mk = null;
-    boolean markerInMiddle = false;
+
 
     // Add A Map Pointer To The MAp
     public void addMarker(GoogleMap googleMap, double lat, double lon) {
 
         LatLng latlong = new LatLng(lat, lon);
-
-        if (markerCount == 1 && markerInMiddle == true) {
-            animateMarker(peterParker, mk);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlong, DEFAULT_ZOOM));
-
-        } else if (markerCount == 1 && markerInMiddle == false) {
-            animateMarker(peterParker, mk);
+        if (markerCount == 1) {
+            animateMarker(latlong.latitude, latlong.longitude, mk);
+//            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlong, DEFAULT_ZOOM));
+//            updateCameraBearing(googleMap, lat, lon,latlong);
         } else if (markerCount == 0) {
             //Set Custom BitMap for Pointer
+            String url = getRequestMarkerUrl(latlong);
+            TaskRequestMarkerDirections taskRequestMarkerDirections = new TaskRequestMarkerDirections();
+            taskRequestMarkerDirections.execute(url);
+            LatLng latalonga = taskRequestMarkerDirections.getLatLng();
+            Log.d(TAG, "addMarker: latalonga is " + latalonga);
             int height = 70;
             int width = 70;
             BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.mipmap.gps_arrow_icon);
             Bitmap b = bitmapdraw.getBitmap();
             Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
-            mMap = googleMap;
-
             mk = mMap.addMarker(new MarkerOptions().position(latlong)
                     .icon(BitmapDescriptorFactory.fromBitmap((smallMarker))));
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latlong, DEFAULT_ZOOM, DEFAULT_TILT, 0)));
-            //Set Marker Count to 1 after first marker is created
+
             markerCount = 1;
             markerInMiddle = true;
             final MarkerTag yourMarkerTag = new MarkerTag();
@@ -1740,18 +1778,94 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         pinMk = mMap.addMarker(new MarkerOptions().position(latlong)
                 .icon(BitmapDescriptorFactory.fromBitmap((smallMarker))));
 //        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latlong, DEFAULT_ZOOM, DEFAULT_TILT, 0)));
-
         final MarkerTag yourPinMarkerTag = new MarkerTag();
         yourPinMarkerTag.setUID(null);
         pinMk.setTag(yourPinMarkerTag);
     }
 
-    public static void animateMarker(final Location destination, final Marker marker) {
+    private String getRequestMarkerUrl(LatLng markerLocation) {
+        //Value of marker location
+        String point = "points=" + markerLocation.latitude + "," + markerLocation.longitude;
+        //Google API key
+        String key = "key=" + getString(R.string.map_api_key);
+        //Create url to request
+        String url = "https://roads.googleapis.com/v1/nearestRoads?" + point + "&" + key;
+        Log.d(TAG, "getRequestMarkerUrl: Direction API url is: " + url);
+        return url;
+    }
+
+//    @SuppressLint("StaticFieldLeak")
+//    public class TaskRequestMarkerDirections extends AsyncTask<String, Void, String> {
+//
+//        @Override
+//        protected String doInBackground(String... strings) {
+//            String responseString = "";
+//            try {
+//                responseString = requestDirection(strings[0]);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            Log.d(TAG, "doInBackground: Success! JSON is " + responseString);
+//            return responseString;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String s) {
+//            super.onPostExecute(s);
+//            //Parse json here
+//            TaskParserMarker taskParser = new TaskParserMarker();
+//            taskParser.execute(s);
+//
+//        }
+//    }
+
+//    public class TaskParserMarker extends AsyncTask<String, Void, LatLng> {
+//        @Override
+//        protected LatLng doInBackground(String... strings) {
+//            JSONObject jsonObject = null;
+//            LatLng routes = null;
+//            try {
+//                jsonObject = new JSONObject(strings[0]);
+//                RoadsParser roadsParser = RoadsParser.fromJson(jsonObject);
+//                routes = roadsParser.getLatLng();
+////                Log.d(TAG, "doInBackground: JSON do in background is " + jsonObject);
+////                String gsonLatLng = (new Gson().fromJson(jsonObject, LatLng.class));
+////                RoadsParser roadsParser = new RoadsParser();
+////                routes.add((List<HashMap<Double, Double>>) roadsParser.parse(jsonObject));
+//                Log.d(TAG, "doInBackground: routes are " + routes);
+//                return routes;
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//                return null;
+//            }
+//
+//        }
+//
+//        @Override
+//        protected void onPostExecute(LatLng latLng) {
+//            Log.d(TAG, "onPostExecute: latlong to plot own marker is " + latLng);
+//            executePlotOwnMarker(latLng);
+//
+//        }
+//    }
+
+    int markerCount = 0;
+    private Marker mk = null;
+    boolean markerInMiddle = false;
+
+    private void executePlotOwnMarker(LatLng latLng) {
+
+    }
+
+    public static void animateMarker(final double lat, final double lon, final Marker marker) {
         if (marker != null) {
             final LatLng startPosition = marker.getPosition();
-            final LatLng endPosition = new LatLng(destination.getLatitude(), destination.getLongitude());
+            final LatLng endPosition = new LatLng(lat, lon);
 
             final float startRotation = marker.getRotation();
+            final Location destination = new Location("");
+            destination.setLatitude(lat);
+            destination.setLongitude(lon);
 
             final MapsMainActivity.LatLngInterpolator latLngInterpolator = new MapsMainActivity.LatLngInterpolator.LinearFixed();
             ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
@@ -1792,6 +1906,163 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         return (result + 360) % 360;
     }
 
+    private interface LatLngInterpolator {
+        LatLng interpolate(float fraction, LatLng a, LatLng b);
+
+        class LinearFixed implements MapsMainActivity.LatLngInterpolator {
+            @Override
+            public LatLng interpolate(float fraction, LatLng a, LatLng b) {
+                double lat = (b.latitude - a.latitude) * fraction + a.latitude;
+                double lngDelta = b.longitude - a.longitude;
+                // Take the shortest path across the 180th meridian.
+                if (Math.abs(lngDelta) > 180) {
+                    lngDelta -= Math.signum(lngDelta) * 360;
+                }
+                double lng = lngDelta * fraction + a.longitude;
+                return new LatLng(lat, lng);
+            }
+        }
+    }
+
+    double bearing;
+    float floatBearing;
+
+    private void updateCameraBearing(GoogleMap googleMap, double lat, double lng, LatLng latLng) {
+        Log.d(TAG, "updateCameraBearing: is called");
+        Log.d(TAG, "updateCameraBearing: lat is " + lat + " while latitude is " + latitude);
+        Log.d(TAG, "updateCameraBearing: lng is " + lng + " while longitude is " + longitude);
+        if (googleMap == null) return;
+        Location oldLoc = new Location("");
+        oldLoc.setLatitude(lat);
+        oldLoc.setLongitude(lng);
+
+        Location newLoc = new Location("");
+        newLoc.setLatitude(latitude);
+        newLoc.setLongitude(longitude);
+
+        double xAxisDiff = longitude - lng;
+        double yAxisDiff = latitude - lat;
+
+        Log.d(TAG, "updateCameraBearing: xAxisDiff is " + xAxisDiff);
+        Log.d(TAG, "updateCameraBearing: yAxisDiff is " + yAxisDiff);
+
+        bearing = oldLoc.bearingTo(newLoc);
+        floatBearing = (float) bearing;
+        Log.d(TAG, "updateCameraBearing: bearing is " + floatBearing);
+        CameraPosition cam = CameraPosition.builder()
+                .target(latLng)
+                .zoom(DEFAULT_ZOOM)
+                .bearing(floatBearing)
+                .tilt(DEFAULT_TILT)
+                .build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cam));
+
+//            if (xAxisDiff > 0 && yAxisDiff > 0) {
+//                Log.d(TAG, "updateCameraBearing: first quadrant is triggered");
+//                double hypotenuse = Math.sqrt(xAxisDiff * xAxisDiff + yAxisDiff * yAxisDiff);
+////                bearing = Math.sin(Math.abs(xAxisDiff) / hypotenuse);
+//                float floatBearing = (float) bearing;
+//                Log.d(TAG, "updateCameraBearing: bearing is " + floatBearing);
+//                CameraPosition cam = CameraPosition.builder()
+//                        .target(latLng)
+//                        .zoom(DEFAULT_ZOOM)
+//                        .bearing(floatBearing)
+//                        .tilt(DEFAULT_TILT)
+//                        .build();
+//                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cam),2000,null);
+//            } else if (xAxisDiff > 0 && yAxisDiff == 0) {
+//                Log.d(TAG, "updateCameraBearing: first quadrant has finished");
+////                bearing = 90;
+//                float floatBearing = (float) bearing;
+//                Log.d(TAG, "updateCameraBearing: bearing is " + floatBearing);
+//                CameraPosition cam = CameraPosition.builder()
+//                        .target(latLng)
+//                        .zoom(DEFAULT_ZOOM)
+//                        .bearing(floatBearing)
+//                        .tilt(DEFAULT_TILT)
+//                        .build();
+//                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cam),2000,null);
+//            } else if (xAxisDiff > 0 && yAxisDiff < 0) {
+//                Log.d(TAG, "updateCameraBearing: second quadrant is triggered");
+//                double hypotenuse = Math.sqrt(xAxisDiff * xAxisDiff + yAxisDiff * yAxisDiff);
+////                bearing = 90 + Math.sin(Math.abs(yAxisDiff) / hypotenuse);
+//                float floatBearing = (float) bearing;
+//                Log.d(TAG, "updateCameraBearing: bearing is " + floatBearing);
+//                CameraPosition cam = CameraPosition.builder()
+//                        .target(latLng)
+//                        .zoom(DEFAULT_ZOOM)
+//                        .bearing(floatBearing)
+//                        .tilt(DEFAULT_TILT)
+//                        .build();
+//                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cam),2000,null);
+//            } else if (xAxisDiff == 0 && yAxisDiff < 0) {
+//                Log.d(TAG, "updateCameraBearing: second quadrant has finished");
+////                bearing = 180;
+//                float floatBearing = (float) bearing;
+//                Log.d(TAG, "updateCameraBearing: bearing is " + floatBearing);
+//                CameraPosition cam = CameraPosition.builder()
+//                        .target(latLng)
+//                        .zoom(DEFAULT_ZOOM)
+//                        .bearing(floatBearing)
+//                        .tilt(DEFAULT_TILT)
+//                        .build();
+//                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cam),2000,null);
+//            } else if (xAxisDiff < 0 && yAxisDiff < 0) {
+//                Log.d(TAG, "updateCameraBearing: third quadrant is triggered");
+//                double hypotenuse = Math.sqrt(xAxisDiff * xAxisDiff + yAxisDiff * yAxisDiff);
+////                bearing = - 90 - Math.sin(Math.abs(yAxisDiff) / hypotenuse);
+//                float floatBearing = (float) bearing;
+//                Log.d(TAG, "updateCameraBearing: bearing is " + floatBearing);
+//                CameraPosition cam = CameraPosition.builder()
+//                        .target(latLng)
+//                        .zoom(DEFAULT_ZOOM)
+//                        .bearing(floatBearing)
+//                        .tilt(DEFAULT_TILT)
+//                        .build();
+//                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cam),2000,null);
+//            } else if (xAxisDiff < 0 && yAxisDiff == 0) {
+//                Log.d(TAG, "updateCameraBearing: third quadrant has finished");
+////                bearing = -90;
+//                float floatBearing = (float) bearing;
+//                Log.d(TAG, "updateCameraBearing: bearing is " + floatBearing);
+//                CameraPosition cam = CameraPosition.builder()
+//                        .target(latLng)
+//                        .zoom(DEFAULT_ZOOM)
+//                        .bearing(floatBearing)
+//                        .tilt(DEFAULT_TILT)
+//                        .build();
+//                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cam),2000,null);
+//            } else if (xAxisDiff < 0 && yAxisDiff > 0) {
+//                Log.d(TAG, "updateCameraBearing: fourth quadrant is triggered");
+//                double hypotenuse = Math.sqrt(xAxisDiff * xAxisDiff + yAxisDiff * yAxisDiff);
+////                bearing = 360 - Math.sin(Math.abs(xAxisDiff) / hypotenuse);
+//                float floatBearing = (float) bearing;
+//                Log.d(TAG, "updateCameraBearing: bearing is " + floatBearing);
+//                CameraPosition cam = CameraPosition.builder()
+//                        .target(latLng)
+//                        .zoom(DEFAULT_ZOOM)
+//                        .bearing(floatBearing)
+//                        .tilt(DEFAULT_TILT)
+//                        .build();
+//                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cam),2000,null);
+//            } else if (xAxisDiff == 0 && yAxisDiff > 0) {
+//                Log.d(TAG, "updateCameraBearing: fourth quadrant has finished");
+////                bearing = 0;
+//                float floatBearing = (float) bearing;
+//                Log.d(TAG, "updateCameraBearing: bearing is " + floatBearing);
+//                CameraPosition cam = CameraPosition.builder()
+//                        .target(latLng)
+//                        .zoom(DEFAULT_ZOOM)
+//                        .bearing(floatBearing)
+//                        .tilt(DEFAULT_TILT)
+//                        .build();
+//                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cam),2000,null);
+//            } else if (xAxisDiff == 0 && yAxisDiff == 0) {
+//
+//            }
+
+    }
+
     @Override
     public void onCameraMoveStarted(int reason) {
         if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
@@ -1808,6 +2079,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         this.position = position;
         if (this.position == 123) {
             Log.d(TAG, "this position is really " + position);
+            showLoading();
             searchMarkerForKenaOneByOne();
             this.position = 0;
         } else {
@@ -1826,24 +2098,6 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         }
     }
 
-
-    private interface LatLngInterpolator {
-        LatLng interpolate(float fraction, LatLng a, LatLng b);
-
-        class LinearFixed implements MapsMainActivity.LatLngInterpolator {
-            @Override
-            public LatLng interpolate(float fraction, LatLng a, LatLng b) {
-                double lat = (b.latitude - a.latitude) * fraction + a.latitude;
-                double lngDelta = b.longitude - a.longitude;
-                // Take the shortest path across the 180th meridian.
-                if (Math.abs(lngDelta) > 180) {
-                    lngDelta -= Math.signum(lngDelta) * 360;
-                }
-                double lng = lngDelta * fraction + a.longitude;
-                return new LatLng(lat, lng);
-            }
-        }
-    }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
@@ -1900,25 +2154,24 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         DrawerLayout mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (mDrawer.isDrawerOpen(GravityCompat.START)) {
             mDrawer.closeDrawer(GravityCompat.START);
-        } else if (fragment != null ){
+        } else if (fragment != null) {
 
 
-            Log.d("backpress","Back Pressed when fragment is " + fragment  );
+            Log.d("backpress", "Back Pressed when fragment is " + fragment);
 //            navFragmentManager = getFragmentManager();
 //            ft = navFragmentManager.beginTransaction();
 
 
-
-//            Log.d(TAG, "onBackPressed: Showbrandoffervisibl " + BrandsOfferFragment.showBrandOffer1.isVisible());
-//            navFragmentManager.popBackStack();
+//            Log.d(TAG, "onBackPressed: Showbrandoffervisibl " + BrandsOfferFragment1.showBrandOffer1.isVisible());
+            navFragmentManager.popBackStack();
 
             mapContainer.setVisibility(View.VISIBLE);
             toolbar.setTitle("Map");
-                            // Update your UI here.
+            // Update your UI here.
 //                            ft.remove(userProfilePage);
 //                            ft.replace(R.id.map_page_container,null);
 //                            ft.commit();
-            fragment=null;
+            fragment = null;
             oldMenuItem = null;
 
 
@@ -1931,14 +2184,15 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         try {
             matchmakingRef.child(foundUser).child("adatem").setValue(ADATEM0);
             matchmakingRef.child(foundUser).child("peterParker").setValue("NotOccupiedByAnyoneYet");
-            FragmentManager manager = getSupportFragmentManager();
-            manager.popBackStack();
-            FragmentTransaction transaction = manager.beginTransaction();
+
+            fragManager.popBackStack();
+            FragmentTransaction transaction = fragManager.beginTransaction();
             transaction.remove(MapsMainActivity.userPopUpFragment);
             Log.d(TAG, "userPopUpFragment is removed");
             Log.d(TAG, "userPopUpFragment and userPopUpFragment1 is removed");
             findOtherUsersLocation();
             transaction.commit();
+            line.remove();
         } catch (NullPointerException e) {
 
         }
