@@ -1,6 +1,7 @@
 package com.opark.opark;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -49,6 +50,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -80,11 +82,12 @@ public class LoadingScreen extends AppCompatActivity {
     public static double pointsGainedFromLoadingScreen;
     private int pointsToUploadFromLoadingScreen;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.loading_screen);
-
+//        loadingScreenCallback = (LoadingScreenListener) LoadingScreen.LoadingScreenListener.class;
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
         userRewardsFolder = storageRef.child("users/" + currentUserID + "/points.txt");
@@ -114,7 +117,7 @@ public class LoadingScreen extends AppCompatActivity {
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+                public void onClick(View v) {
                 matchmakingRef.child(currentUserID).removeValue();
                 geofireRef.child(currentUserID).removeValue();
                 MapsMainActivity.shareParkingButton.setVisibility(View.VISIBLE);
@@ -127,7 +130,7 @@ public class LoadingScreen extends AppCompatActivity {
         });
     }
 
-    private void ShareUnpinnedLocation(){
+    private void ShareUnpinnedLocation() {
         MapsMainActivity.geoFire.setLocation(currentUserID, new GeoLocation(MapsMainActivity.latitude, MapsMainActivity.longitude), new GeoFire.CompletionListener() {
             @Override
             public void onComplete(String key, DatabaseError error) {
@@ -165,7 +168,7 @@ public class LoadingScreen extends AppCompatActivity {
         });
     }
 
-    private void SharePinnedLocation(){
+    private void SharePinnedLocation() {
         MapsMainActivity.geoFire.setLocation(currentUserID, new GeoLocation(MapsMainActivity.pinnedLatitude, MapsMainActivity.pinnedLongitude), new GeoFire.CompletionListener() {
             @Override
             public void onComplete(String key, DatabaseError error) {

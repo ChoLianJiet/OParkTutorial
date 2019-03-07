@@ -106,14 +106,26 @@ public class TaskRequestMarkerDirections extends AsyncTask<String, Void, String>
         @Override
         protected void onPostExecute(LatLng latLng) {
             Log.d(TAG, "onPostExecute: latlong to plot own marker is " + latLng);
-            setLatLng(latLng);
+            returningLatLng(latLng);
         }
     }
 
-    public void setLatLng(LatLng latLng) {
+//    private String getRequestMarkerUrl(LatLng markerLocation) {
+//        //Value of marker location
+//        String point = "points=" + markerLocation.latitude + "," + markerLocation.longitude;
+//        //Google API key
+//        String key = "key=" + String.valueOf(R.string.map_api_key);
+//        //Create url to request
+//        String url = "https://roads.googleapis.com/v1/nearestRoads?" + point + "&" + key;
+//        Log.d(TAG, "getRequestMarkerUrl: Direction API url is: " + url);
+//        return url;
+//    }
+
+    public LatLng returningLatLng(LatLng latLng) {
         Log.d(TAG, "setLatLng: latlng is " + latLng);
-        mLatLng = latLng;
+//        mLatLng = latLng;
         Log.d(TAG, "setLatLng: mLatLng is now " + mLatLng);
+        return latLng;
     }
 
     public LatLng getLatLng() {
