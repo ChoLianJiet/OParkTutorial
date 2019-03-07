@@ -2348,7 +2348,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         shareParkingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findParkingButton.setOnClickListener(null);
+                
                 setMatchkingFolderInDatabse();
                 shareParkingButton.setVisibility(View.INVISIBLE);
                 findParkingButton.setVisibility(View.INVISIBLE);
