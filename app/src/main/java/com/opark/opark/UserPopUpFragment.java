@@ -28,6 +28,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -221,11 +222,17 @@ public class UserPopUpFragment extends Fragment {
     public void backgroundNotClickable() {
         MapsMainActivity.mMap.getUiSettings().setScrollGesturesEnabled(false);
         MapsMainActivity.mMap.getUiSettings().setZoomGesturesEnabled(false);
+        MapsMainActivity.mMap.setInfoWindowAdapter(null);
+        MapsMainActivity.mMap.setOnInfoWindowLongClickListener(null);
+        MapsMainActivity.mMap.setOnMarkerClickListener(null);
     }
 
     private void declineUser() {
 
-        MapsMainActivity.line.remove();
+        for(Polyline line : MapsMainActivity.lineArray)
+        {
+            line.remove();
+        }
 
         matchmakingRef.child(foundUser).child("adatem").setValue(MapsMainActivity.ADATEM0);
         matchmakingRef.child(foundUser).child("peterParker").setValue("NotOccupiedByAnyoneYet");

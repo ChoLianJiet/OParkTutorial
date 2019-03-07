@@ -1,11 +1,15 @@
 package com.opark.opark;
 
-import android.location.Location;
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.Task;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,13 +19,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
-public class TaskRequestMarkerDirections extends AsyncTask<String, Void, String> {
+
+public class TaskRequestMarkerDirections1 implements Callable<LatLng> {
 
     private static final String TAG = "TaskRequestMarkerDirect";
     private LatLng mLatLng;
 
-    public TaskRequestMarkerDirections() {
+    @Override
+    public LatLng call() throws Exception {
+        return mLatLng;
     }
 
     private String requestDirection(String reqUrl) throws IOException {
@@ -59,30 +67,31 @@ public class TaskRequestMarkerDirections extends AsyncTask<String, Void, String>
         return responseString;
     }
 
-    @Override
-    protected String doInBackground(String... strings) {
-        String responseString = "";
-        try {
-            responseString = requestDirection(strings[0]);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public class TaskRequestMarkerDirections extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String responseString = "";
+            try {
+                responseString = requestDirection(strings[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.d(TAG, "doInBackground: Success! JSON is " + responseString);
+            return responseString;
         }
-        Log.d(TAG, "doInBackground: Success! JSON is " + responseString);
-        return responseString;
-    }
 
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-        //Parse json here
-        TaskParserMarker taskParser = new TaskParserMarker();
-        taskParser.execute(s);
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            //Parse json here
+            TaskParserMarker taskParser = new TaskParserMarker();
+            taskParser.execute(s);
 
+        }
     }
 
     public class TaskParserMarker extends AsyncTask<String, Void, LatLng> {
-
-
         @Override
         protected LatLng doInBackground(String... strings) {
             JSONObject jsonObject = null;
@@ -97,45 +106,30 @@ public class TaskRequestMarkerDirections extends AsyncTask<String, Void, String>
 //                routes.add((List<HashMap<Double, Double>>) roadsParser.parse(jsonObject));
                 Log.d(TAG, "doInBackground: routes are " + routes);
                 return routes;
-            } catch (JSONException e)
-
-            {
+            } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
-            }catch (NullPointerException ee){
-                return null;
-
             }
+
         }
 
         @Override
         protected void onPostExecute(LatLng latLng) {
             Log.d(TAG, "onPostExecute: latlong to plot own marker is " + latLng);
-            returningLatLng(latLng);
+//            executePlotOwnMarker(latLng);
+            setLatLng(latLng);
         }
     }
 
-//    private String getRequestMarkerUrl(LatLng markerLocation) {
-//        //Value of marker location
-//        String point = "points=" + markerLocation.latitude + "," + markerLocation.longitude;
-//        //Google API key
-//        String key = "key=" + String.valueOf(R.string.map_api_key);
-//        //Create url to request
-//        String url = "https://roads.googleapis.com/v1/nearestRoads?" + point + "&" + key;
-//        Log.d(TAG, "getRequestMarkerUrl: Direction API url is: " + url);
-//        return url;
-//    }
-
-    public LatLng returningLatLng(LatLng latLng) {
+    public void setLatLng(LatLng latLng) {
         Log.d(TAG, "setLatLng: latlng is " + latLng);
-//        mLatLng = latLng;
+        mLatLng = latLng;
         Log.d(TAG, "setLatLng: mLatLng is now " + mLatLng);
-        return latLng;
+        getLatLng();
     }
 
     public LatLng getLatLng() {
         Log.d(TAG, "getLatLng: latlng is " + mLatLng);
         return mLatLng;
     }
-
 }

@@ -5,6 +5,7 @@ android {
     compileSdkVersion 27
     buildToolsVersion '28.0.3'
     defaultConfig {
+
         applicationId "com.opark.opark"
         minSdkVersion 26
 
@@ -17,6 +18,14 @@ android {
 
         android {
             defaultConfig {
+                splits {
+                    abi {
+                        enable true
+                        reset()
+                        include 'x86', 'armeabi-v7a', 'x86_64'
+                        universalApk true
+                    }
+                }
                 multiDexEnabled true
             }
         }
@@ -111,6 +120,9 @@ android {
         implementation "io.reactivex.rxjava2:rxjava:2.2.6"
 
         implementation 'com.github.FrangSierra:RxFirebase:1.5.6'
+
+        // Library to get JSON through URL
+        implementation 'com.loopj.android:android-async-http:1.4.9'
 
     }
 
