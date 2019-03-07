@@ -46,6 +46,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.opark.opark.AdminActivity;
 import com.opark.opark.BuildConfig;
 import com.opark.opark.R;
 import com.opark.opark.UserProfileSetup;
@@ -197,6 +198,8 @@ public class EmailLogin extends Fragment {
 
                         handleFacebookAccessToken(loginResult.getAccessToken());
                         FirebaseUser user = mAuth.getCurrentUser();
+
+
                         updateUI(user);
                     }
 
@@ -233,6 +236,9 @@ public class EmailLogin extends Fragment {
                 final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 Log.d("EmailLogin", "updateUI: currentUserID" + currentUserID);
                 currentMerchantEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+
+
 
                 checkIsMerchantOrUser(currentUserID);
 
@@ -338,11 +344,15 @@ public class EmailLogin extends Fragment {
                 Log.d("login", "user logged in");
                 Log.d("urlget", "uri: " + uri.toString());
 
-                Intent intent = new Intent(getActivity(), MapsMainActivity.class);
-                intent.putExtra("firebaseUser", userID);
-                getActivity().finish();
-                startActivity(intent);
+                try {
 
+                    Intent intent = new Intent(getActivity(), MapsMainActivity.class);
+                    intent.putExtra("firebaseUser", userID);
+                    getActivity().finish();
+                    startActivity(intent);
+                } catch (NullPointerException e ){
+
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -475,8 +485,14 @@ public class EmailLogin extends Fragment {
                 } else {
                     FirebaseUser currentUser = mAuth.getCurrentUser();
 
-                    updateUI(currentUser);
 
+                    if (FirebaseAuth.getInstance().getCurrentUser().getEmail().equals("oparkadmin1@admin.com")){
+                        Intent adminIntent = new Intent(getActivity(),AdminActivity.class);
+                        getActivity().finish();
+                        startActivity(adminIntent);
+                    }else {
+                        updateUI(currentUser);
+                    }
                 }
             }
         });

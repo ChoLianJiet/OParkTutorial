@@ -27,7 +27,7 @@ public class RewardsPocketAdapter extends RecyclerView.Adapter<RewardsPocketAdap
         TextView merchantOfferTitle;
         TextView merchantName;
         TextView merchantNumber;
-        TextView merchantAddress;
+        TextView merchantFirst,merchantSecond,merchantCity,merchantState,merchantPostcode;
         TextView rewardsRedemptionCode;
         ImageView merchantOfferImage;
 
@@ -39,7 +39,11 @@ public class RewardsPocketAdapter extends RecyclerView.Adapter<RewardsPocketAdap
             merchantOfferTitle = (TextView) view.findViewById(R.id.r_merchant_offer_title);
             merchantName = (TextView) view.findViewById(R.id.r_merchant_name);
             merchantNumber=view.findViewById(R.id.r_merchant_number);
-            merchantAddress=view.findViewById(R.id.r_merchant_address);
+            merchantFirst=view.findViewById(R.id.merchant_first);
+            merchantSecond=view.findViewById(R.id.merchant_second);
+            merchantCity=view.findViewById(R.id.merchant_city);
+            merchantState= view.findViewById(R.id.merchant_state);
+            merchantPostcode=view.findViewById(R.id.merchant_postcode);
             merchantOfferImage = view.findViewById(R.id.r_merchant_offer_image);
             rewardsRedemptionCode = view.findViewById(R.id.r_redemption_code);
 
@@ -73,7 +77,14 @@ public class RewardsPocketAdapter extends RecyclerView.Adapter<RewardsPocketAdap
 
         holder.merchantOfferTitle.setText(rewardsRedeemedList.get(i).getMerchantOfferTitle());
         holder.merchantName.setText(rewardsRedeemedList.get(i).getMerchantName());
-        holder.merchantAddress.setText(rewardsRedeemedList.get(i).getMerchantAddress());
+        holder.merchantFirst.setText(rewardsRedeemedList.get(i).getMerchantAddress().getFirstline());
+        holder.merchantSecond.setText(rewardsRedeemedList.get(i).getMerchantAddress().getSecondline());
+        holder.merchantCity.setText(rewardsRedeemedList.get(i).getMerchantAddress().getCity());
+        holder.merchantState.setText(rewardsRedeemedList.get(i).getMerchantAddress().getCountryState());
+        holder.merchantPostcode.setText(rewardsRedeemedList.get(i).getMerchantAddress().getPostcode());
+
+
+
         holder.rewardsRedemptionCode.setText(rewardsRedeemedList.get(i).getPreRedemptionCode());
         holder.merchantNumber.setText(rewardsRedeemedList.get(i).getMerchantContact());
 

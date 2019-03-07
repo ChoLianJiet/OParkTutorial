@@ -64,7 +64,7 @@ public class TabLayoutPagerAdapter  extends FragmentPagerAdapter implements Bran
                 return new CategoriesOfferFragment();
             case 2:
 
-                return new BrandsOfferFragment();
+                return new BrandsOfferFragmentHost();
 
 
 

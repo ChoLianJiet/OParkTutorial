@@ -48,11 +48,15 @@ import com.opark.opark.R;
 import com.opark.opark.merchant_side.merchant_class.Merchant;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOfferAdapter;
+import com.opark.opark.model.Address;
 import com.opark.opark.rewards_redemption.ConfirmPreRedeem;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
@@ -84,11 +88,12 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   private  UploadProgressBarDialog uploadProgressBarDialog;
   private String yy,mm,dd;
   public static MerchantOfferAdapter merchantOfferAdapter;
+  private EditText offerDescription;
 
   private String merchantOfferExpiryDate;
   private String merchantCoName;
   private String merchantCoPhone;
-  private String merchantCoAddress;
+  private Address merchantCoAddress;
   public Context mContext;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -145,6 +150,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     uploadButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
+
         uploadFile();
 
 //        setFolderInDatabase();
@@ -190,6 +196,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     offerRedemptionCost=findViewById(R.id.points_cost);
     uploadButton = findViewById(R.id.upload_offer_button);
     offerCategory = findViewById(R.id.offer_category);
+    offerDescription = findViewById(R.id.offer_details);
   }
 
 
@@ -306,6 +313,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   }
 
 
+/*
   private void setFolderInDatabase() {
 
     Merchant thisMerchant = new Merchant(merchantCoName , merchantCoPhone,  currentMerchantEmail, merchantCoAddress);
@@ -327,6 +335,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
     offerlistDatabaseRef.child(offerTitle).setValue(merchantOfferData);
     offerlistDatabaseRef.child(offerTitle).child("redeemCount").setValue(0);
   }
+*/
 
 
 
@@ -351,8 +360,9 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
             merchantCoName = (merchObjList.get(i).getMerchCoName());
             Log.d(TAG, "onSuccess: merch Name" + merchantCoName);
             merchantCoPhone = (merchObjList.get(i).getMerchContact());
-            merchantCoAddress =(merchObjList.get(i).getMerchCoAddress());
+            merchantCoAddress =(merchObjList.get(i).getMerchAddress());
             Log.d(TAG, "Iteration success" + i);
+            Log.d(TAG, "onSuccess:  " + merchObjList.get(i).getMerchAddress());
 
 
           }
@@ -381,7 +391,27 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
 
 
+  public void objToByteStreamUpload(String obj, StorageReference destination){
 
+    String objStr = new Gson().toJson(obj);
+    InputStream in = new ByteArrayInputStream(objStr.getBytes(Charset.forName("UTF-8")));
+    UploadTask uploadTask = destination.putStream(in);
+    uploadTask.addOnFailureListener(new OnFailureListener() {
+      @Override
+      public void onFailure(@NonNull Exception exception) {
+        // Use analytics to find out why is the error
+        // then only implement the best corresponding measures
+
+
+      }
+    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+      @Override
+      public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+        Toast.makeText(getApplicationContext(), "Profile update successful!", Toast.LENGTH_LONG).show();
+        // Use analytics to calculate the success rate
+      }
+    });
+  }
 
 
   private void uploadFile() {
@@ -393,7 +423,12 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
        final StorageReference fileReference = merchantOfferStorageReference.child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("offerImage"
               + "." + getFileExtension(filePath));
 
-       merchantOfferImageRefFromSto = fileReference;
+      final StorageReference descriptionReference =  merchantOfferStorageReference.child("merchants/offerlist/"+ merchantCoName + "/"+offerTitle).child("desc.txt");
+      merchantOfferImageRefFromSto = fileReference;
+
+
+
+       objToByteStreamUpload(offerDescription.getText().toString(),descriptionReference);
 
       mUploadTask = fileReference.putFile(filePath)
               .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -406,6 +441,15 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
                       mProgressBar.setProgress(0);
                       uploadProgressBarDialog.dismiss();
+                      Intent uploadOfferIntent = new Intent(MerchUploadOfferActivity.this, MoreImageUploadActivity.class);
+                      Bundle merchDetails = new Bundle();
+                      merchDetails.putString("merchantname", merchantCoName);
+                      merchDetails.putString("offertitle",offerTitle);
+                      uploadOfferIntent.putExtras(merchDetails);
+
+                      startActivity(uploadOfferIntent);
+
+                      finish();
 
                     }
                   }, 500);
@@ -453,6 +497,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
     final MerchantOffer merchantOfferData = new MerchantOffer();
                   merchantOfferData.setMerchantName(merchantCoName);
+                  merchantOfferData.setMerchantEmail(currentMerchantEmail);
                   merchantOfferData.setMerchantOfferTitle(offerTitle);
                   merchantOfferData.setMerchantAddress(merchantCoAddress);
                   merchantOfferData.setMerchantContact(merchantCoPhone);
@@ -463,6 +508,7 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
                   Log.d(TAG, "setFolderInDatabase: offer image" + offerImageForUpload);
 
 
+    Log.d(TAG, "setUpMerchantOffer:  " + merchantOfferData.getMerchantAddress().getFirstline());
     Log.d("charat", "setUpMerchantOffer: " + merchantCoName.charAt(0));
 
 
@@ -476,7 +522,10 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
 
 
 
-    offerlistDatabaseRef.child(offerTitle).setValue(merchantOfferData);
+    offerlistDatabaseRef.child("offer-waiting-approval/"+offerTitle).setValue(merchantOfferData);
+
+
+
                   String categoryString = offerCategory.getText().toString();
       Log.d(TAG, "setUpMerchantOffer: getText" + offerCategory.getText().toString() );
                   switch(categoryString) {
@@ -524,9 +573,11 @@ public class MerchUploadOfferActivity extends AppCompatActivity {
   private void setUpCategory(String catString, MerchantOffer merchOffer){
 
       Log.d(TAG, "setUpCategory: ");
-      DatabaseReference categoryDataRef = FirebaseDatabase.getInstance().getReference().child("offercategory/" + catString );
+      DatabaseReference categoryDataRef = FirebaseDatabase.getInstance().getReference().child("offerlist/offercategory/" + catString );
 
-      categoryDataRef.child(merchOffer.getMerchantOfferTitle()).setValue(merchOffer);
+
+    categoryDataRef.push().setValue(merchOffer.getMerchantOfferTitle());
+//      categoryDataRef.child(merchOffer.getMerchantOfferTitle()).setValue(merchOffer);
       Log.d(TAG, "setUpCategory: merchOffer Image " + merchOffer.getOfferImage());
 
 

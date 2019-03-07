@@ -1,5 +1,6 @@
 package com.opark.opark.rewards_redemption;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,19 +22,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.opark.opark.BrandsAlphabet;
-import com.opark.opark.BrandsName;
-import com.opark.opark.BrandsOfferFragment1;
 import com.opark.opark.R;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOffer;
 import com.opark.opark.merchant_side.merchant_offer.MerchantOfferAdapter;
-import com.opark.opark.rewards_redemption.ConfirmPreRedeem;
-import com.opark.opark.rewards_redemption.RewardsFragment;
+import com.opark.opark.merchant_side.merchant_offer.OfferDetailsActivity;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.opark.opark.share_parking.MapsMainActivity.navFragmentManager;
 
 public class AllOfferFragment extends Fragment {
 
@@ -54,6 +48,7 @@ public class AllOfferFragment extends Fragment {
     public static ConfirmPreRedeem confirmPreRedeem ;
     int backStackCount;
     final public String TAG = "AllOfferFragment";
+    final Bundle detailsBundle = new Bundle();
 
 
 
@@ -99,7 +94,7 @@ public class AllOfferFragment extends Fragment {
 
 
 //        merchantOffer = new ArrayList<>();
-        offerlistDatabaseRef.addChildEventListener(new ChildEventListener() {
+        offerlistDatabaseRef.child("approved-offers").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Log.d("tab", "onChildAdded: datasnapshot key" + dataSnapshot.getKey());
@@ -121,7 +116,7 @@ public class AllOfferFragment extends Fragment {
 //
 //                        brandsname.setBrandsName(dataSnapshot.getValue(MerchantOffer.class).getMerchantName());
 //
-//                        BrandsOfferFragment1.brandsNameListK.add(brandsname);
+//                        BrandsOfferFragment.brandsNameListK.add(brandsname);
 //
 //
 //                        Log.d(TAG, "'K'");
@@ -153,6 +148,43 @@ public class AllOfferFragment extends Fragment {
                     }, new MerchantOfferAdapter.CardClicked() {
                         @Override
                         public void onCardClicked(View v, int position) {
+
+//
+//
+//
+//                            String landingImgUrl = merchantOffer.get(position).getOfferImage();
+//                            final Intent offerDetailsIntent = new Intent(getActivity(), OfferDetailsActivity.class);
+//
+//                            detailsBundle.putString("offertitle",merchantOffer.get(position).getMerchantOfferTitle());
+//                            Log.d("cardclick", "title:  " + detailsBundle.getString("offertitle"));
+//                            detailsBundle.putString("merchantconame",merchantOffer.get(position).getMerchantName());
+//                            detailsBundle.putString("merchantemail",merchantOffer.get(position).getMerchantEmail());
+//                            detailsBundle.putString("merchantcontact",merchantOffer.get(position).getMerchantContact());
+//                            detailsBundle.putString("offercost",merchantOffer.get(position).getOfferCost());
+//                            detailsBundle.putString("landingImgUrl",landingImgUrl);
+//                            detailsBundle.putString("expirydate",merchantOffer.get(position).getExpiryDate());
+//                            detailsBundle.putString("merchantfirst", merchantOffer.get(position).getMerchantAddress().getFirstline());
+//                            detailsBundle.putString("merchantsecond", merchantOffer.get(position).getMerchantAddress().getSecondline());
+//                            detailsBundle.putString("merchantcity", merchantOffer.get(position).getMerchantAddress().getCity());
+//                            detailsBundle.putString("merchantstate", merchantOffer.get(position).getMerchantAddress().getCountryState());
+//                            detailsBundle.putString("merchantpostcode", merchantOffer.get(position).getMerchantAddress().getPostcode());
+//                            detailsBundle.putString("firstline",merchantOffer.get(position).getMerchantAddress().getFirstline());
+//                            detailsBundle.putString("secondline",merchantOffer.get(position).getMerchantAddress().getSecondline());
+//                            detailsBundle.putString("city",merchantOffer.get(position).getMerchantAddress().getCity());
+//                            detailsBundle.putString("state",merchantOffer.get(position).getMerchantAddress().getCountryState());
+//                            detailsBundle.putString("postcode",merchantOffer.get(position).getMerchantAddress().getPostcode());
+//
+//                            offerDetailsIntent.putExtras(detailsBundle);
+//                            startActivity(offerDetailsIntent);
+//
+
+
+
+
+
+
+
+
 
                         }
                     });

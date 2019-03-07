@@ -1,13 +1,16 @@
 package com.opark.opark.rewards_redemption;
 
+import com.opark.opark.model.Address;
+
 public class RewardsPocketOffer {
-    private String merchantOfferTitle, merchantName, merchantAddress, merchantContact, preRedemptionCode;
+    private String merchantOfferTitle, merchantName,  merchantContact, preRedemptionCode;
     private String  offerImage;
+    private Address merchantAddress;
     public RewardsPocketOffer() {
     }
 
 
-    public RewardsPocketOffer(String merchantOfferTitle, String merchantName, String merchantAddress, String merchantContact, String preRedemptionCode, String offerImage) {
+    public RewardsPocketOffer(String merchantOfferTitle, String merchantName, Address merchantAddress, String merchantContact, String preRedemptionCode, String offerImage) {
         this.merchantOfferTitle = merchantOfferTitle;
         this.merchantName = merchantName;
         this.merchantAddress = merchantAddress;
@@ -32,11 +35,11 @@ public class RewardsPocketOffer {
         this.merchantName = merchantName;
     }
 
-    public String getMerchantAddress() {
+    public Address getMerchantAddress() {
         return merchantAddress;
     }
 
-    public void setMerchantAddress(String merchantAddress) {
+    public void setMerchantAddress(Address merchantAddress) {
         this.merchantAddress = merchantAddress;
     }
 

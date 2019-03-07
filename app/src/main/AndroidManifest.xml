@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="com.opark.opark">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.opark.opark">
 
     <!-- Uses permission -->
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission
         android:name="android.permission.LOCATION_HARDWARE"
-        tools:ignore="ProtectedPermissions"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW"/>
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
+
     <uses-feature android:name="android.hardware.location.gps" />
 
     <!-- FACEBOOK META DATA ELEMENT -->
@@ -30,104 +31,85 @@
         <!-- GOOGLE LOCATION SERVICE META DATA -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
+            android:value="@string/facebook_app_id" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/map_api_key"/>
+            android:value="@string/map_api_key" />
         <meta-data
             android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts"/>
+            android:resource="@array/preloaded_fonts" />
 
         <activity
             android:name=".login_auth.LoginActivity"
-            android:theme="@style/AppTheme">
-        </activity>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".card_swipe.MainActivityCardSwipe"
-            android:theme="@style/AppTheme">
-        </activity>
-        <activity android:name=".motion_vehicle_tracker.Map">
-        </activity>
-        <activity android:name=".RegisterActivity"/>
-        <activity android:name=".UserProfileSetup">
-        </activity>
+            android:theme="@style/AppTheme"></activity>
+        <activity android:name=".motion_vehicle_tracker.Map"></activity>
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".UserProfileSetup"></activity>
         <activity
             android:name=".UserPopUp"
-            android:theme="@style/AppTheme.CustomTheme">
-        </activity>
+            android:theme="@style/AppTheme.CustomTheme"></activity>
         <activity
             android:name=".NoUserPopUp"
-            android:theme="@style/AppTheme.CustomTheme">
-        </activity>
+            android:theme="@style/AppTheme.CustomTheme"></activity>
         <activity
             android:name=".FinishUserPopUp"
-            android:theme="@style/AppTheme.CustomTheme">
-        </activity>
+            android:theme="@style/AppTheme.CustomTheme"></activity>
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="Opark"/>
+            android:label="Opark" />
         <activity
             android:name="com.facebook.CustomTabActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
 
-            <category android:name="android.intent.category.DEFAULT"/>
-            <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="@string/fb_login_protocol_scheme"/>
+                <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
         <activity
             android:name=".share_parking.MapsMainActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_maps_main"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".LoadingScreen">
-        </activity>
+            android:screenOrientation="portrait" />
+        <activity android:name=".LoadingScreen" />
         <activity
             android:name=".KenaMap"
             android:configChanges="orientation"
             android:label="@string/title_activity_maps_main"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".PeterMap"
             android:configChanges="orientation"
             android:label="@string/title_activity_maps_main"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity android:name=".ProfileEdit">
-        </activity>
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".ProfileEdit"></activity>
         <activity android:name=".splash_screen.SplashActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".login_auth.PhoneAuth">
-        </activity>
-        <activity android:name=".login_auth.EmailLogin">
-        </activity>
-        <activity android:name=".rewards_redemption.RewardsFragment">
-        </activity>
-        <activity android:name="merchant_all.merchant_prof.MerchantProfileSetup">
-        </activity>
-        <activity android:name=".merchant_side.MerchProfileSetup">
-        </activity>
-        <activity android:name=".login_auth.MerchWaitingApproval">
-        </activity>
-        <activity android:name=".merchant_side.MerchActivity">
-        </activity>
-        <activity android:name=".merchant_side.MerchUploadOfferActivity">
-        </activity>
-        <activity android:name=".InsufficientPointsDialog">
-        </activity>
+        <activity android:name=".login_auth.PhoneAuth" />
+        <activity android:name=".login_auth.EmailLogin" />
+        <activity android:name=".rewards_redemption.RewardsFragment" />
+        <activity android:name="merchant_all.merchant_prof.MerchantProfileSetup" />
+        <activity android:name=".merchant_side.MerchProfileSetup" />
+        <activity android:name=".login_auth.MerchWaitingApproval" />
+        <activity android:name=".merchant_side.MerchActivity" />
+        <activity android:name=".merchant_side.MerchUploadOfferActivity" />
+        <activity android:name=".InsufficientPointsDialog" />
+        <activity android:name=".merchant_side.MoreImageUploadActivity" />
+        <activity android:name=".AdminActivity" />
+        <activity android:name=".OfferApprovalActivity" />
+        <activity android:name=".merchant_side.merchant_offer.OfferDetailsActivity"></activity>
     </application>
 
 </manifest>
-
-
