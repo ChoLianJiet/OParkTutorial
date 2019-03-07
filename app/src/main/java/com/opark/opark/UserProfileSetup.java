@@ -29,6 +29,7 @@ import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.model.User;
+import com.opark.opark.model.UserSeasonalRanking;
 import com.opark.opark.share_parking.MapsMainActivity;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
@@ -569,10 +570,42 @@ else {
 
             DatabaseReference userPointsDaRef = FirebaseDatabase.getInstance().getReference().child("users/userPoints/"+firebaseUserUID);
             userPointsDaRef.setValue(userPoints);
-        StorageReference userRewardsFolder = storageRef.child("users/" +firebaseUserUID + "/points.txt");
+        StorageReference userRewardsFolder = storageRef.child("users/" +firebaseUserUID+ "/points.txt");
         objToByteStreamUpload(userPoints,userRewardsFolder);
 
-        Intent intent = new Intent(UserProfileSetup.this, MapsMainActivity.class);
+            DatabaseReference userCurrentRank = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/currentRank");
+            userCurrentRank.setValue("normal");
+            DatabaseReference successfulShareCount = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/successfulShare");
+            successfulShareCount.setValue(0);
+            DatabaseReference totalSharePointsAccummulated = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/sharePoints");
+            totalSharePointsAccummulated.setValue(0);
+            DatabaseReference selfFFK = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/shareFFK");
+            selfFFK.setValue(0);
+            DatabaseReference peterFFK = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/peterFFK");
+            peterFFK.setValue(0);
+            DatabaseReference selfFindFFK = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/selfFindFFK");
+            selfFindFFK.setValue(0);
+
+
+
+            StorageReference userRankingFileLocation = storageRef.child("users/" + firebaseUserUID +  "/userRankFile.txt");
+
+            UserSeasonalRanking userSeasonalRanking = new UserSeasonalRanking("medium",0,0,0,0,0);
+
+            objToByteStreamUpload(userSeasonalRanking,userRankingFileLocation);
+            
+
+
+
+
+
+
+
+
+
+
+
+            Intent intent = new Intent(UserProfileSetup.this, MapsMainActivity.class);
         finish();
         startActivity(intent);}
     }

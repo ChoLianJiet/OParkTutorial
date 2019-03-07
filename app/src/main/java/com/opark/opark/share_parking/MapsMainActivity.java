@@ -890,6 +890,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                                     taskRequestDirections.execute(url);
 
                                 } catch (NullPointerException e) {
+                                    Log.d(TAG, "Laggy stuff:  ");
                                     e.printStackTrace();
                                 }
                             } else {
@@ -904,6 +905,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                         }
                     });
                 } catch (NullPointerException e) {
+                    Log.d(TAG, "Laggy stuff1:  ");
 
                 }
                 return false;
@@ -1451,6 +1453,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 //                                                                    }
                                                     }
                                                 } catch (NullPointerException e) {
+                                                    Log.d(TAG, "Laggy stuff3  ");
 
                                                 }
                                             }
@@ -1651,6 +1654,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 //                searchMarkerForKenaOneByOne();
             }
         } catch (NullPointerException e) {
+            Log.d(TAG, "no dismiss dao loading :  ");
 
         }
 
