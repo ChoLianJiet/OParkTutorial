@@ -835,7 +835,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
-            public boolean onMarkerClick(Marker marker) {
+            public boolean onMarkerClick(final Marker marker) {
                 showLoading();
                 exchangeButtons(shareParkingButton, findParkingButton, fakeFindParkingButton);
 //                if (marker.equals(mk) || marker.equals(pinMk)) {
@@ -890,8 +890,9 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                                     taskRequestDirections.execute(url);
 
                                 } catch (NullPointerException e) {
-                                    Log.d(TAG, "Laggy stuff:  ");
                                     e.printStackTrace();
+                                    Log.d(TAG, "onDataChange: showloading keep loading");
+
                                 }
                             } else {
 //                            newArrayList.remove(foundUser);
@@ -905,8 +906,9 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                         }
                     });
                 } catch (NullPointerException e) {
-                    Log.d(TAG, "Laggy stuff1:  ");
-
+                    Log.d(TAG, "onDataChange: showloading keep loading 1");
+                    dismissLoading();
+                    reverseExchangeButtons(shareParkingButton,findParkingButton,fakeFindParkingButton);
                 }
                 return false;
             }
@@ -1188,6 +1190,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 matchmakingRef.child(foundUser).child("peterParker").setValue("NotOccupiedByAnyoneYet");
             } catch (NullPointerException e) {
                 e.printStackTrace();
+                Log.d(TAG, "onDataChange: showloading keep loading 2");
             }
         }
         super.onDestroy();
@@ -1453,8 +1456,8 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 //                                                                    }
                                                     }
                                                 } catch (NullPointerException e) {
-                                                    Log.d(TAG, "Laggy stuff3  ");
-
+                                                    e.printStackTrace();
+                                                    Log.d(TAG, "onDataChange: showloading keep loading 3");
                                                 }
                                             }
 
@@ -1492,7 +1495,8 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                                     }
                                 }
                             } catch (NullPointerException e) {
-
+                                e.printStackTrace();
+                                Log.d(TAG, "onDataChange: showloading keep loading 4");
                             }
                         }
 
@@ -1599,6 +1603,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                                                 taskRequestDirections.execute(url);
                                             } catch (NullPointerException e) {
                                                 e.printStackTrace();
+                                                Log.d(TAG, "onDataChange: showloading keep loading 5");
                                             }
                                         } else {
 //                            newArrayList.remove(foundUser);
@@ -1637,6 +1642,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                             }
                         } catch (NullPointerException e) {
                             e.printStackTrace();
+                            Log.d(TAG, "onDataChange: showloading keep loading 6");
                         }
                     }
 
@@ -1654,8 +1660,8 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 //                searchMarkerForKenaOneByOne();
             }
         } catch (NullPointerException e) {
-            Log.d(TAG, "no dismiss dao loading :  ");
-
+            e.printStackTrace();
+            Log.d(TAG, "onDataChange: showloading keep loading 6");
         }
 
     }
@@ -2352,7 +2358,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
         shareParkingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+
                 setMatchkingFolderInDatabse();
                 shareParkingButton.setVisibility(View.INVISIBLE);
                 findParkingButton.setVisibility(View.INVISIBLE);
