@@ -312,78 +312,78 @@ appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener
 
 
 
-private void animateSlideLayout() {
-    editTextSearch.setVisibility(View.VISIBLE);
+    private void animateSlideLayout() {
+        editTextSearch.setVisibility(View.VISIBLE);
 
-    editTextSearch.requestFocus();
-
-
-    AnimatorSet animatorSet = new AnimatorSet();
+        editTextSearch.requestFocus();
 
 
-    ValueAnimator widthAnimator = ValueAnimator.ofInt(0,expWidth);
-    widthAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-        @Override
-        public void onAnimationUpdate(ValueAnimator animation) {
-            int animatedValue = (int) animation.getAnimatedValue();
-            expandingLayout.getLayoutParams().width = animatedValue;
+        AnimatorSet animatorSet = new AnimatorSet();
 
-            expandingLayout.requestLayout();
 
-        }
-    });
-    widthAnimator.setDuration(200);
+        ValueAnimator widthAnimator = ValueAnimator.ofInt(0,expWidth);
+        widthAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int animatedValue = (int) animation.getAnimatedValue();
+                expandingLayout.getLayoutParams().width = animatedValue;
+
+                expandingLayout.requestLayout();
+
+            }
+        });
+        widthAnimator.setDuration(200);
 //    widthAnimator.start();
 //    Animation startAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_anim);
 //    expanding.startAnimation(startAnimation);
-    ObjectAnimator fadeAnim = ObjectAnimator.ofFloat(editTextSearch, "alpha", 0f, 1f);
-    fadeAnim.setDuration(600);
+        ObjectAnimator fadeAnim = ObjectAnimator.ofFloat(editTextSearch, "alpha", 0f, 1f);
+        fadeAnim.setDuration(600);
 
-    ObjectAnimator fadeOutAnim = ObjectAnimator.ofFloat(editTextSearchBig, "alpha", 1f, 0f);
-    fadeOutAnim.setDuration(100);
+        ObjectAnimator fadeOutAnim = ObjectAnimator.ofFloat(editTextSearchBig, "alpha", 1f, 0f);
+        fadeOutAnim.setDuration(100);
 
 
 //    AlphaAnimation fadeAnim = new AlphaAnimation(0,1);
 //    fadeAnim.setDuration(400);
 
 
-    animatorSet.playTogether(widthAnimator,fadeOutAnim,fadeAnim);
+        animatorSet.playTogether(widthAnimator,fadeOutAnim,fadeAnim);
 
-    animatorSet.start();
+        animatorSet.start();
 
-    editTextSearchIsExpanded = true;
-
-
-
-    if(animatorSet.isStarted()&& animatorSet.isRunning()){
-
-        editTextSearchBig.setVisibility(View.INVISIBLE);
+        editTextSearchIsExpanded = true;
 
 
 
-        editTextSearch.setText(editTextSearchBig.getText().toString());
+        if(animatorSet.isStarted()&& animatorSet.isRunning()){
 
-        editTextSearch.setSelection(editTextSearchBig.getText().length());
+            editTextSearchBig.setVisibility(View.INVISIBLE);
+
+
+
+            editTextSearch.setText(editTextSearchBig.getText().toString());
+
+            editTextSearch.setSelection(editTextSearchBig.getText().length());
 
 //            editTextSearch.requestFocus();
 
 
+        }
+
+
+
+        Log.d(TAG, "animateSlideLayout: " + animatorSet);
+
+        if (!animatorSet.isRunning()){
+            Log.d(TAG, "animateSlideOutLayout: End");
+            editTextSearchBig.setVisibility(View.VISIBLE);
+
+
+            animatorSet.end();
+        }
+
+
     }
-
-
-
-    Log.d(TAG, "animateSlideLayout: " + animatorSet);
-
-    if (!animatorSet.isRunning()){
-        Log.d(TAG, "animateSlideOutLayout: End");
-        editTextSearchBig.setVisibility(View.VISIBLE);
-
-
-        animatorSet.end();
-    }
-
-
-}
 
 
 
@@ -486,8 +486,8 @@ private void animateSlideLayout() {
         }
 
 
-            AllOfferFragment.merchantOfferAdapter.getFilter().filter(charSequence);
-            AllOfferFragment.allRecView.setAdapter(AllOfferFragment.merchantOfferAdapter);
+        AllOfferFragment.merchantOfferAdapter.getFilter().filter(charSequence);
+        AllOfferFragment.allRecView.setAdapter(AllOfferFragment.merchantOfferAdapter);
 
     }
 

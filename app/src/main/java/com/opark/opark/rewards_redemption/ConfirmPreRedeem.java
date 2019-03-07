@@ -2,6 +2,7 @@ package com.opark.opark.rewards_redemption;
 
 
 import android.content.Context;
+import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,6 +36,9 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import static com.opark.opark.rewards_redemption.RewardsFragment.ONE_MEGABYTE;
 import static com.opark.opark.rewards_redemption.RewardsFragment.getAppContext;
@@ -213,6 +217,15 @@ public class ConfirmPreRedeem extends DialogFragment {
 
     private static void userPreRedemption(){
 
+        String redeemStatus = "ready-for-redemption";
+        Date c = Calendar.getInstance().getTime();
+        System.out.println("Current time => " + c);
+
+
+
+        String redeemDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+
+        Log.d(TAG, "userPreRedemption:  redeemdate and status  " +  redeemDate);
 
         SecureRandom random = new SecureRandom();
         String preRedemptionCode = new BigInteger(30, random).toString(32).toUpperCase();
@@ -224,7 +237,7 @@ public class ConfirmPreRedeem extends DialogFragment {
 
 
             DatabaseReference preRedemptionDataRef = FirebaseDatabase.getInstance().getReference().child("users/pre-redeemedlist/" + RewardsFragment.redeemUid);
-            RewardsPocketOffer rewardsPocketUpdate = new RewardsPocketOffer(merchantOfferTitle, merchantName, merchantAddress, merchantContact, preRedemptionCode, merchantOfferImageUrl);
+            RewardsPocketOffer rewardsPocketUpdate = new RewardsPocketOffer(redeemStatus,redeemDate,merchantOfferTitle, merchantName, merchantContact, preRedemptionCode, merchantOfferImageUrl,merchantAddress);
 
             Log.d(TAG, "userPreRedemption: merchant OfferTitle " + merchantOfferTitle);
 

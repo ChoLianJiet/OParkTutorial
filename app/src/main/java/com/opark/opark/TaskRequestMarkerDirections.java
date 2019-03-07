@@ -97,9 +97,14 @@ public class TaskRequestMarkerDirections extends AsyncTask<String, Void, String>
 //                routes.add((List<HashMap<Double, Double>>) roadsParser.parse(jsonObject));
                 Log.d(TAG, "doInBackground: routes are " + routes);
                 return routes;
-            } catch (JSONException e) {
+            } catch (JSONException e)
+
+            {
                 e.printStackTrace();
                 return null;
+            }catch (NullPointerException ee){
+                return null;
+
             }
         }
 

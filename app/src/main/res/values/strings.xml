@@ -85,7 +85,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-
+    <string name="using_voucher_error">Our system detects you have a similar voucher that is in the redemption process with the merchant.\n Please contact merchant to complete the redemption before redeeming other similar vouchers</string>
     <string name="food_and_beverage_category">Food &amp; Beverage</string>
     <string name="health_and_beauty_category">Health &amp; Beauty</string>
     <string name="shopping_category">Shopping</string>

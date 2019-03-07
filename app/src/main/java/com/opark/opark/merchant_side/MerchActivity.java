@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -33,10 +34,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+import com.opark.opark.MerchantAcceptUsingVoucher;
 import com.opark.opark.R;
 import com.opark.opark.login_auth.LoginActivity;
 import com.opark.opark.merchant_side.merchant_class.Merchant;
 import com.opark.opark.rewards_redemption.RewardsPreredemption;
+import com.opark.opark.rewards_redemption.UseVoucherCheckAndConfirm;
 
 
 import java.io.UnsupportedEncodingException;
@@ -62,6 +65,8 @@ public class MerchActivity extends AppCompatActivity implements View.OnFocusChan
     private EditText code5;
     private EditText code6;
     private EditText mPinHiddenEditText;
+    private MerchantAcceptUsingVoucher merchantAcceptUsingVoucher;
+    public static String redemptionCode, redeemingUser;
 
     private Spinner whichOffer;
     TextView merchProfImgButton;
@@ -85,9 +90,14 @@ public class MerchActivity extends AppCompatActivity implements View.OnFocusChan
         setContentView(R.layout.activity_merch);
 
 
+
+
         bindViews();
 
         setPINListeners();
+
+
+
 
 
         merchantEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
@@ -119,6 +129,7 @@ public class MerchActivity extends AppCompatActivity implements View.OnFocusChan
                 });
             }
         });
+
 
 
 
@@ -739,8 +750,64 @@ public void getMerchStuff() {
 
 
 
+        final DatabaseReference usingVoucher = FirebaseDatabase.getInstance().getReference().child("offerlist/using-voucher/"+offerSelected);
 
-        amountRedeemedDatabase = FirebaseDatabase.getInstance().getReference("offerlist/" + offerSelected +  "/redeemedUsers");
+        usingVoucher.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Log.d(TAG, "onChildAdded: " + dataSnapshot);
+
+
+                Log.d(TAG, "onChildAdded: " + dataSnapshot.getKey());
+                Log.d(TAG, "onChildAdded:  " + dataSnapshot.getValue());
+
+                redeemingUser = dataSnapshot.getKey();
+                redemptionCode = dataSnapshot.getValue().toString();
+
+                Bundle argumentRedeemUserVoucher = new Bundle();
+
+                argumentRedeemUserVoucher.putString("redeeminguser",redeemingUser);
+                argumentRedeemUserVoucher.putString("redemptioncode",redemptionCode);
+                argumentRedeemUserVoucher.putString("offertitle", offerSelected);
+                argumentRedeemUserVoucher.putString("merchantprofilename",merchantProfileName);
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                merchantAcceptUsingVoucher = new MerchantAcceptUsingVoucher();
+                merchantAcceptUsingVoucher.setArguments(argumentRedeemUserVoucher);
+                 merchantAcceptUsingVoucher.show(fragmentManager, "");
+
+
+
+
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
+
+
+        amountRedeemedDatabase = FirebaseDatabase.getInstance().getReference("offerlist/offer-redemption-count/" + offerSelected +  "/redeemedUsers");
         amountRedeemedDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

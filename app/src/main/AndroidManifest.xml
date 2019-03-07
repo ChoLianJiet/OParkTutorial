@@ -2,9 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.opark.opark">
-
     <!-- Uses permission -->
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -19,7 +17,6 @@
 
     <uses-feature android:name="android.hardware.location.gps" />
 
-    <!-- FACEBOOK META DATA ELEMENT -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -27,8 +24,8 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <!-- GOOGLE LOCATION SERVICE META DATA -->
+        <activity android:name=".merchant_side.ActivityAcceptVoucherList"></activity>
+        <activity android:name=".rewards_redemption.RewardsActivity" /> <!-- GOOGLE LOCATION SERVICE META DATA -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
@@ -44,19 +41,19 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".card_swipe.MainActivityCardSwipe"
-            android:theme="@style/AppTheme"></activity>
-        <activity android:name=".motion_vehicle_tracker.Map"></activity>
+            android:theme="@style/AppTheme" />
+        <activity android:name=".motion_vehicle_tracker.Map" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".UserProfileSetup"></activity>
+        <activity android:name=".UserProfileSetup" />
         <activity
             android:name=".UserPopUp"
-            android:theme="@style/AppTheme.CustomTheme"></activity>
+            android:theme="@style/AppTheme.CustomTheme" />
         <activity
             android:name=".NoUserPopUp"
-            android:theme="@style/AppTheme.CustomTheme"></activity>
+            android:theme="@style/AppTheme.CustomTheme" />
         <activity
             android:name=".FinishUserPopUp"
-            android:theme="@style/AppTheme.CustomTheme"></activity>
+            android:theme="@style/AppTheme.CustomTheme" />
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -83,13 +80,13 @@
             android:name=".KenaMap"
             android:configChanges="orientation"
             android:label="@string/title_activity_maps_main"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".PeterMap"
             android:configChanges="orientation"
             android:label="@string/title_activity_maps_main"
-            android:screenOrientation="portrait"></activity>
-        <activity android:name=".ProfileEdit"></activity>
+            android:screenOrientation="portrait" />
+        <activity android:name=".ProfileEdit" />
         <activity android:name=".splash_screen.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -109,7 +106,7 @@
         <activity android:name=".merchant_side.MoreImageUploadActivity" />
         <activity android:name=".AdminActivity" />
         <activity android:name=".OfferApprovalActivity" />
-        <activity android:name=".merchant_side.merchant_offer.OfferDetailsActivity"></activity>
+        <activity android:name=".merchant_side.merchant_offer.OfferDetailsActivity" />
     </application>
 
 </manifest>

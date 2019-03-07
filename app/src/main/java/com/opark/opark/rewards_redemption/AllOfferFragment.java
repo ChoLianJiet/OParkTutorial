@@ -149,34 +149,34 @@ public class AllOfferFragment extends Fragment {
                         @Override
                         public void onCardClicked(View v, int position) {
 
-//
-//
-//
-//                            String landingImgUrl = merchantOffer.get(position).getOfferImage();
-//                            final Intent offerDetailsIntent = new Intent(getActivity(), OfferDetailsActivity.class);
-//
-//                            detailsBundle.putString("offertitle",merchantOffer.get(position).getMerchantOfferTitle());
-//                            Log.d("cardclick", "title:  " + detailsBundle.getString("offertitle"));
-//                            detailsBundle.putString("merchantconame",merchantOffer.get(position).getMerchantName());
-//                            detailsBundle.putString("merchantemail",merchantOffer.get(position).getMerchantEmail());
-//                            detailsBundle.putString("merchantcontact",merchantOffer.get(position).getMerchantContact());
-//                            detailsBundle.putString("offercost",merchantOffer.get(position).getOfferCost());
-//                            detailsBundle.putString("landingImgUrl",landingImgUrl);
-//                            detailsBundle.putString("expirydate",merchantOffer.get(position).getExpiryDate());
-//                            detailsBundle.putString("merchantfirst", merchantOffer.get(position).getMerchantAddress().getFirstline());
-//                            detailsBundle.putString("merchantsecond", merchantOffer.get(position).getMerchantAddress().getSecondline());
-//                            detailsBundle.putString("merchantcity", merchantOffer.get(position).getMerchantAddress().getCity());
-//                            detailsBundle.putString("merchantstate", merchantOffer.get(position).getMerchantAddress().getCountryState());
-//                            detailsBundle.putString("merchantpostcode", merchantOffer.get(position).getMerchantAddress().getPostcode());
-//                            detailsBundle.putString("firstline",merchantOffer.get(position).getMerchantAddress().getFirstline());
-//                            detailsBundle.putString("secondline",merchantOffer.get(position).getMerchantAddress().getSecondline());
-//                            detailsBundle.putString("city",merchantOffer.get(position).getMerchantAddress().getCity());
-//                            detailsBundle.putString("state",merchantOffer.get(position).getMerchantAddress().getCountryState());
-//                            detailsBundle.putString("postcode",merchantOffer.get(position).getMerchantAddress().getPostcode());
-//
-//                            offerDetailsIntent.putExtras(detailsBundle);
-//                            startActivity(offerDetailsIntent);
-//
+
+
+
+                            String landingImgUrl = merchantOffer.get(position).getOfferImage();
+                            final Intent offerDetailsIntent = new Intent(getActivity(), OfferDetailsActivity.class);
+
+                            detailsBundle.putString("offertitle",merchantOffer.get(position).getMerchantOfferTitle());
+                            Log.d("cardclick", "title:  " + detailsBundle.getString("offertitle"));
+                            detailsBundle.putString("merchantconame",merchantOffer.get(position).getMerchantName());
+                            detailsBundle.putString("merchantemail",merchantOffer.get(position).getMerchantEmail());
+                            detailsBundle.putString("merchantcontact",merchantOffer.get(position).getMerchantContact());
+                            detailsBundle.putString("offercost",merchantOffer.get(position).getOfferCost());
+                            detailsBundle.putString("landingImgUrl",landingImgUrl);
+                            detailsBundle.putString("expirydate",merchantOffer.get(position).getExpiryDate());
+                            detailsBundle.putString("merchantfirst", merchantOffer.get(position).getMerchantAddress().getFirstline());
+                            detailsBundle.putString("merchantsecond", merchantOffer.get(position).getMerchantAddress().getSecondline());
+                            detailsBundle.putString("merchantcity", merchantOffer.get(position).getMerchantAddress().getCity());
+                            detailsBundle.putString("merchantstate", merchantOffer.get(position).getMerchantAddress().getCountryState());
+                            detailsBundle.putString("merchantpostcode", merchantOffer.get(position).getMerchantAddress().getPostcode());
+                            detailsBundle.putString("firstline",merchantOffer.get(position).getMerchantAddress().getFirstline());
+                            detailsBundle.putString("secondline",merchantOffer.get(position).getMerchantAddress().getSecondline());
+                            detailsBundle.putString("city",merchantOffer.get(position).getMerchantAddress().getCity());
+                            detailsBundle.putString("state",merchantOffer.get(position).getMerchantAddress().getCountryState());
+                            detailsBundle.putString("postcode",merchantOffer.get(position).getMerchantAddress().getPostcode());
+
+                            offerDetailsIntent.putExtras(detailsBundle);
+                            startActivity(offerDetailsIntent);
+
 
 
 

@@ -3,12 +3,24 @@ package com.opark.opark.rewards_redemption;
 import com.opark.opark.model.Address;
 
 public class RewardsPocketOffer {
+    private String redeemStatus,redeemDate;
     private String merchantOfferTitle, merchantName,  merchantContact, preRedemptionCode;
     private String  offerImage;
     private Address merchantAddress;
     public RewardsPocketOffer() {
     }
 
+
+    public RewardsPocketOffer(String redeemStatus, String redeemDate, String merchantOfferTitle, String merchantName, String merchantContact, String preRedemptionCode, String offerImage, Address merchantAddress) {
+        this.redeemStatus = redeemStatus;
+        this.redeemDate = redeemDate;
+        this.merchantOfferTitle = merchantOfferTitle;
+        this.merchantName = merchantName;
+        this.merchantContact = merchantContact;
+        this.preRedemptionCode = preRedemptionCode;
+        this.offerImage = offerImage;
+        this.merchantAddress = merchantAddress;
+    }
 
     public RewardsPocketOffer(String merchantOfferTitle, String merchantName, Address merchantAddress, String merchantContact, String preRedemptionCode, String offerImage) {
         this.merchantOfferTitle = merchantOfferTitle;
@@ -65,5 +77,22 @@ public class RewardsPocketOffer {
 
     public void setOfferImage(String offerImage) {
         this.offerImage = offerImage;
+    }
+
+
+    public String getRedeemStatus() {
+        return redeemStatus;
+    }
+
+    public void setRedeemStatus(String redeemStatus) {
+        this.redeemStatus = redeemStatus;
+    }
+
+    public String getRedeemDate() {
+        return redeemDate;
+    }
+
+    public void setRedeemDate(String redeemDate) {
+        this.redeemDate = redeemDate;
     }
 }

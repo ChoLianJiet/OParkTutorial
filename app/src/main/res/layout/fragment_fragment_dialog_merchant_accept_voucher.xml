@@ -1,14 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:padding="30dp"
     android:layout_height="match_parent"
-    tools:context=".FragmentDialogMerchantAcceptVoucher">
+    tools:context=".MerchantAcceptUsingVoucher">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
 
-</FrameLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/accept_voucher_offer_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentTop="true"
+
+
+                android:layout_marginTop="20dp"
+                android:text="Offer Title"
+                android:textSize="24sp"
+                 />
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/accept_voucher_user_id_name"
+                android:text="wants to redeem this offer "
+                app:layout_constraintStart_toEndOf="@+id/accept_voucher_user_id_name"
+                app:layout_constraintTop_toBottomOf="@+id/accept_voucher_user_id_name" />
+
+            <TextView
+                android:id="@+id/accept_voucher_redemption_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="36dp"
+                android:text="Redemption Code"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/textView13"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="@+id/textView13"
+                app:layout_constraintHorizontal_bias="0.409"
+                app:layout_constraintStart_toStartOf="@+id/textView13"
+                app:layout_constraintTop_toBottomOf="@+id/textView13" />
+
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="wrap_content"
+                android:layout_height="18dp"
+                android:layout_marginTop="10dp"
+                android:layout_centerHorizontal="true"
+                android:text="with redemption code"
+                android:layout_below="@id/textView11"
+                 />
+
+            <TextView
+
+                android:id="@+id/accept_voucher_user_id_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/accept_voucher_offer_title"
+                android:layout_marginTop="30dp"
+                android:text="Uid Name"
+/>
+
+            <Button
+                android:id="@+id/accept_voucher_decline_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="56dp"
+                android:layout_marginBottom="8dp"
+                android:layout_below="@id/accept_voucher_redemption_code"
+                android:text="Decline"
+                android:layout_toEndOf="@id/accept_voucher_accept_button"
+             />
+
+            <Button
+                android:id="@+id/accept_voucher_accept_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="56dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="Accept"
+                android:layout_below="@id/accept_voucher_redemption_code" />
+        </RelativeLayout>
+
+
+</RelativeLayout>

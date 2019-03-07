@@ -1,9 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+
     tools:context=".merchant_side.ActivityAcceptVoucherList">
 
-</android.support.constraint.ConstraintLayout>
+
+
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:padding="20dp"
+            android:layout_height="wrap_content">
+
+
+            <TextView
+                android:id="@+id/inform_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:text="Kindly please ensure you are at the payment counter and is ready to use your voucher" />
+
+            <TextView
+                android:id="@+id/use_voucher_error_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textSize="20sp"
+                android:layout_below="@id/inform_text"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"
+                android:textColor="@color/red"
+                android:text="@string/using_voucher_error" />
+
+
+
+            <Button
+                android:id="@+id/confirm_use_voucher_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@id/inform_text"
+                android:layout_below="@id/use_voucher_error_text"
+                android:text="Confirm"
+                android:layout_marginTop="30dp"
+                />
+
+        </RelativeLayout>
+
+
+
+
+
+</RelativeLayout>

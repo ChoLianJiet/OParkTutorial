@@ -114,16 +114,15 @@
                             />
 
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/merchant_state"
-                            android:text="State"
-                            android:layout_marginStart="8dp"
 
-                            android:layout_below="@+id/merchant_name"
-                            />
                     </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/merchant_state"
+                        android:text="State"
+                        android:layout_below="@+id/merchant_name"
+                        />
                 </LinearLayout>
 
 
@@ -152,6 +151,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:gravity="center"
+                android:clickable="true"
                 android:background="@color/buttonWhite"
                 android:layout_height="50dp">
 
@@ -161,7 +161,7 @@
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
                     android:fontFamily="@font/roboto_black"
-                    android:text="REDEMPTION CODE"
+                    android:text="Click to use voucher"
                     android:textColor="@color/azure"/>
 
             </LinearLayout>

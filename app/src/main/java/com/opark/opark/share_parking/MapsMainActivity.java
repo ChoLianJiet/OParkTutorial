@@ -113,8 +113,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import com.opark.opark.BrandsOfferFragment;
-import com.opark.opark.BrandsOfferFragment1;
 import com.opark.opark.CustomInfoWindowAdapter;
 import com.opark.opark.DirectionsParser;
 import com.opark.opark.FinishUserPopUp;
@@ -127,6 +125,7 @@ import com.opark.opark.TaskRequestMarkerDirections;
 import com.opark.opark.dialogs.DecideWantToRemovePinDialog;
 import com.opark.opark.dialogs.PromptDetectedFFKDialogForKena;
 import com.opark.opark.ShowBrandOffer;
+import com.opark.opark.rewards_redemption.RewardsActivity;
 import com.opark.opark.rewards_redemption.RewardsFragment;
 import com.opark.opark.rewards_redemption.RewardsPocketFragment;
 import com.opark.opark.feedback.FeedbackDialog;
@@ -302,7 +301,6 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         getSupportFragmentManager();
-        acquireUserProfileAndStoreLocal();
         getLocationPermission();
 
         shareParkingButton = (Button) findViewById(R.id.share_parking_button);
@@ -346,6 +344,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
         // Current User ID
         currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        acquireUserProfileAndStoreLocal();
 
         // Pin Location
         pinLocationButton = (ImageButton) findViewById(R.id.pin_location_button);
@@ -502,7 +501,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
                     try {
                         userPoints = (new Gson().fromJson(new String(bytes, "UTF-8"), Integer.class));
-                        Log.d(TAG, "onSuccess: " + userPoints);
+                        Log.d(TAG, " userPoints From storgae: " + userPoints);
                         userPointsTextView.setText(String.valueOf(userPoints));
 
 
@@ -534,13 +533,17 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
                 try {
                     userPoints = dataSnapshot.getValue(Integer.class);
-//                userPoints = Integer.parseInt(String.valueOf(dataSnapshot.getValue()));
+
                     userPointsTextView.setText(String.valueOf(userPoints));
 
 
-                    Log.d(TAG, "onDataChange: userPoints" + userPoints);
+                    Log.d(TAG, "userpoints:  user id is  " + currentUserID);
+                    Log.d(TAG, "onDataChange: DataRef is " + userPointDataRef);
+                    Log.d(TAG, " userPoints" + userPoints);
                 } catch (NullPointerException e) {
 
+
+                    Log.d(TAG, "user Points Dataref NULL POINT EXC:  ");
                     userPointDataRef.setValue(userPoints);
 
                 }
@@ -586,6 +589,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
+                Log.d(TAG, "onFailure:  self download ");
             }
         });
 
@@ -669,6 +673,9 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 break;
 
             case R.id.nav_second_fragment:
+
+//               startActivity(new Intent(this, RewardsActivity.class));
+
                 rewardsPageFrag = new RewardsFragment();
                 fragment = rewardsPageFrag;
                 executeFragmentTransaction(fragment);
@@ -1139,6 +1146,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
     //Retrieve location for peterParker
     private void loadLocationForThisUser() {
+
 
         liveUsersRef.child(currentUserID).child("l").addValueEventListener(new ValueEventListener() {
             @Override
@@ -1718,7 +1726,6 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
     private double deg2rad(double deg) {
         return (deg * Math.PI / 180.0);
     }
-
 
 
     // Add A Map Pointer To The MAp
