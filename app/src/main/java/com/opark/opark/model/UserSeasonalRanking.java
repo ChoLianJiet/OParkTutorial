@@ -3,18 +3,19 @@ package com.opark.opark.model;
 public class UserSeasonalRanking {
 
     String userRank;
-    int successfulShareCount,    totalSharePointsAccummulated            ,selfFFK    ,peterFFK            ,selfFindFFK;
+    int successfulShareCount,    totalSharePointsAccummulated            ,selfShareFFKCount    ,youGotFFKedCount            ,selfFindFFKCount;
 
     public UserSeasonalRanking() {
     }
 
-    public UserSeasonalRanking(String userRank, int successfulShareCount, int totalSharePointsAccummulated, int selfFFK, int peterFFK, int selfFindFFK) {
+    public UserSeasonalRanking(String userRank, int successfulShareCount, int totalSharePointsAccummulated, int selfShareFFKCount, int youGotFFKedCount, int selfFindFFKCount) {
         this.userRank = userRank;
-        this.successfulShareCount = successfulShareCount;
         this.totalSharePointsAccummulated = totalSharePointsAccummulated;
-        this.selfFFK = selfFFK;
-        this.peterFFK = peterFFK;
-        this.selfFindFFK = selfFindFFK;
+        this.successfulShareCount = successfulShareCount;
+        
+        this.selfShareFFKCount = selfShareFFKCount;
+        this.youGotFFKedCount = youGotFFKedCount;
+        this.selfFindFFKCount = selfFindFFKCount;
     }
 
     public String getUserRank() {
@@ -42,26 +43,26 @@ public class UserSeasonalRanking {
     }
 
     public int getSelfFFK() {
-        return selfFFK;
+        return selfShareFFKCount;
     }
 
-    public void setSelfFFK(int selfFFK) {
-        this.selfFFK = selfFFK;
+    public void setSelfFFK(int selfShareFFKCount) {
+        this.selfShareFFKCount = selfShareFFKCount;
     }
 
     public int getPeterFFK() {
-        return peterFFK;
+        return youGotFFKedCount;
     }
 
-    public void setPeterFFK(int peterFFK) {
-        this.peterFFK = peterFFK;
+    public void setPeterFFK(int youGotFFKedCount) {
+        this.youGotFFKedCount = youGotFFKedCount;
     }
 
     public int getSelfFindFFK() {
-        return selfFindFFK;
+        return selfFindFFKCount;
     }
 
-    public void setSelfFindFFK(int selfFindFFK) {
-        this.selfFindFFK = selfFindFFK;
+    public void setSelfFindFFK(int selfFindFFKCount) {
+        this.selfFindFFKCount = selfFindFFKCount;
     }
 }
