@@ -223,6 +223,7 @@ public class RewardsPocketFragment extends Fragment implements RewardsPocketAdap
 
             rewardsPocketOffers.remove(dataSnapshot.getValue(RewardsPocketOffer.class));
 
+
             rewardsPocketAdapter.notifyItemRemoved(positionClicked);
             rewardsPocketAdapter.notifyDataSetChanged();
 

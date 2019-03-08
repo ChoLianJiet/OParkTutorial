@@ -310,7 +310,6 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         getSupportFragmentManager();
-        acquireUserProfileAndStoreLocal();
         getLocationPermission();
 
         shareParkingButton = (Button) findViewById(R.id.share_parking_button);
@@ -358,6 +357,7 @@ public class MapsMainActivity extends AppCompatActivity implements OnMapReadyCal
 
         // Current User ID
         currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        acquireUserProfileAndStoreLocal();
 
         // Pin Location
         pinLocationButton = (ImageButton) findViewById(R.id.pin_location_button);

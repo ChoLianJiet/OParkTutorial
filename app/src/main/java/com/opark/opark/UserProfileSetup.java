@@ -573,17 +573,17 @@ else {
         StorageReference userRewardsFolder = storageRef.child("users/" +firebaseUserUID+ "/points.txt");
         objToByteStreamUpload(userPoints,userRewardsFolder);
 
-            DatabaseReference userCurrentRank = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/currentRank");
+            DatabaseReference userCurrentRank = FirebaseDatabase.getInstance().getReference().child("users/rankingCompute/" +firebaseUserUID+ "/share/currentRank");
             userCurrentRank.setValue("normal");
-            DatabaseReference successfulShareCount = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/successfulShare");
+            DatabaseReference successfulShareCount = FirebaseDatabase.getInstance().getReference().child("users/rankingCompute/" +firebaseUserUID+ "/share/successfulShare");
             successfulShareCount.setValue(0);
-            DatabaseReference totalSharePointsAccummulated = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/sharePoints");
+            DatabaseReference totalSharePointsAccummulated = FirebaseDatabase.getInstance().getReference().child("users/rankingCompute/" +firebaseUserUID+ "/share/sharePoints");
             totalSharePointsAccummulated.setValue(0);
-            DatabaseReference selfFFK = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/shareFFK");
+            DatabaseReference selfFFK = FirebaseDatabase.getInstance().getReference().child("users/rankingCompute/" +firebaseUserUID+ "/share/shareFFK");
             selfFFK.setValue(0);
-            DatabaseReference peterFFK = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/peterFFK");
+            DatabaseReference peterFFK = FirebaseDatabase.getInstance().getReference().child("users/rankingCompute/" +firebaseUserUID+ "/share/peterFFK");
             peterFFK.setValue(0);
-            DatabaseReference selfFindFFK = FirebaseDatabase.getInstance().getReference().child("users/" +firebaseUserUID+ "/share/selfFindFFK");
+            DatabaseReference selfFindFFK = FirebaseDatabase.getInstance().getReference().child("users/rankingCompute/" +firebaseUserUID+ "/share/selfFindFFK");
             selfFindFFK.setValue(0);
 
 
@@ -593,7 +593,7 @@ else {
             UserSeasonalRanking userSeasonalRanking = new UserSeasonalRanking("medium",0,0,0,0,0);
 
             objToByteStreamUpload(userSeasonalRanking,userRankingFileLocation);
-            
+
 
 
 
