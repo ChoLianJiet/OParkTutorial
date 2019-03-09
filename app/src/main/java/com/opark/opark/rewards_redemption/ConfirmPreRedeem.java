@@ -1,6 +1,7 @@
 package com.opark.opark.rewards_redemption;
 
 
+import android.app.Dialog;
 import android.content.Context;
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -54,13 +55,14 @@ public class ConfirmPreRedeem extends DialogFragment {
     private static int pointsAfterRedemption;
     public static int redeemCost;
     private static String redeemUid;
+    public static String expiryDate;
     public static String merchantName;
     public static String merchantOfferTitle;
     public static Address merchantAddress;
     public static String merchantOfferImageUrl;
     public static String merchantContact;
     public static String rewardsMerchant;
-
+    Dialog dialog ;
 
 
 
@@ -76,6 +78,7 @@ public class ConfirmPreRedeem extends DialogFragment {
         bindViews(view);
 
 
+        dialog = getDialog();
         confirmRedeemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -174,7 +177,7 @@ public class ConfirmPreRedeem extends DialogFragment {
             @Override
             public void onComplete(@NonNull Task<byte[]> task) {
                 Log.d(TAG, "onComplete:  Complete JOr outside completed Calc");
-                getDialog().dismiss();
+                dialog.dismiss();
 
             }
 
@@ -237,11 +240,13 @@ public class ConfirmPreRedeem extends DialogFragment {
 
 
             DatabaseReference preRedemptionDataRef = FirebaseDatabase.getInstance().getReference().child("users/pre-redeemedlist/" + RewardsFragment.redeemUid);
-            RewardsPocketOffer rewardsPocketUpdate = new RewardsPocketOffer(redeemStatus,redeemDate,merchantOfferTitle, merchantName, merchantContact, preRedemptionCode, merchantOfferImageUrl,merchantAddress);
 
             Log.d(TAG, "userPreRedemption: merchant OfferTitle " + merchantOfferTitle);
 
             String preRedeemedKey = preRedemptionDataRef.push().getKey();
+
+            RewardsPocketOffer rewardsPocketUpdate = new RewardsPocketOffer(redeemStatus,redeemDate,preRedeemedKey,expiryDate,merchantOfferTitle, merchantName, merchantContact, preRedemptionCode, merchantOfferImageUrl,merchantAddress);
+
             preRedemptionDataRef.child(preRedeemedKey).setValue(rewardsPocketUpdate);
 
             RewardsPreredemption thisRewardPreredeemed = new RewardsPreredemption(RewardsFragment.redeemUid, preRedeemedKey);

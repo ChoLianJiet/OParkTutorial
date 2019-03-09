@@ -25,17 +25,19 @@ import com.opark.opark.R;
 import static com.opark.opark.rewards_redemption.RewardsPocketFragment.currentUserId;
 import static com.opark.opark.rewards_redemption.RewardsPocketFragment.merchantCoName;
 import static com.opark.opark.rewards_redemption.RewardsPocketFragment.preredemptionCode;
-import static com.opark.opark.rewards_redemption.RewardsPocketFragment.pushKey;
 
 public class UseVoucherCheckAndConfirm extends DialogFragment {
 
 
-    private static final String TAG = "DialogFragmentUseVouche";
+    private static final String TAG = "UseVoucherCheckAndConfirm";
     private Button confirmButton;
     private TextView useVoucherErrorText;
     private TextView useVoucherText;
     private Dialog dialog;
+    private String merchantOfferTitle;
+    String preredemptionCode;
     DatabaseReference usingVoucher;
+    String key;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -43,7 +45,10 @@ public class UseVoucherCheckAndConfirm extends DialogFragment {
 //        getDialog().setCanceledOnTouchOutside(false);
 //        getDialog().setCancelable(false);
 
-
+        Bundle bundle = getArguments();
+       key = bundle.getString("pushkey");
+       merchantOfferTitle = bundle.getString("merchantoffertitle");
+       preredemptionCode = bundle.getString("redemptioncode");
 
              dialog =getDialog();
         bindViews(view);
@@ -53,7 +58,7 @@ public class UseVoucherCheckAndConfirm extends DialogFragment {
 
         Log.d(TAG, " all " + currentUserId +" "+ preredemptionCode);
         usingVoucher = FirebaseDatabase.getInstance().getReference().child("offerlist").child("using-voucher")
-                                .child(RewardsPocketFragment.merchantOfferTitle).child(currentUserId);
+                                .child(merchantOfferTitle).child(currentUserId);
 
         usingVoucher.addListenerForSingleValueEvent(
                 new ValueEventListener() {
@@ -87,13 +92,13 @@ public class UseVoucherCheckAndConfirm extends DialogFragment {
                                 }
                             });
 
-                        if (dataSnapshot.getKey().equals(currentUserId) && (!dataSnapshot.getValue().toString().equals(RewardsPocketFragment.preredemptionCode))){
+                        if (dataSnapshot.getKey().equals(currentUserId) && (!dataSnapshot.getValue().toString().equals(preredemptionCode))){
 
                             Log.d(TAG, "onDataChange: USER REDEEMING ITEM " );
 
 
                            DatabaseReference redeemStatus = FirebaseDatabase.getInstance().getReference().child("users/pre-redeemedlist").child(currentUserId)
-                            .child(pushKey).child("redeemStatus");
+                            .child(key).child("redeemStatus");
 
 
 //                           redeemStatus.setValue("redeem-other-first");
@@ -101,7 +106,7 @@ public class UseVoucherCheckAndConfirm extends DialogFragment {
 //                            useVoucherText.setText(R.string.using_voucher_error);
                             confirmButton.setVisibility(View.INVISIBLE);
                         }
-                        else if (dataSnapshot.getValue().toString().equals(RewardsPocketFragment.preredemptionCode)){
+                        else if (dataSnapshot.getValue().toString().equals(preredemptionCode)){
                             useVoucherText.setText("Please complete the redemption of this voucher with the merchant");
                         }
                         }catch (NullPointerException e ){

@@ -149,19 +149,29 @@
         </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/click_here"
                 android:layout_width="match_parent"
                 android:gravity="center"
                 android:clickable="true"
+                android:orientation="horizontal"
                 android:background="@color/buttonWhite"
                 android:layout_height="50dp">
 
                 <TextView
-                    android:id="@+id/r_redemption_code"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
                     android:fontFamily="@font/roboto_black"
                     android:text="Click to use voucher"
+                    android:textColor="@color/azure"/>
+                <TextView
+                    android:layout_marginStart="10dp"
+                    android:id="@+id/r_redemption_code"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:fontFamily="@font/roboto_black"
+                    android:text="Redemption Code"
                     android:textColor="@color/azure"/>
 
             </LinearLayout>

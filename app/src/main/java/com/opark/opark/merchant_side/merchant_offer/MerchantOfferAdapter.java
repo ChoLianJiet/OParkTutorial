@@ -152,6 +152,7 @@ public class MerchantOfferAdapter extends RecyclerView.Adapter<MerchantOfferAdap
                 ConfirmPreRedeem.merchantAddress = merchantOfferList.get(i).getMerchantAddress();
                 ConfirmPreRedeem.merchantContact = merchantOfferList.get(i).getMerchantContact();
                 ConfirmPreRedeem.merchantOfferImageUrl = merchantOfferList.get(i).getOfferImage();
+                ConfirmPreRedeem.expiryDate= merchantOfferList.get(i).getExpiryDate();
 
 
                 mButtonClicked.onButtonClicked(v, i);

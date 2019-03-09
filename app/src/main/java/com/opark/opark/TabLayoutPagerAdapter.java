@@ -73,17 +73,7 @@ public class TabLayoutPagerAdapter  extends FragmentPagerAdapter implements Bran
             default:
                 return new AllOfferFragment();
         }
-//        if (position == 0) {
-//            Log.d("tab", "getItem: 1st");
-//            return new AllOfferFragment();
-//        }
-//        else if (position == 1){
-//            Log.d("tab", "getItem: 2nd");
-//            return new CategoriesOfferFragment();
-//
-//        } else {
-//            return new BrandsFragment();
-//        }
+
     }
 
     // This determines the number of tabs

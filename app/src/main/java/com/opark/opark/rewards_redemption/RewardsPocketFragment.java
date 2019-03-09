@@ -34,8 +34,11 @@ public class RewardsPocketFragment extends Fragment implements RewardsPocketAdap
     private DatabaseReference offerlistDatabaseRef;
     private DatabaseReference rewardsDatabaseRef;
 
+
+    public static FragmentManager fragmentManager ;
     RewardsPocketAdapter rewardsPocketAdapter;
     public static String preredemptionCode;
+    RewardsPocketAdapter.UseVoucher mUseVoucher ;
 
     private StorageReference userPointsStorageRef;
     private StorageReference rewardsRedemptionRecord;
@@ -58,6 +61,7 @@ public class RewardsPocketFragment extends Fragment implements RewardsPocketAdap
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.rewards_pocket_rec_view, container, false);
 
+
 //try {
         RecyclerView merchantRecView = (RecyclerView) view.findViewById(R.id.rewards_pocket_recview);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -70,29 +74,110 @@ public class RewardsPocketFragment extends Fragment implements RewardsPocketAdap
 
         offerlistDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users/pre-redeemedlist/" + currentUserId);
 
-        /*rewardsPocketAdapter = new RewardsPocketAdapter(rewardsPocketOffers, new RewardsPocketAdapter.UseVoucher() {
-            @Override
-            public void useVoucher(View v, int position) {
 
-                preredemptionCode = rewardsPocketOffers.get(position).getPreRedemptionCode();
-                merchantOfferTitle = rewardsPocketOffers.get(position).getMerchantOfferTitle();
-                merchantCoName = rewardsPocketOffers.get(position).getMerchantName();
+     mUseVoucher = new RewardsPocketAdapter.UseVoucher() {
+         @Override
+         public void useVoucher(View v,  String key, String merchantOfferTitle, String redemptionCode) {
+             Log.d(TAG, "useVoucher:  ");
+             DatabaseReference offerlistDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users/pre-redeemedlist/" + currentUserId);
+             offerlistDatabaseRef.child(key).child("redeemStatus").setValue("usingVoucher");
+
+             Log.d(TAG, "useVoucher:  " + redemptionCode);
+             Log.d(TAG, "useVoucher: " + key);
+//             final DatabaseReference offerlistDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users/pre-redeemedlist/" + currentUserId);
+//
+//             offerlistDatabaseRef.addChildEventListener(new ChildEventListener() {
+//                 @Override
+//                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//                     Log.d(TAG, "onDataChange:  datasnapshot " + dataSnapshot.getChildren());
+////                                dataSnapshot.getChildren(currentUserId);
+//
+//
+//
+////                               dataSnapshot.getValue(RewardsPocketOffer.class).setRedeemStatus("using-voucher");
+//
+//                     Log.d(TAG, "onDataChange: " + dataSnapshot.getValue(RewardsPocketOffer.class).getRedeemStatus());
+//
+//                     pushKey = dataSnapshot.getKey();
+//
+//
+//                     if (dataSnapshot.getValue(RewardsPocketOffer.class).getRedeemStatus().equals("redeem-other-first")) {
+//
+//                         Log.d(TAG, "redeem other first");
+//
+//                     } else if (dataSnapshot == null) {
+//
+//
+//                         Log.d(TAG, "data1 = null ");
+//                     } else
+//
+//                         offerlistDatabaseRef.child(pushKey).child("redeemStatus").setValue("usingVoucher");
+//
+//                     try {
+//
+
+                         FragmentManager fragmentManager = getFragmentManager();
+                         Bundle bundle = new Bundle();
+                         bundle.putString("pushkey",key);
+                         bundle.putString("merchantoffertitle", merchantOfferTitle);
+                         bundle.putString("redemptioncode",redemptionCode);
+
+                         useVoucherCheckAndConfirm = new UseVoucherCheckAndConfirm();
+
+                         useVoucherCheckAndConfirm.setArguments(bundle);
+                         Log.d(TAG, "fragman null or not :  " + fragmentManager);
+                         useVoucherCheckAndConfirm.show(fragmentManager, "");
+//
+//
+//                     } catch (NullPointerException e) {
+//                         e.printStackTrace();
+//                     }
+//
+//                     Log.d(TAG, "onDataChange:  " + dataSnapshot.getValue(RewardsPocketOffer.class).getMerchantOfferTitle());
+//
+//                 }
+//
+//                 @Override
+//                 public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                 }
+//
+//                 @Override
+//                 public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//
+//                 }
+//
+//                 @Override
+//                 public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                 }
+//
+//                 @Override
+//                 public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                 }
+//             });
+
+         }
+     };
 
 
+//        rewardsPocketAdapter = new RewardsPocketAdapter(rewardsPocketOffers,currentUserId);
+        rewardsPocketAdapter = new RewardsPocketAdapter(rewardsPocketOffers, mUseVoucher, currentUserId);
 
-            }
-        }, currentUserId);*/
 
-
+/*
         initializeData(merchantRecView);
+*/
 
-//        merchantRecView.setAdapter(rewardsPocketAdapter);
+        merchantRecView.setAdapter(rewardsPocketAdapter);
 
 
         return view;
     }
 
 
+/*
     private void initializeData(final RecyclerView merchantRecView) {
 
         Log.d("INITDATA", "initializeData: initialising data");
@@ -125,20 +210,30 @@ public class RewardsPocketFragment extends Fragment implements RewardsPocketAdap
                         merchantOfferTitle = rewardsPocketOffers.get(position).getMerchantOfferTitle();
                         merchantCoName = rewardsPocketOffers.get(position).getMerchantName();
 
-                        /*
-                         *//*final DatabaseReference usingVoucher = FirebaseDatabase.getInstance().getReference().child("offerlist").child("using-voucher")
-                                .child(merchantOfferTitle).child(currentUserId);*//*
+                        */
+/*
                          *//*
+*/
+/*final DatabaseReference usingVoucher = FirebaseDatabase.getInstance().getReference().child("offerlist").child("using-voucher")
+                                .child(merchantOfferTitle).child(currentUserId);*//*
+*/
+/*
+                         *//*
+*/
+/*
                         final StorageReference usingVoucher = FirebaseStorage.getInstance().getReference().child("merchants/offerlist/"+merchantCoName)
-                                .child(merchantOfferTitle).child("using-voucher");*/
+                                .child(merchantOfferTitle).child("using-voucher");*//*
 
-                           /* final DatabaseReference redeemStatus = FirebaseDatabase.getInstance().getReference().child("users/pre-redeemedlist").child(currentUserId);
+
+                           */
+/* final DatabaseReference redeemStatus = FirebaseDatabase.getInstance().getReference().child("users/pre-redeemedlist").child(currentUserId);
 
 
                             redeemStatus.addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-*/
+*//*
+
                         Log.d(TAG, "onDataChange:  datasnapshot " + dataSnapshot3.getChildren());
 //                                dataSnapshot.getChildren(currentUserId);
 
@@ -184,11 +279,13 @@ public class RewardsPocketFragment extends Fragment implements RewardsPocketAdap
 
 
 
-                              /*  @Override
+                              */
+/*  @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                 }
-                            });*/
+                            });*//*
+
 
 //
 
@@ -248,12 +345,13 @@ public class RewardsPocketFragment extends Fragment implements RewardsPocketAdap
 //        merchantOffer.add(new MerchantOffer("Kenny Rogers 20 % off", "Kenny Rogers","10 JLN SB INDAH, SERI KEMBANGAN","+60165555555", "1000",));
 //        merchantOffer.add(new MerchantOffer("Kenny Rogers 40 % off", "Kenny Rogers","10 JLN SB INDAH, SERI KEMBANGAN","+60165555555", "1000",));
         }
+*/
 
 
-@Override
-public void useVoucher(View v,int position){
+    @Override
+    public void useVoucher(View v,  String pushKey, String merchantOfferTitle, String preredemptionCode) {
 
 
-        Log.d(TAG,"useVoucher:  External use Voucher ` ");
-        }
-        }
+        Log.d(TAG, "external:  " + pushKey);
+    }
+}

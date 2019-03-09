@@ -3,7 +3,7 @@ package com.opark.opark.rewards_redemption;
 import com.opark.opark.model.Address;
 
 public class RewardsPocketOffer {
-    private String redeemStatus,redeemDate;
+    private String redeemStatus,redeemDate,pushKey,expiryDate;
     private String merchantOfferTitle, merchantName,  merchantContact, preRedemptionCode;
     private String  offerImage;
     private Address merchantAddress;
@@ -11,9 +11,11 @@ public class RewardsPocketOffer {
     }
 
 
-    public RewardsPocketOffer(String redeemStatus, String redeemDate, String merchantOfferTitle, String merchantName, String merchantContact, String preRedemptionCode, String offerImage, Address merchantAddress) {
+    public RewardsPocketOffer(String redeemStatus, String redeemDate, String pushKey, String expiryDate, String merchantOfferTitle, String merchantName, String merchantContact, String preRedemptionCode, String offerImage, Address merchantAddress) {
         this.redeemStatus = redeemStatus;
         this.redeemDate = redeemDate;
+        this.pushKey = pushKey;
+        this.expiryDate = expiryDate;
         this.merchantOfferTitle = merchantOfferTitle;
         this.merchantName = merchantName;
         this.merchantContact = merchantContact;
@@ -22,13 +24,24 @@ public class RewardsPocketOffer {
         this.merchantAddress = merchantAddress;
     }
 
-    public RewardsPocketOffer(String merchantOfferTitle, String merchantName, Address merchantAddress, String merchantContact, String preRedemptionCode, String offerImage) {
+    public RewardsPocketOffer(String redeemStatus, String redeemDate, String pushKey, String merchantOfferTitle, String merchantName, String merchantContact, String preRedemptionCode, String offerImage, Address merchantAddress) {
+        this.redeemStatus = redeemStatus;
+        this.redeemDate = redeemDate;
+        this.pushKey = pushKey;
         this.merchantOfferTitle = merchantOfferTitle;
         this.merchantName = merchantName;
-        this.merchantAddress = merchantAddress;
         this.merchantContact = merchantContact;
         this.preRedemptionCode = preRedemptionCode;
         this.offerImage = offerImage;
+        this.merchantAddress = merchantAddress;
+    }
+
+    public String getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(String expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public String getMerchantOfferTitle() {
@@ -94,5 +107,13 @@ public class RewardsPocketOffer {
 
     public void setRedeemDate(String redeemDate) {
         this.redeemDate = redeemDate;
+    }
+
+    public String getPushKey() {
+        return pushKey;
+    }
+
+    public void setPushKey(String pushKey) {
+        this.pushKey = pushKey;
     }
 }

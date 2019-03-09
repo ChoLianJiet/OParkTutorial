@@ -730,7 +730,7 @@ public class KenaMap extends FragmentActivity implements OnMapReadyCallback,Goog
         Log.d(TAG,"PromptPeterNearbyMini() is called");
 
         StorageReference flagStorageLocation = storageRef.child("users/" + currentUserId + "/gotflag.txt");
-        objToByteStreamUpload(user,flagStorageLocation);
+        objToByteStreamUpload(user.userCar,flagStorageLocation);
         CalculatePoints();
         /*** Intent to Feedback***/
 
